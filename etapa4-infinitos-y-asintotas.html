@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 4 · Límites infinitos, ∞/∞ y asíntotas — Prototipo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0f2244;--blue:#1d6fcc;--blue2:#2d82e6;--sky:#0ea5e9;
+  --bg:#eef6ff;--bg2:#f8fbff;--white:#fff;
+  --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
+  --g500:#64748b;--g600:#475569;--g700:#334155;--g800:#1e293b;
+  --ok:#059669;--ok-bg:#d1fae5;--err:#dc2626;--err-bg:#fee2e2;
+  --warn:#d97706;--warn-bg:#fef3c7;--hint:#7c3aed;--hint-bg:#ede9fe;
+  --amber:#f59e0b;
+  --r:12px;--rl:16px;--rxl:24px;
+  --sh:0 4px 6px -1px rgba(0,0,0,.08),0 2px 4px -1px rgba(0,0,0,.05);
+  --shl:0 10px 25px -5px rgba(0,0,0,.1),0 4px 8px -2px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--g800);line-height:1.6;font-size:16px}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;line-height:1.25}
+h2{font-size:clamp(1.4rem,3vw,2rem);color:var(--navy)}
+h3{font-size:1.15rem;color:var(--navy)}
+p{margin-bottom:.7em}strong{color:var(--navy)}em{font-style:italic}
+sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
+.container{max-width:980px;margin:0 auto;padding:0 20px}
+
+.topbar{background:var(--navy);color:#94a3b8;font-size:12px;font-weight:600;letter-spacing:.04em;padding:8px 0;text-align:center}
+.topbar b{color:#7dd3fc}
+.hero{background:linear-gradient(135deg,#0f2244 0%,#1d6fcc 70%,#0ea5e9 120%);color:#fff;padding:38px 0 44px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(56,189,248,.18),transparent 60%);pointer-events:none}
+.hero .container{position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#bfdbfe;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px}
+.hero h2{color:#fff;margin-bottom:10px;font-size:clamp(1.6rem,4vw,2.5rem)}
+.hero-sub{color:#bfdbfe;font-size:1.02rem;max-width:680px}
+.hero-obj{margin-top:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:var(--r);padding:12px 16px;font-size:13.5px;color:#e0f2fe;max-width:700px}
+.hero-obj b{color:#fff}
+
+.ruta{position:sticky;top:0;z-index:50;background:var(--navy);padding:10px 0;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.ruta-inner{display:flex;align-items:center;gap:6px;flex-wrap:wrap;overflow-x:auto}
+.rstep{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.rstep:hover{background:rgba(255,255,255,.12)}
+.rstep.active{background:rgba(29,111,204,.6);border-color:var(--blue2);color:#dbeafe}
+.rstep.done{background:rgba(5,150,105,.22);border-color:#10b981;color:#6ee7b7}
+.rnum{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.rstep.done .rnum{background:#10b981;color:#fff}.rstep.active .rnum{background:var(--blue2);color:#fff}
+
+.wrap{padding:28px 0 70px}
+.card{background:var(--white);border-radius:var(--rl);box-shadow:var(--sh);border:1px solid var(--g200);padding:24px;margin-bottom:22px;scroll-margin-top:64px;animation:rise .4s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.card-title{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.cti{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ic-diag{background:var(--hint-bg);color:var(--hint)}
+.ic-poe{background:#dbeafe;color:var(--blue)}
+.ic-inf{background:#ffedd5;color:#c2410c}
+.ic-cross{background:var(--warn-bg);color:var(--warn)}
+.ic-asint{background:#dcfce7;color:var(--ok)}
+.ic-quiz{background:#fce7f3;color:#be185d}
+.ic-sint{background:var(--warn-bg);color:var(--warn)}
+.card-title h3{margin:0}
+.card-lead{color:var(--g600);font-size:14.5px;margin-bottom:16px}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px}
+.fnum{border-bottom:1.6px solid currentColor;padding:0 8px 1px}
+.fden{padding:1px 8px 0}
+.lim{font-style:italic}
+
+.poe-states{display:flex;gap:6px;margin:14px 0 18px;flex-wrap:wrap}
+.pstate{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--g500);padding:5px 13px;border-radius:50px;background:var(--g100);border:1px solid var(--g200);transition:all .25s}
+.pstate .pn{width:18px;height:18px;border-radius:50%;background:var(--g300);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px}
+.pstate.on{background:#eff6ff;border-color:var(--blue);color:var(--blue)}.pstate.on .pn{background:var(--blue)}
+.pstate.cleared{background:var(--ok-bg);border-color:#10b981;color:#047857}.pstate.cleared .pn{background:#10b981}
+.parrow{color:var(--g300);align-self:center;font-weight:700}
+.predict-group{margin-bottom:16px}
+.pq{font-weight:600;color:var(--navy);font-size:15px;margin-bottom:10px;padding-left:12px;border-left:3px solid var(--hint)}
+.popts{display:flex;flex-direction:column;gap:8px}
+.popt{width:100%;text-align:left;padding:11px 15px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--white);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:11px}
+.popt:hover{border-color:var(--hint);background:#faf5ff;color:var(--navy)}
+.popt.sel{border-color:var(--hint);background:var(--hint-bg);color:var(--navy);font-weight:600}
+.pdot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--g300);flex-shrink:0;transition:all .18s}
+.popt.sel .pdot{border-color:var(--hint);background:var(--hint);box-shadow:inset 0 0 0 3px var(--white)}
+.predict-actions{margin-top:6px}
+.btn{padding:11px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-go{background:var(--hint);color:#fff}.btn-go:hover{background:#6d28d9;transform:translateY(-1px)}
+.btn-go.dim{opacity:.45;pointer-events:none}
+.btn-ghost{background:var(--g100);color:var(--g700);border:1px solid var(--g200)}.btn-ghost:hover{background:var(--g200)}
+.btn-next{background:var(--navy);color:#bfdbfe}.btn-next:hover{background:var(--blue);color:#fff;transform:translateY(-1px)}
+.lockmsg{font-size:13px;color:var(--hint);margin-top:8px;font-weight:600;display:none}
+.lockmsg.show{display:block}
+.poe-observe{position:relative;margin-top:6px;border-top:1px dashed var(--g200);padding-top:18px}
+.observe-inner{transition:filter .5s,opacity .5s}
+.poe-observe.locked .observe-inner{filter:blur(7px);opacity:.45;pointer-events:none;user-select:none}
+.lock-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;z-index:3}
+.poe-observe:not(.locked) .lock-ov{display:none}
+.lock-ic{font-size:30px}.lock-tx{font-weight:700;color:var(--navy);font-size:15px}.lock-sub{font-size:13px;color:var(--g500);max-width:280px}
+.obs-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+@media(max-width:760px){.obs-grid{grid-template-columns:1fr}}
+.canvas-wrap{background:var(--bg2);border-radius:var(--r);border:1px solid var(--g200);overflow:hidden}
+.canvas-wrap canvas{display:block;width:100%;height:auto}
+.ltable{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tcol{background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:10px}
+.tcol-head{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;text-align:center;padding-bottom:8px;margin-bottom:6px;border-bottom:1px solid var(--g200)}
+.tcol-head.left{color:var(--blue)}.tcol-head.right{color:var(--sky)}
+.trow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;padding:4px 2px;font-family:'Courier New',monospace;font-size:12.5px}
+.trow .tx{color:var(--g600);text-align:right}.trow .tarrow{color:var(--g300);font-size:11px}.trow .tfx{color:var(--navy);font-weight:700;text-align:left}
+.tcol-foot{margin-top:8px;padding-top:8px;border-top:1.5px dashed var(--g300);text-align:center;font-size:13px;color:var(--g600)}
+.tcol-foot b{font-family:'Courier New',monospace}.tcol-foot.left b{color:var(--blue)}.tcol-foot.right b{color:var(--sky)}
+.poe-explain{margin-top:18px;border-top:1px dashed var(--g200);padding-top:18px;display:none;animation:rise .4s ease both}
+.poe-explain.show{display:block}
+.explain-head{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.explain-head .eh-ic{width:30px;height:30px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.explain-head h4{color:var(--navy);font-size:16px}
+.explain-body{font-size:14.5px;color:var(--g700)}.explain-body p{margin-bottom:.6em}
+.bigidea{background:linear-gradient(90deg,#eff6ff,var(--white));border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;margin-top:12px;font-size:14.5px;color:var(--g700)}
+.explain-next{margin-top:16px}
+.diag-note{display:none;margin-top:14px;background:var(--hint-bg);border:1px solid #c4b5fd;border-radius:var(--r);padding:13px 16px;font-size:14px;color:#4c1d95}
+.diag-note.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+
+/* ∞/∞ explorer */
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+@media(max-width:680px){.cases{grid-template-columns:1fr}}
+.case-card{background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .2s;text-align:center}
+.case-card:hover{border-color:var(--blue);background:#f0f7ff}
+.case-card.on{border-color:var(--blue);background:#eff6ff;box-shadow:var(--sh)}
+.case-deg{font-family:'Courier New',monospace;font-weight:700;color:var(--navy);font-size:15px;margin-bottom:6px}
+.case-name{font-size:12px;color:var(--g500);font-weight:600}
+.case-detail{display:none;margin-top:16px;background:var(--navy);border-radius:var(--r);padding:16px 18px;color:#e0f2fe;animation:rise .35s ease both}
+.case-detail.show{display:block}
+.case-detail .cd-ex{font-family:'Courier New',monospace;font-size:1.05rem;color:#7dd3fc;margin-bottom:8px}
+.case-detail .cd-res{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
+.case-detail .cd-why{font-size:13.5px;color:#bfdbfe}
+
+/* worked oblique steps */
+.lsteps{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.lstep{display:none;gap:14px;align-items:flex-start;animation:rise .35s ease both}
+.lstep.show{display:flex}
+.lstep-label{flex-shrink:0;width:92px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--g500);background:var(--g100);border:1px solid var(--g200);border-radius:8px;padding:6px 8px;text-align:center;margin-top:2px}
+.lstep-body{flex:1;min-width:0}
+.lstep-math{font-family:'Courier New',monospace;font-size:1.02rem;color:var(--navy);font-weight:700}
+.lstep-why{font-size:13px;color:var(--g600);margin-top:4px}
+.lstep-next{margin-top:10px;background:var(--g100);color:var(--g700);border:1px solid var(--g200);font-size:13px;padding:8px 16px}
+.lstep-next:hover{background:var(--g200)}
+
+.def-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0 4px}
+@media(max-width:680px){.def-grid{grid-template-columns:1fr}}
+.def-card{border:1px solid var(--g200);border-radius:var(--r);padding:14px;background:var(--g50)}
+.def-card h4{font-size:13px;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.def-card .badge{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.def-v .badge{background:var(--amber)}.def-h .badge{background:var(--sky)}.def-o .badge{background:var(--hint)}
+.def-card .def-eq{font-family:'Courier New',monospace;font-size:13px;color:var(--g700);background:var(--white);border:1px solid var(--g200);border-radius:8px;padding:7px 9px;margin-top:4px}
+
+.qopts{display:flex;flex-direction:column;gap:8px}
+.qopt{width:100%;text-align:left;padding:11px 15px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--white);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:11px}
+.qopt:hover:not(.locked){border-color:var(--blue);background:#f0f7ff;color:var(--navy)}
+.qopt .ql{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--g300);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--g600);flex-shrink:0;transition:all .18s}
+.qopt.correct{border-color:var(--ok);background:var(--ok-bg);color:#065f46;font-weight:600}.qopt.correct .ql{border-color:var(--ok);background:var(--ok);color:#fff}
+.qopt.wrong{border-color:var(--err);background:var(--err-bg);color:#991b1b}.qopt.wrong .ql{border-color:var(--err);background:var(--err);color:#fff}
+.qopt.locked{cursor:default}
+.qfb{border-radius:var(--r);padding:13px 15px;margin-top:11px;font-size:14px;display:none;gap:10px;align-items:flex-start}
+.qfb.show{display:flex;animation:rise .35s ease both}
+.qfb.ok{background:var(--ok-bg);border:1px solid #6ee7b7;color:#065f46}.qfb.bad{background:var(--err-bg);border:1px solid #fca5a5;color:#7f1d1d}
+.qfb-ic{font-size:17px;flex-shrink:0}
+.qitem{margin-bottom:22px}.qitem:last-of-type{margin-bottom:0}
+.qhead{font-size:12px;font-weight:700;text-transform:uppercase;color:var(--g500);margin-bottom:6px}
+.qtext{font-weight:600;color:var(--navy);font-size:15px;margin-bottom:12px;padding-left:12px;border-left:3px solid var(--blue)}
+.quiz-done{display:none;margin-top:6px;background:var(--navy);color:#bfdbfe;border-radius:var(--r);padding:14px;text-align:center;font-size:14px}
+.quiz-done.show{display:block;animation:rise .4s ease both}.quiz-done b{color:#7dd3fc;font-size:1.3rem}
+
+.sint-q{font-weight:600;color:var(--navy);font-size:14.5px;margin:14px 0 8px;padding-left:12px;border-left:3px solid var(--warn)}
+.sint-ta{width:100%;min-height:72px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);resize:vertical;background:var(--g50)}
+.sint-ta:focus{outline:none;border-color:var(--warn);background:var(--white)}
+.sint-fill{display:inline-block;min-width:120px;border-bottom:2px dashed var(--g300);color:var(--warn);font-weight:700}
+.sint-done{display:none;margin-top:14px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#065f46}
+.sint-done.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+
+.proto-note{background:#fff7ed;border:1px dashed #fdba74;border-radius:var(--r);padding:12px 16px;font-size:13px;color:#9a3412;margin-bottom:22px;display:flex;gap:10px;align-items:flex-start}
+@media(max-width:520px){
+  .card{padding:17px}
+  .ltable{grid-template-columns:1fr}
+  .btn{width:100%;justify-content:center}
+  .predict-actions .btn,.explain-next .btn,.lstep-next{width:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar"><b>INSPT · UTN</b> &nbsp;·&nbsp; Análisis Matemático I &nbsp;·&nbsp; Prof. Ariel Cardozo</div>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-badge">⬡ Unidad 2 · Etapa 4 de 7</div>
+    <h2>Límites infinitos, ∞/∞ y asíntotas</h2>
+    <p class="hero-sub">¿Qué significa que una función "se vaya a infinito"? ¿El límite existe? ¿Una curva puede tocar su asíntota? Tres ideas que casi todos malinterpretan — y que vas a aclarar acá.</p>
+    <div class="hero-obj"><b>🎯 Meta:</b> distinguir "el límite es infinito" (no existe como número; la función crece sin tope) de un límite finito; salvar la indeterminación ∞/∞; y conectar los límites con las asíntotas vertical, horizontal y oblicua.</div>
+  </div>
+</header>
+
+<nav class="ruta">
+  <div class="container ruta-inner" id="ruta">
+    <div class="rstep active" data-go="sec-diag"><span class="rnum">0</span>Idea previa</div>
+    <div class="rstep" data-go="poe-inf"><span class="rnum">1</span>Límite infinito</div>
+    <div class="rstep" data-go="sec-ii"><span class="rnum">2</span>∞/∞</div>
+    <div class="rstep" data-go="poe-cross"><span class="rnum">3</span>¿Cruza?</div>
+    <div class="rstep" data-go="sec-asint"><span class="rnum">4</span>Asíntotas</div>
+    <div class="rstep" data-go="sec-quiz"><span class="rnum">5</span>Práctica</div>
+    <div class="rstep" data-go="sec-sint"><span class="rnum">6</span>Síntesis</div>
+  </div>
+</nav>
+
+<div class="wrap"><div class="container">
+
+  <div class="proto-note"><span>🧪</span><div><strong>Prototipo de andamiaje — Etapa 4.</strong> Incluye el ataque a dos errores muy comunes: "el límite vale infinito" (∞ no es un número) y "la curva nunca toca su asíntota" (las horizontales y oblicuas sí se pueden cruzar). Más el explorador de los tres casos de ∞/∞.</div></div>
+
+  <!-- DIAGNÓSTICO -->
+  <section class="card" id="sec-diag">
+    <div class="card-title"><div class="cti ic-diag">💭</div><h3>Antes de empezar: ¿qué pensás vos?</h3></div>
+    <p class="card-lead">No hay respuesta correcta todavía. Queremos saber con qué idea llegás.</p>
+    <div class="predict-group">
+      <div class="pq">Una función crece sin parar cerca de un punto (como 1/x² cerca de 0). ¿Qué dirías?</div>
+      <div class="popts" id="diag-opts">
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>El límite existe y vale infinito.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>El límite (finito) no existe; la función crece sin cota.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>El límite vale 0.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>No se puede decir nada.</button>
+      </div>
+    </div>
+    <div class="diag-note" id="diag-note"><span>📌</span><div>Anotada tu idea. La vamos a poner a prueba enseguida.</div></div>
+  </section>
+
+  <!-- POE 1: LÍMITE INFINITO -->
+  <section class="card" id="poe-inf">
+    <div class="card-title"><div class="cti ic-poe">🔬</div><h3>Experimento · Límite infinito</h3></div>
+    <p class="card-lead">Tomemos <span class="frac"><span class="fnum">1</span><span class="fden">x − 4</span></span> y miremos qué pasa cuando x se acerca a 4.</p>
+
+    <div class="poe-states" id="states-inf">
+      <div class="pstate on" data-s="predict"><span class="pn">1</span>Predecí</div><span class="parrow">→</span>
+      <div class="pstate" data-s="observe"><span class="pn">2</span>Observá</div><span class="parrow">→</span>
+      <div class="pstate" data-s="explain"><span class="pn">3</span>Explicá</div>
+    </div>
+
+    <div class="poe-predict">
+      <div class="predict-group">
+        <div class="pq">¿Qué le pasa a f cuando x se acerca a 4 por cada lado?</div>
+        <div class="popts">
+          <button class="popt" onclick="poeSel('inf','distintos',this)"><span class="pdot"></span>Por izquierda → −∞ y por derecha → +∞ (signos distintos)</button>
+          <button class="popt" onclick="poeSel('inf','masmas',this)"><span class="pdot"></span>Por ambos lados → +∞</button>
+          <button class="popt" onclick="poeSel('inf','finito',this)"><span class="pdot"></span>Se acerca a un número finito</button>
+          <button class="popt" onclick="poeSel('inf','cero',this)"><span class="pdot"></span>Por ambos lados → 0</button>
+        </div>
+      </div>
+      <div class="predict-actions">
+        <button class="btn btn-go dim" id="lock-inf" onclick="poeLock('inf')">Ver qué pasa →</button>
+        <div class="lockmsg" id="lockmsg-inf">Elegí una opción para continuar.</div>
+      </div>
+    </div>
+
+    <div class="poe-observe locked" id="obs-inf">
+      <div class="lock-ov"><div class="lock-ic">🔒</div><div class="lock-tx">Primero hacé tu predicción</div><div class="lock-sub">El gráfico y la tabla se desbloquean al confirmar.</div></div>
+      <div class="observe-inner">
+        <div class="obs-grid">
+          <div class="canvas-wrap"><canvas id="cv-inf" width="540" height="400"></canvas></div>
+          <div><div class="ltable" id="tbl-inf"></div>
+            <p style="font-size:13px;color:var(--g600);margin-top:10px">Cerca de x = 4 el denominador se hace diminuto: por izquierda es negativo (f → −∞) y por derecha positivo (f → +∞).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="poe-explain" id="exp-inf">
+      <div class="explain-head"><div class="eh-ic">💡</div><h4>Lo que muestra el experimento</h4></div>
+      <div class="explain-body" id="expbody-inf"></div>
+      <div class="explain-next"><button class="btn btn-next" data-go="sec-ii">Siguiente: ∞/∞ →</button></div>
+    </div>
+  </section>
+
+  <!-- ∞/∞ -->
+  <section class="card" id="sec-ii">
+    <div class="card-title"><div class="cti ic-inf">∞</div><h3>Indeterminación ∞/∞</h3></div>
+    <p class="card-lead">Cuando numerador y denominador "se van a infinito" en un cociente de polinomios, queda ∞/∞ — otra indeterminación. La técnica: dividir arriba y abajo por la mayor potencia de x.</p>
+
+    <div class="poe-states" id="states-ii">
+      <div class="pstate on" data-s="predict"><span class="pn">1</span>Predecí</div><span class="parrow">→</span>
+      <div class="pstate" data-s="observe"><span class="pn">2</span>Resolvé</div><span class="parrow">→</span>
+      <div class="pstate" data-s="explain"><span class="pn">3</span>Generalizá</div>
+    </div>
+
+    <div class="poe-predict">
+      <div class="predict-group">
+        <div class="pq"><span class="lim">lim</span><sub>x→∞</sub> <span class="frac"><span class="fnum">2x⁵ + 5x³ − 6x + 8</span><span class="fden">4x⁵ − 2x + 1</span></span> &nbsp;= ?</div>
+        <div class="popts">
+          <button class="popt" onclick="poeSel('ii','uno',this)"><span class="pdot"></span>1, porque ∞/∞ = 1</button>
+          <button class="popt" onclick="poeSel('ii','medio',this)"><span class="pdot"></span>1/2</button>
+          <button class="popt" onclick="poeSel('ii','inf',this)"><span class="pdot"></span>∞</button>
+          <button class="popt" onclick="poeSel('ii','cero',this)"><span class="pdot"></span>0</button>
+        </div>
+      </div>
+      <div class="predict-actions">
+        <button class="btn btn-go dim" id="lock-ii" onclick="poeLock('ii')">Ver la resolución →</button>
+        <div class="lockmsg" id="lockmsg-ii">Elegí una opción para continuar.</div>
+      </div>
+    </div>
+
+    <div class="poe-observe locked" id="obs-ii">
+      <div class="lock-ov"><div class="lock-ic">🔒</div><div class="lock-tx">Primero hacé tu predicción</div><div class="lock-sub">La resolución paso a paso se desbloquea al confirmar.</div></div>
+      <div class="observe-inner">
+        <div class="lsteps" id="ii-steps"></div>
+      </div>
+    </div>
+
+    <div class="poe-explain" id="exp-ii">
+      <div class="explain-head"><div class="eh-ic">💡</div><h4>La regla general: comparar grados</h4></div>
+      <div class="explain-body">
+        <p>El resultado de un ∞/∞ entre polinomios depende solo de <strong>comparar los grados</strong> del numerador y el denominador. Tocá cada caso:</p>
+        <div class="cases" id="ii-cases">
+          <div class="case-card" onclick="showCase('mayor',this)"><div class="case-deg">grado ↑ &gt; grado ↓</div><div class="case-name">numerador "gana"</div></div>
+          <div class="case-card" onclick="showCase('igual',this)"><div class="case-deg">grado ↑ = grado ↓</div><div class="case-name">empatan</div></div>
+          <div class="case-card" onclick="showCase('menor',this)"><div class="case-deg">grado ↑ &lt; grado ↓</div><div class="case-name">denominador "gana"</div></div>
+        </div>
+        <div class="case-detail" id="case-detail"></div>
+        <div class="bigidea"><strong>En una frase:</strong> en ∞/∞ entre polinomios, si arriba tiene mayor grado el límite es ±∞; si los grados son iguales es el <strong>cociente de los coeficientes principales</strong>; si abajo tiene mayor grado el límite es 0. (Y ∞/∞ <em>no</em> es 1.)</p></div>
+      </div>
+      <div class="explain-next"><button class="btn btn-next" data-go="poe-cross">Siguiente: ¿se puede cruzar una asíntota? →</button></div>
+    </div>
+  </section>
+
+  <!-- POE 2: CRUZAR ASÍNTOTA (M11) -->
+  <section class="card" id="poe-cross">
+    <div class="card-title"><div class="cti ic-cross">🤔</div><h3>El mito de la asíntota intocable</h3></div>
+    <p class="card-lead">Una pregunta que casi todos contestan mal. Comprometete con una respuesta antes de ver el gráfico.</p>
+
+    <div class="poe-states" id="states-cross">
+      <div class="pstate on" data-s="predict"><span class="pn">1</span>Predecí</div><span class="parrow">→</span>
+      <div class="pstate" data-s="observe"><span class="pn">2</span>Observá</div><span class="parrow">→</span>
+      <div class="pstate" data-s="explain"><span class="pn">3</span>Explicá</div>
+    </div>
+
+    <div class="poe-predict">
+      <div class="predict-group">
+        <div class="pq">¿El gráfico de una función puede <strong>tocar o cruzar</strong> su asíntota horizontal?</div>
+        <div class="popts">
+          <button class="popt" onclick="poeSel('cross','no',this)"><span class="pdot"></span>No, nunca: una asíntota no se puede tocar</button>
+          <button class="popt" onclick="poeSel('cross','si',this)"><span class="pdot"></span>Sí: puede cruzarla para x finito, y solo se aproxima en el infinito</button>
+        </div>
+      </div>
+      <div class="predict-actions">
+        <button class="btn btn-go dim" id="lock-cross" onclick="poeLock('cross')">Ver qué pasa →</button>
+        <div class="lockmsg" id="lockmsg-cross">Elegí una opción para continuar.</div>
+      </div>
+    </div>
+
+    <div class="poe-observe locked" id="obs-cross">
+      <div class="lock-ov"><div class="lock-ic">🔒</div><div class="lock-tx">Primero comprometete con una respuesta</div><div class="lock-sub">El gráfico se desbloquea al confirmar.</div></div>
+      <div class="observe-inner">
+        <div class="obs-grid">
+          <div class="canvas-wrap"><canvas id="cv-cross" width="540" height="400"></canvas></div>
+          <div>
+            <p style="font-size:13.5px;color:var(--g700)">La función <span class="frac"><span class="fnum">2x² + x</span><span class="fden">x² + 1</span></span> tiene asíntota horizontal <strong>y = 2</strong>.</p>
+            <p style="font-size:13.5px;color:var(--g700)">Y sin embargo <strong>cruza</strong> esa recta en x = 2 (el punto marcado): pasa por debajo, la atraviesa, y recién para x grande se aproxima a 2 desde arriba.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="poe-explain" id="exp-cross">
+      <div class="explain-head"><div class="eh-ic">💡</div><h4>Lo que muestra el experimento</h4></div>
+      <div class="explain-body" id="expbody-cross"></div>
+      <div class="explain-next"><button class="btn btn-next" data-go="sec-asint">Siguiente: las tres asíntotas →</button></div>
+    </div>
+  </section>
+
+  <!-- ASÍNTOTAS -->
+  <section class="card" id="sec-asint">
+    <div class="card-title"><div class="cti ic-asint">📐</div><h3>Las tres asíntotas, definidas por límites</h3></div>
+    <p class="card-lead">Cada asíntota es, en el fondo, un límite. Esta es la idea que conviene fijar:</p>
+    <div class="def-grid">
+      <div class="def-card def-v"><h4><span class="badge">V</span>Vertical</h4><div style="font-size:13px;color:var(--g600)">La recta x = a, si la función se dispara al infinito al acercarse a a.</div><div class="def-eq"><span class="lim">lim</span><sub>x→a</sub> f(x) = ∞ &nbsp;⇒&nbsp; x = a</div></div>
+      <div class="def-card def-h"><h4><span class="badge">H</span>Horizontal</h4><div style="font-size:13px;color:var(--g600)">La recta y = L, si la función tiende a L cuando x se va al infinito.</div><div class="def-eq"><span class="lim">lim</span><sub>x→∞</sub> f(x) = L &nbsp;⇒&nbsp; y = L</div></div>
+      <div class="def-card def-o"><h4><span class="badge">O</span>Oblicua</h4><div style="font-size:13px;color:var(--g600)">La recta y = mx + b, cuando no hay horizontal pero la curva se "pega" a una recta inclinada.</div><div class="def-eq">m = <span class="lim">lim</span> f(x)/x &nbsp;·&nbsp; b = <span class="lim">lim</span> [f(x) − mx]</div></div>
+    </div>
+
+    <p style="margin-top:18px;font-size:14.5px;color:var(--g700)"><strong>Ejemplo trabajado — asíntota oblicua.</strong> Busquemos las asíntotas de <span class="frac"><span class="fnum">2x²</span><span class="fden">x + 3</span></span>. Avanzá paso a paso:</p>
+    <div class="lsteps" id="ob-steps"></div>
+    <div class="canvas-wrap" id="ob-graph-wrap" style="display:none;margin-top:16px"><canvas id="cv-ob" width="560" height="380"></canvas></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="card" id="sec-quiz">
+    <div class="card-title"><div class="cti ic-quiz">✏️</div><h3>Verificá tu comprensión</h3></div>
+    <p class="card-lead">Si te equivocás, la devolución te dice por qué.</p>
+    <div id="quiz-mount"></div>
+    <div class="quiz-done" id="quiz-done"></div>
+  </section>
+
+  <!-- SÍNTESIS -->
+  <section class="card" id="sec-sint">
+    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Síntesis: ¿qué cambió en tu cabeza?</h3></div>
+    <p class="card-lead">Ponerlo en palabras lo fija mejor que solo leerlo.</p>
+    <div class="sint-q">Explicá con tus palabras la diferencia entre "<strong>el límite vale 5</strong>" y "<strong>el límite es infinito</strong>".</div>
+    <textarea class="sint-ta" id="sint1" placeholder="Cuando el límite vale 5… En cambio, cuando 'es infinito'…"></textarea>
+    <div class="sint-q">¿Por qué una asíntota <strong>vertical</strong> no se puede cruzar, pero una <strong>horizontal</strong> sí?</div>
+    <textarea class="sint-ta" id="sint2" placeholder="La vertical está en un punto donde… La horizontal solo describe…"></textarea>
+    <div style="margin-top:14px"><button class="btn btn-next" onclick="saveSint()">Guardar mi reflexión ✓</button></div>
+    <div class="sint-done" id="sint-done"><span>🎉</span><div><strong>¡Etapa 4 completa!</strong> Ya distinguís límite finito de infinito, salvás ∞/∞ comparando grados y conectás cada asíntota con un límite. En la próxima etapa vas a usar todo esto para analizar una función racional completa.</div></div>
+  </section>
+
+</div></div>
+
+<script>
+/* ===================== MOTOR DE GRAFICACIÓN ===================== */
+class GraphPlotter{
+  constructor(id,o={}){
+    this.canvas=document.getElementById(id);this.ctx=this.canvas.getContext('2d');
+    this.xMin=o.xMin??-6;this.xMax=o.xMax??6;this.yMin=o.yMin??-8;this.yMax=o.yMax??8;
+    this.pL=46;this.pR=18;this.pT=18;this.pB=34;
+  }
+  get W(){return this.canvas.width-this.pL-this.pR}
+  get H(){return this.canvas.height-this.pT-this.pB}
+  cx(x){return this.pL+(x-this.xMin)/(this.xMax-this.xMin)*this.W}
+  cy(y){return this.pT+(this.yMax-y)/(this.yMax-this.yMin)*this.H}
+  clear(){const c=this.ctx;c.fillStyle='#f8fbff';c.fillRect(0,0,this.canvas.width,this.canvas.height)}
+  drawGrid(){const c=this.ctx;c.strokeStyle='#e2eaf5';c.lineWidth=.75;c.setLineDash([]);
+    for(let x=Math.ceil(this.xMin);x<=Math.floor(this.xMax);x++){if(x===0)continue;c.beginPath();c.moveTo(this.cx(x),this.pT);c.lineTo(this.cx(x),this.pT+this.H);c.stroke();}
+    for(let y=Math.ceil(this.yMin);y<=Math.floor(this.yMax);y++){if(y===0)continue;c.beginPath();c.moveTo(this.pL,this.cy(y));c.lineTo(this.pL+this.W,this.cy(y));c.stroke();}}
+  drawAxes(){const c=this.ctx,y0=this.cy(0),x0=this.cx(0);
+    const inY=y0>=this.pT&&y0<=this.pT+this.H,inX=x0>=this.pL&&x0<=this.pL+this.W;
+    const ay0=inY?y0:this.pT+this.H,ax0=inX?x0:this.pL;
+    c.strokeStyle='#334155';c.lineWidth=1.5;c.fillStyle='#334155';c.setLineDash([]);
+    if(inY){c.beginPath();c.moveTo(this.pL,y0);c.lineTo(this.pL+this.W-6,y0);c.stroke();
+      c.beginPath();c.moveTo(this.pL+this.W,y0);c.lineTo(this.pL+this.W-10,y0-4);c.lineTo(this.pL+this.W-10,y0+4);c.closePath();c.fill();
+      c.fillStyle='#475569';c.font='12px Outfit,sans-serif';c.textAlign='center';c.fillText('x',this.pL+this.W+7,y0+4);}
+    if(inX){c.strokeStyle='#334155';c.fillStyle='#334155';
+      c.beginPath();c.moveTo(x0,this.pT+this.H);c.lineTo(x0,this.pT+6);c.stroke();
+      c.beginPath();c.moveTo(x0,this.pT);c.lineTo(x0-4,this.pT+10);c.lineTo(x0+4,this.pT+10);c.closePath();c.fill();
+      c.fillStyle='#475569';c.font='12px Outfit,sans-serif';c.fillText('y',x0,this.pT-6);}
+    c.fillStyle='#64748b';c.font='10.5px Outfit,sans-serif';
+    for(let x=Math.ceil(this.xMin);x<=Math.floor(this.xMax);x++){if(x===0)continue;const px=this.cx(x);
+      c.strokeStyle='#475569';c.lineWidth=1;c.beginPath();c.moveTo(px,ay0-3);c.lineTo(px,ay0+3);c.stroke();
+      if(inY&&Math.abs(px-this.pL)>5&&Math.abs(px-(this.pL+this.W))>10){c.textAlign='center';c.fillText(x,px,ay0+14);}}
+    for(let y=Math.ceil(this.yMin);y<=Math.floor(this.yMax);y++){if(y===0)continue;const py=this.cy(y);
+      c.strokeStyle='#475569';c.lineWidth=1;c.beginPath();c.moveTo(ax0-3,py);c.lineTo(ax0+3,py);c.stroke();
+      if(inX){c.textAlign='right';c.fillText(y,ax0-6,py+3);}}
+    if(inX&&inY){c.textAlign='right';c.fillStyle='#64748b';c.fillText('0',x0-4,y0+12);}}
+  hLine(val,label,color){const c=this.ctx;c.save();c.strokeStyle=color||'#0ea5e9';c.lineWidth=1.6;c.setLineDash([8,4]);
+    const y=this.cy(val);if(y>=this.pT&&y<=this.pT+this.H){c.beginPath();c.moveTo(this.pL,y);c.lineTo(this.pL+this.W,y);c.stroke();
+      c.setLineDash([]);c.fillStyle=color||'#0284c7';c.font='italic 11.5px Outfit,sans-serif';c.textAlign='right';c.fillText(label,this.pL+this.W-3,y-5);}c.restore();c.setLineDash([]);}
+  vLine(val,label,color){const c=this.ctx;c.save();c.strokeStyle=color||'#f59e0b';c.lineWidth=1.6;c.setLineDash([8,4]);
+    const x=this.cx(val);if(x>=this.pL&&x<=this.pL+this.W){c.beginPath();c.moveTo(x,this.pT);c.lineTo(x,this.pT+this.H);c.stroke();
+      c.setLineDash([]);c.fillStyle=color||'#d97706';c.font='italic 11.5px Outfit,sans-serif';c.textAlign='center';c.fillText(label,x,this.pT+13);}c.restore();c.setLineDash([]);}
+  oblique(m,b,label,color){const c=this.ctx;c.save();c.strokeStyle=color||'#7c3aed';c.lineWidth=1.6;c.setLineDash([8,4]);
+    c.beginPath();c.moveTo(this.cx(this.xMin),this.cy(m*this.xMin+b));c.lineTo(this.cx(this.xMax),this.cy(m*this.xMax+b));c.stroke();
+    c.setLineDash([]);c.fillStyle=color||'#6d28d9';c.font='italic 11.5px Outfit,sans-serif';c.textAlign='left';
+    const lx=this.xMax-1.6,ly=m*lx+b;c.fillText(label,this.cx(lx),this.cy(ly)-6);c.restore();c.setLineDash([]);}
+  plot(fn,color='#1d6fcc',lw=2.6){const c=this.ctx;c.strokeStyle=color;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';c.setLineDash([]);
+    const steps=900,dx=(this.xMax-this.xMin)/steps;let started=false,prevY=null;c.beginPath();
+    for(let i=0;i<=steps;i++){const x=this.xMin+i*dx;let y;
+      try{y=fn(x)}catch(e){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      if(!isFinite(y)||isNaN(y)){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      if(prevY!==null&&Math.abs(y-prevY)>(this.yMax-this.yMin)*.75){c.stroke();c.beginPath();started=false}
+      const X=this.cx(x),Y=this.cy(y);if(!started){c.moveTo(X,Y);started=true}else c.lineTo(X,Y);prevY=y;}
+    c.stroke();}
+  point(x,y,filled=true,color='#ef4444',r=6){const c=this.ctx,px=this.cx(x),py=this.cy(y);
+    c.beginPath();c.arc(px,py,r,0,Math.PI*2);
+    if(filled){c.fillStyle=color;c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();}
+    else{c.fillStyle='#f8fbff';c.fill();c.strokeStyle=color;c.lineWidth=2.6;c.stroke();}}
+}
+function fmt(n){if(!isFinite(n))return n>0?'+∞':'−∞';let s=n.toFixed(4);s=s.replace(/\.?0+$/,'');s=s.replace('.',',');s=s.replace('-','−');return s;}
+
+const DONE={diag:false,inf:false,ii:false,cross:false,asint:false,quiz:false,sint:false};
+const PRED={};
+
+/* ===================== DIAGNÓSTICO ===================== */
+function selectDiag(btn){
+  document.querySelectorAll('#diag-opts .popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');document.getElementById('diag-note').classList.add('show');
+  DONE.diag=true;updateRuta();
+}
+
+/* ===================== POE genérico (predict/observe/explain) ===================== */
+function setStates(id,state){
+  document.querySelectorAll('#states-'+id+' .pstate').forEach(el=>{
+    el.classList.remove('on','cleared');const s=el.dataset.s,order=['predict','observe','explain'];
+    if(order.indexOf(s)<order.indexOf(state))el.classList.add('cleared');else if(s===state)el.classList.add('on');
+  });
+}
+function poeSel(id,v,btn){
+  btn.closest('.popts').querySelectorAll('.popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');PRED[id]=v;
+  document.getElementById('lock-'+id).classList.remove('dim');
+  document.getElementById('lockmsg-'+id).classList.remove('show');
+}
+function poeLock(id){
+  if(!PRED[id]){document.getElementById('lockmsg-'+id).classList.add('show');return;}
+  document.getElementById('obs-'+id).classList.remove('locked');
+  setStates(id,'observe');
+  document.querySelectorAll('#'+(id==='inf'?'poe-inf':id==='ii'?'sec-ii':'poe-cross')+' .poe-predict .popt').forEach(b=>b.style.pointerEvents='none');
+  document.getElementById('lock-'+id).classList.add('dim');
+  if(id==='inf'){drawInf();buildInfTable();setTimeout(()=>explainInf(),900);}
+  else if(id==='ii'){revealIISteps();}
+  else if(id==='cross'){drawCross();setTimeout(()=>explainCross(),900);}
+}
+
+/* ===================== POE INFINITO ===================== */
+let GI;
+function drawInf(){
+  GI=GI||new GraphPlotter('cv-inf',{xMin:0,xMax:8,yMin:-6,yMax:6});
+  GI.clear();GI.drawGrid();GI.drawAxes();GI.vLine(4,'x = 4');
+  GI.plot(x=>1/(x-4),'#1d6fcc',2.6);
+}
+function buildInfTable(){
+  const L=[3.5,3.9,3.99],R=[4.5,4.1,4.01],f=x=>1/(x-4);
+  const row=x=>`<div class="trow"><span class="tx">${fmt(x)}</span><span class="tarrow">→</span><span class="tfx">${fmt(f(x))}</span></div>`;
+  document.getElementById('tbl-inf').innerHTML=
+    `<div class="tcol"><div class="tcol-head left">x → 4⁻</div>${L.map(row).join('')}<div class="tcol-foot left">→ <b>−∞</b></div></div>
+     <div class="tcol"><div class="tcol-head right">x → 4⁺</div>${R.map(row).join('')}<div class="tcol-foot right">→ <b>+∞</b></div></div>`;
+}
+function explainInf(){
+  const exp=document.getElementById('exp-inf');if(exp.classList.contains('show'))return;
+  const p=PRED.inf;let h='';
+  if(p==='distintos'){h+=`<p>Tal cual. Por izquierda f → −∞ y por derecha f → +∞: los signos son <strong>distintos</strong> y no se "compensan".</p>`;}
+  else if(p==='masmas'){h+=`<p>Casi: f sí se dispara, pero con <strong>signos distintos</strong> — por izquierda → −∞ y por derecha → +∞. El denominador cambia de signo al cruzar 4.</p>`;}
+  else if(p==='finito'){h+=`<p>Mirá la tabla: los valores no se estabilizan, se disparan. Por izquierda → −∞ y por derecha → +∞.</p>`;}
+  else {h+=`<p>0 sería si el denominador creciera. Acá el denominador se hace <em>diminuto</em>, así que el cociente se dispara: → −∞ y → +∞ según el lado.</p>`;}
+  h+=`<div class="bigidea"><strong>Dos ideas clave.</strong> (1) "El límite es infinito" es una forma de hablar: ∞ <strong>no es un número</strong>, significa que f crece sin tope — el límite <em>finito</em> no existe. (2) Como los laterales dan ±∞ distintos, en x = 4 hay una <strong>asíntota vertical</strong>.</p></div>`;
+  document.getElementById('expbody-inf').innerHTML=h;
+  exp.classList.add('show');setStates('inf','explain');DONE.inf=true;updateRuta();
+}
+
+/* ===================== ∞/∞ ===================== */
+const II_STEPS=[
+  {label:'Sustituir',math:'x → ∞:  (∞)/(∞)',why:'Numerador y denominador crecen sin tope: queda ∞/∞, una indeterminación. No vale 1.'},
+  {label:'Dividir',math:'÷ x⁵ arriba y abajo (la mayor potencia)',why:'Dividimos cada término por x⁵, el grado más alto presente.'},
+  {label:'Simplificar',math:'(2 + 5/x² − 6/x⁴ + 8/x⁵) / (4 − 2/x⁴ + 1/x⁵)',why:'Cada término con x en el denominador tiende a 0 cuando x → ∞ (recordá: k/x → 0).'},
+  {label:'Evaluar',math:'(2 + 0 − 0 + 0) / (4 − 0 + 0) = 2/4',why:'Quedan solo los coeficientes principales: 2 y 4.'},
+  {label:'Resultado',math:'lim = 1/2',why:'Grados iguales ⇒ el límite es el cociente de los coeficientes principales.'}
+];
+function revealIISteps(){
+  const mount=document.getElementById('ii-steps');
+  mount.innerHTML=II_STEPS.map((s,i)=>`<div class="lstep" id="ii-step-${i}"><div class="lstep-label">${s.label}</div><div class="lstep-body"><div class="lstep-math">${s.math}</div><div class="lstep-why">${s.why}</div>${i<II_STEPS.length-1?`<button class="btn lstep-next" onclick="iiAdvance()">Siguiente paso ▾</button>`:''}</div></div>`).join('');
+  IIidx=0;document.getElementById('ii-step-0').classList.add('show');
+}
+let IIidx=0;
+function iiAdvance(){
+  IIidx++;const el=document.getElementById('ii-step-'+IIidx);if(el)el.classList.add('show');
+  if(IIidx>=II_STEPS.length-1)explainII();
+}
+function explainII(){
+  const exp=document.getElementById('exp-ii');if(exp.classList.contains('show'))return;
+  exp.classList.add('show');setStates('ii','explain');DONE.ii=true;updateRuta();
+}
+const CASES={
+  mayor:{ex:'lim (2x⁵ + …) / (4x³ − …)',res:'= +∞',why:'El numerador tiene mayor grado: "gana" y el cociente se dispara. (Sería −∞ si los signos de los coeficientes principales fueran opuestos.)'},
+  igual:{ex:'lim (2x⁵ + …) / (4x⁵ − …)',res:'= 2/4 = 1/2',why:'Mismo grado arriba y abajo: el límite es el cociente de los coeficientes principales. Acá 2/4.'},
+  menor:{ex:'lim (4x³ − …) / (2x⁵ + …)',res:'= 0',why:'El denominador tiene mayor grado: "gana" y arrastra el cociente a 0.'}
+};
+function showCase(k,el){
+  document.querySelectorAll('#ii-cases .case-card').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  const c=CASES[k],d=document.getElementById('case-detail');
+  d.innerHTML=`<div class="cd-ex">${c.ex}</div><div class="cd-res">${c.res}</div><div class="cd-why">${c.why}</div>`;
+  d.classList.add('show');
+}
+
+/* ===================== POE CRUZAR ASÍNTOTA ===================== */
+let GC;
+function drawCross(){
+  GC=GC||new GraphPlotter('cv-cross',{xMin:-6,xMax:9,yMin:-1,yMax:4});
+  GC.clear();GC.drawGrid();GC.drawAxes();
+  GC.hLine(2,'y = 2 (asíntota)','#0ea5e9');
+  GC.plot(x=>(2*x*x+x)/(x*x+1),'#1d6fcc',2.6);
+  GC.point(2,2,true,'#dc2626',6); // cruce en (2,2)
+}
+function explainCross(){
+  const exp=document.getElementById('exp-cross');if(exp.classList.contains('show'))return;
+  const p=PRED.cross;let h='';
+  if(p==='si'){h+=`<p>Exacto. La curva cruza y = 2 en x = 2 (el punto rojo), y solo se <em>aproxima</em> a la recta cuando x → ±∞.</p>`;}
+  else{h+=`<p>Es la respuesta intuitiva, pero falla. Mirá: la curva <strong>cruza</strong> y = 2 en x = 2 (punto rojo). Lo que vale para las verticales no vale para las horizontales.</p>`;}
+  h+=`<div class="bigidea"><strong>La distinción clave.</strong> Una asíntota <strong>vertical</strong> no se cruza porque la función no está definida en ese punto. Pero una asíntota <strong>horizontal</strong> (u <strong>oblicua</strong>) describe solo el comportamiento <em>en el infinito</em>: para x finito la curva puede cruzarla cuantas veces quiera.</p></div>`;
+  document.getElementById('expbody-cross').innerHTML=h;
+  exp.classList.add('show');setStates('cross','explain');DONE.cross=true;updateRuta();
+}
+
+/* ===================== ASÍNTOTA OBLICUA (worked) ===================== */
+const OB_STEPS=[
+  {label:'Dominio',math:'x + 3 ≠ 0  ⇒  x ≠ −3',why:'El denominador se anula en −3: ahí no está definida.'},
+  {label:'Vertical',math:'lim_{x→−3} 2x²/(x+3) = ∞  ⇒  x = −3',why:'Al acercarse a −3 el denominador → 0 y la función se dispara: asíntota vertical x = −3.'},
+  {label:'Horizontal',math:'lim_{x→∞} 2x²/(x+3) = ∞  ⇒  no hay AH',why:'El numerador tiene mayor grado: el límite es ∞, así que no hay asíntota horizontal. Buscamos oblicua.'},
+  {label:'Pendiente m',math:'m = lim 2x²/[x(x+3)] = lim 2x²/(x²+3x) = 2',why:'m = lim f(x)/x. Grados iguales ⇒ cociente de coeficientes principales = 2.'},
+  {label:'Ordenada b',math:'b = lim [2x²/(x+3) − 2x] = lim (−6x)/(x+3) = −6',why:'b = lim [f(x) − mx]. Operando queda −6.'},
+  {label:'Resultado',math:'Oblicua: y = 2x − 6   ·   Vertical: x = −3',why:'La curva se "pega" a la recta y = 2x − 6 en el infinito, y se dispara en x = −3.'}
+];
+function renderOb(){
+  const mount=document.getElementById('ob-steps');
+  mount.innerHTML=OB_STEPS.map((s,i)=>`<div class="lstep" id="ob-step-${i}"><div class="lstep-label">${s.label}</div><div class="lstep-body"><div class="lstep-math">${s.math}</div><div class="lstep-why">${s.why}</div>${i<OB_STEPS.length-1?`<button class="btn lstep-next" onclick="obAdvance()">Siguiente paso ▾</button>`:''}</div></div>`).join('');
+  document.getElementById('ob-step-0').classList.add('show');
+}
+let OBidx=0;
+function obAdvance(){
+  OBidx++;const el=document.getElementById('ob-step-'+OBidx);if(el)el.classList.add('show');
+  if(OBidx>=OB_STEPS.length-1){drawOb();DONE.asint=true;updateRuta();}
+}
+function drawOb(){
+  const wrap=document.getElementById('ob-graph-wrap');wrap.style.display='block';
+  const G=new GraphPlotter('cv-ob',{xMin:-12,xMax:8,yMin:-14,yMax:10});
+  G.clear();G.drawGrid();G.drawAxes();
+  G.vLine(-3,'x = −3');
+  G.oblique(2,-6,'y = 2x − 6');
+  G.plot(x=>(2*x*x)/(x+3),'#1d6fcc',2.6);
+}
+
+/* ===================== QUIZ ===================== */
+const QUIZ=[
+ {q:'<span class="lim">lim</span><sub>x→0</sub> 1/x². ¿Cuál afirmación es correcta?',
+  opts:[
+   {t:'El límite existe y vale ∞.',ok:false,fb:'Decir que "es infinito" es una forma de hablar: ∞ no es un número. Significa que f crece sin tope; el límite finito no existe.'},
+   {t:'El límite finito no existe; f crece sin cota (f → +∞).',ok:true,fb:'Correcto. La función crece sin tope: no hay límite finito.'},
+   {t:'El límite vale 0.',ok:false,fb:'Al revés: el denominador x² se hace diminuto, así que el cociente se dispara, no se va a 0.'},
+   {t:'Vale +∞ por derecha y −∞ por izquierda.',ok:false,fb:'Ojo: como está al cuadrado, x² es positivo a ambos lados, así que f → +∞ por los dos. El signo no cambia.'}
+  ]},
+ {q:'Una función tiene asíntota horizontal y = 2. ¿Cuál afirmación es válida?',
+  opts:[
+   {t:'La curva nunca puede tocar y = 2.',ok:false,fb:'Eso vale para las asíntotas verticales, no para las horizontales. Una curva puede cruzar su AH para x finito y aun así aproximarse en el infinito.'},
+   {t:'Puede cruzar y = 2 para x finito, pero se aproxima a y = 2 cuando x → ±∞.',ok:true,fb:'Exacto. La AH describe solo el comportamiento en el infinito.'},
+   {t:'y = 2 pertenece al dominio de la función.',ok:false,fb:'y = 2 es un valor de la imagen/comportamiento, no del dominio (que es de x). Son cosas distintas.'},
+   {t:'La función es constante e igual a 2.',ok:false,fb:'No: tiende a 2 en el infinito, pero puede variar (e incluso cruzar el 2) para x finito.'}
+  ]},
+ {q:'<span class="lim">lim</span><sub>x→∞</sub> (3x²)/(5x² − x + 2):',
+  opts:[
+   {t:'1, porque ∞/∞ = 1.',ok:false,fb:'∞ no es un número, y ∞/∞ no es 1. Con grados iguales, el límite es el cociente de los coeficientes principales: 3/5.'},
+   {t:'3/5.',ok:true,fb:'Correcto: grados iguales ⇒ cociente de coeficientes principales, 3/5.'},
+   {t:'∞.',ok:false,fb:'El numerador no domina: los grados son iguales (2 y 2). El límite es finito, 3/5.'},
+   {t:'0.',ok:false,fb:'0 sería si el denominador tuviera mayor grado. Acá los grados empatan: da 3/5.'}
+  ]}
+];
+const quizState=QUIZ.map(()=>({answered:false}));
+function renderQuiz(){
+  const m=document.getElementById('quiz-mount'),L=['A','B','C','D'];let h='';
+  QUIZ.forEach((it,qi)=>{
+    h+=`<div class="qitem"><div class="qhead">Pregunta ${qi+1} de ${QUIZ.length}</div><div class="qtext">${it.q}</div><div class="qopts">`;
+    it.opts.forEach((o,oi)=>{h+=`<button class="qopt" id="q-${qi}-${oi}" onclick="answerQuiz(${qi},${oi})"><span class="ql">${L[oi]}</span>${o.t}</button>`;});
+    h+=`</div><div class="qfb" id="qfb-${qi}"><span class="qfb-ic"></span><span class="qfb-tx"></span></div></div>`;
+  });
+  m.innerHTML=h;
+}
+function answerQuiz(qi,oi){
+  if(quizState[qi].answered)return;quizState[qi].answered=true;
+  const it=QUIZ[qi],chosen=it.opts[oi];
+  it.opts.forEach((o,i)=>{const b=document.getElementById('q-'+qi+'-'+i);b.classList.add('locked');if(o.ok)b.classList.add('correct');else if(i===oi)b.classList.add('wrong');});
+  const fb=document.getElementById('qfb-'+qi);fb.className='qfb show '+(chosen.ok?'ok':'bad');
+  fb.querySelector('.qfb-ic').textContent=chosen.ok?'✅':'❌';fb.querySelector('.qfb-tx').textContent=chosen.fb;
+  if(quizState.every(q=>q.answered)){
+    const n=QUIZ.reduce((a,it,i)=>a+(document.getElementById('qfb-'+i).classList.contains('ok')?1:0),0);
+    const d=document.getElementById('quiz-done');
+    d.innerHTML=`Respondiste correctamente <b>${n}</b> de ${QUIZ.length}. ${n===QUIZ.length?'Tenés la idea clara 💪':'Repasá la devolución en rojo.'}`;
+    d.classList.add('show');DONE.quiz=true;updateRuta();
+  }
+}
+
+/* ===================== SÍNTESIS ===================== */
+function saveSint(){document.getElementById('sint-done').classList.add('show');DONE.sint=true;updateRuta();}
+
+/* ===================== RUTA ===================== */
+function updateRuta(){
+  const map=['diag','inf','ii','cross','asint','quiz','sint'];
+  document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('done',DONE[map[i]]));
+}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-go]');if(el){const t=document.getElementById(el.dataset.go);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}});
+
+/* ===================== INIT ===================== */
+document.addEventListener('DOMContentLoaded',()=>{
+  drawInf();drawCross();        // dibujan detrás del blur
+  renderOb();
+  renderQuiz();
+  const secs=[['sec-diag',0],['poe-inf',1],['sec-ii',2],['poe-cross',3],['sec-asint',4],['sec-quiz',5],['sec-sint',6]];
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const idx=secs.find(s=>s[0]===e.target.id);if(!idx)return;document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('active',i===idx[1]));}});},{rootMargin:'-40% 0px -55% 0px'});
+  secs.forEach(s=>{const el=document.getElementById(s[0]);if(el)obs.observe(el);});
+});
+window.addEventListener('resize',()=>{if(GI&&!document.getElementById('obs-inf').classList.contains('locked'))drawInf();if(GC&&!document.getElementById('obs-cross').classList.contains('locked'))drawCross();});
+</script>
+</body>
+</html>

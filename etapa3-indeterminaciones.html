@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 3 · Indeterminaciones 0/0, conjugado y trigonométricos — Prototipo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0f2244;--blue:#1d6fcc;--blue2:#2d82e6;--sky:#0ea5e9;
+  --bg:#eef6ff;--bg2:#f8fbff;--white:#fff;
+  --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
+  --g500:#64748b;--g600:#475569;--g700:#334155;--g800:#1e293b;
+  --ok:#059669;--ok-bg:#d1fae5;--err:#dc2626;--err-bg:#fee2e2;
+  --warn:#d97706;--warn-bg:#fef3c7;--hint:#7c3aed;--hint-bg:#ede9fe;
+  --r:12px;--rl:16px;--rxl:24px;
+  --sh:0 4px 6px -1px rgba(0,0,0,.08),0 2px 4px -1px rgba(0,0,0,.05);
+  --shl:0 10px 25px -5px rgba(0,0,0,.1),0 4px 8px -2px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--g800);line-height:1.6;font-size:16px}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;line-height:1.25}
+h2{font-size:clamp(1.4rem,3vw,2rem);color:var(--navy)}
+h3{font-size:1.15rem;color:var(--navy)}
+p{margin-bottom:.7em}
+strong{color:var(--navy)}em{font-style:italic}
+sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
+.container{max-width:980px;margin:0 auto;padding:0 20px}
+
+.topbar{background:var(--navy);color:#94a3b8;font-size:12px;font-weight:600;letter-spacing:.04em;padding:8px 0;text-align:center}
+.topbar b{color:#7dd3fc}
+
+.hero{background:linear-gradient(135deg,#0f2244 0%,#1d6fcc 70%,#0ea5e9 120%);color:#fff;padding:38px 0 44px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(56,189,248,.18),transparent 60%);pointer-events:none}
+.hero .container{position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#bfdbfe;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px}
+.hero h2{color:#fff;margin-bottom:10px;font-size:clamp(1.7rem,4vw,2.6rem)}
+.hero-sub{color:#bfdbfe;font-size:1.02rem;max-width:660px}
+.hero-obj{margin-top:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:var(--r);padding:12px 16px;font-size:13.5px;color:#e0f2fe;max-width:700px}
+.hero-obj b{color:#fff}
+
+.ruta{position:sticky;top:0;z-index:50;background:var(--navy);padding:10px 0;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.ruta-inner{display:flex;align-items:center;gap:6px;flex-wrap:wrap;overflow-x:auto}
+.rstep{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.rstep:hover{background:rgba(255,255,255,.12)}
+.rstep.active{background:rgba(29,111,204,.6);border-color:var(--blue2);color:#dbeafe}
+.rstep.done{background:rgba(5,150,105,.22);border-color:#10b981;color:#6ee7b7}
+.rnum{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.rstep.done .rnum{background:#10b981;color:#fff}.rstep.active .rnum{background:var(--blue2);color:#fff}
+
+.wrap{padding:28px 0 70px}
+.card{background:var(--white);border-radius:var(--rl);box-shadow:var(--sh);border:1px solid var(--g200);padding:24px;margin-bottom:22px;scroll-margin-top:64px;animation:rise .4s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.card-title{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.cti{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ic-diag{background:var(--hint-bg);color:var(--hint)}
+.ic-poe{background:#dbeafe;color:var(--blue)}
+.ic-ladder{background:#dcfce7;color:var(--ok)}
+.ic-quiz{background:#fce7f3;color:#be185d}
+.ic-sint{background:var(--warn-bg);color:var(--warn)}
+.card-title h3{margin:0}
+.card-lead{color:var(--g600);font-size:14.5px;margin-bottom:16px}
+
+/* fracción */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 2px}
+.fnum{border-bottom:1.6px solid currentColor;padding:0 8px 1px}
+.fden{padding:1px 8px 0}
+.lim{font-style:italic}
+
+/* POE */
+.poe-states{display:flex;gap:6px;margin:14px 0 18px;flex-wrap:wrap}
+.pstate{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--g500);padding:5px 13px;border-radius:50px;background:var(--g100);border:1px solid var(--g200);transition:all .25s}
+.pstate .pn{width:18px;height:18px;border-radius:50%;background:var(--g300);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px}
+.pstate.on{background:#eff6ff;border-color:var(--blue);color:var(--blue)}
+.pstate.on .pn{background:var(--blue)}
+.pstate.cleared{background:var(--ok-bg);border-color:#10b981;color:#047857}
+.pstate.cleared .pn{background:#10b981}
+.parrow{color:var(--g300);align-self:center;font-weight:700}
+.predict-group{margin-bottom:16px}
+.pq{font-weight:600;color:var(--navy);font-size:15px;margin-bottom:10px;padding-left:12px;border-left:3px solid var(--hint)}
+.popts{display:flex;flex-direction:column;gap:8px}
+.popt{width:100%;text-align:left;padding:11px 15px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--white);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:11px}
+.popt:hover{border-color:var(--hint);background:#faf5ff;color:var(--navy)}
+.popt.sel{border-color:var(--hint);background:var(--hint-bg);color:var(--navy);font-weight:600}
+.pdot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--g300);flex-shrink:0;transition:all .18s}
+.popt.sel .pdot{border-color:var(--hint);background:var(--hint);box-shadow:inset 0 0 0 3px var(--white)}
+.predict-actions{margin-top:6px}
+.btn{padding:11px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-go{background:var(--hint);color:#fff}.btn-go:hover{background:#6d28d9;transform:translateY(-1px)}
+.btn-go.dim{opacity:.45;pointer-events:none}
+.btn-ghost{background:var(--g100);color:var(--g700);border:1px solid var(--g200)}.btn-ghost:hover{background:var(--g200)}
+.btn-next{background:var(--navy);color:#bfdbfe}.btn-next:hover{background:var(--blue);color:#fff;transform:translateY(-1px)}
+.lockmsg{font-size:13px;color:var(--hint);margin-top:8px;font-weight:600;display:none}
+.lockmsg.show{display:block}
+.poe-observe{position:relative;margin-top:6px;border-top:1px dashed var(--g200);padding-top:18px}
+.observe-inner{transition:filter .5s,opacity .5s}
+.poe-observe.locked .observe-inner{filter:blur(7px);opacity:.45;pointer-events:none;user-select:none}
+.lock-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;z-index:3}
+.poe-observe:not(.locked) .lock-ov{display:none}
+.lock-ic{font-size:30px}.lock-tx{font-weight:700;color:var(--navy);font-size:15px}.lock-sub{font-size:13px;color:var(--g500);max-width:280px}
+.obs-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+@media(max-width:760px){.obs-grid{grid-template-columns:1fr}}
+.canvas-wrap{background:var(--bg2);border-radius:var(--r);border:1px solid var(--g200);overflow:hidden}
+.canvas-wrap canvas{display:block;width:100%;height:auto}
+.ltable{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tcol{background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:10px}
+.tcol-head{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;text-align:center;padding-bottom:8px;margin-bottom:6px;border-bottom:1px solid var(--g200)}
+.tcol-head.left{color:var(--blue)}.tcol-head.right{color:var(--sky)}
+.trow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;padding:4px 2px;font-family:'Courier New',monospace;font-size:13px}
+.trow .tx{color:var(--g600);text-align:right}.trow .tarrow{color:var(--g300);font-size:11px}.trow .tfx{color:var(--navy);font-weight:700;text-align:left}
+.tcol-foot{margin-top:8px;padding-top:8px;border-top:1.5px dashed var(--g300);text-align:center;font-size:13px;color:var(--g600)}
+.tcol-foot b{font-family:'Courier New',monospace}.tcol-foot.left b{color:var(--blue)}.tcol-foot.right b{color:var(--sky)}
+.poe-explain{margin-top:18px;border-top:1px dashed var(--g200);padding-top:18px;display:none;animation:rise .4s ease both}
+.poe-explain.show{display:block}
+.explain-head{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.explain-head .eh-ic{width:30px;height:30px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.explain-head h4{color:var(--navy);font-size:16px}
+.explain-body{font-size:14.5px;color:var(--g700)}.explain-body p{margin-bottom:.6em}
+.bigidea{background:linear-gradient(90deg,#eff6ff,var(--white));border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;margin-top:12px;font-size:14.5px;color:var(--g700)}
+.explain-next{margin-top:16px}
+
+.diag-note{display:none;margin-top:14px;background:var(--hint-bg);border:1px solid #c4b5fd;border-radius:var(--r);padding:13px 16px;font-size:14px;color:#4c1d95}
+.diag-note.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+
+/* ===== ESCALERA ===== */
+.ladder-intro{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#14532d;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
+.rung{background:var(--white);border-radius:var(--rl);box-shadow:var(--sh);border:1px solid var(--g200);border-left:4px solid var(--ok);padding:22px;margin-bottom:18px;scroll-margin-top:64px}
+.rung-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.rung-num{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#bfdbfe;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.fade-badge{font-size:12px;font-weight:700;color:var(--ok);background:var(--ok-bg);border:1px solid #6ee7b7;padding:4px 12px;border-radius:50px}
+.limit-line{display:flex;align-items:center;gap:8px;font-size:1.25rem;color:var(--navy);font-family:'Outfit',sans-serif;background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:12px 18px;margin-bottom:16px;flex-wrap:wrap}
+.lsteps{display:flex;flex-direction:column;gap:10px}
+.lstep{display:none;gap:14px;align-items:flex-start;animation:rise .35s ease both}
+.lstep.show{display:flex}
+.lstep-label{flex-shrink:0;width:96px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--g500);background:var(--g100);border:1px solid var(--g200);border-radius:8px;padding:6px 8px;text-align:center;margin-top:2px}
+.lstep-body{flex:1;min-width:0}
+.lstep-math{font-family:'Courier New',monospace;font-size:1.02rem;color:var(--navy);font-weight:700}
+.lstep-why{font-size:13px;color:var(--g600);margin-top:4px}
+.lstep-next{margin-top:10px;background:var(--g100);color:var(--g700);border:1px solid var(--g200);font-size:13px;padding:8px 16px}
+.lstep-next:hover{background:var(--g200)}
+.lstep-q{font-weight:600;color:var(--navy);font-size:14.5px;margin-bottom:9px}
+.lstep-resolved{display:none;margin-top:9px;padding:9px 12px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r)}
+.lstep-resolved.show{display:block;animation:rise .3s ease both}
+.qopts{display:flex;flex-direction:column;gap:8px}
+.qopt{width:100%;text-align:left;padding:10px 14px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--white);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:10px}
+.qopt:hover:not(.locked){border-color:var(--blue);background:#f0f7ff;color:var(--navy)}
+.qopt .ql{width:23px;height:23px;border-radius:50%;border:1.5px solid var(--g300);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--g600);flex-shrink:0;transition:all .18s}
+.qopt.correct{border-color:var(--ok);background:var(--ok-bg);color:#065f46;font-weight:600}
+.qopt.correct .ql{border-color:var(--ok);background:var(--ok);color:#fff}
+.qopt.wrong{border-color:var(--err);background:var(--err-bg);color:#991b1b}
+.qopt.wrong .ql{border-color:var(--err);background:var(--err);color:#fff}
+.qopt.locked{cursor:default}
+.qfb{border-radius:var(--r);padding:12px 14px;margin-top:10px;font-size:14px;display:none;gap:10px;align-items:flex-start}
+.qfb.show{display:flex;animation:rise .3s ease both}
+.qfb.ok{background:var(--ok-bg);border:1px solid #6ee7b7;color:#065f46}
+.qfb.bad{background:var(--err-bg);border:1px solid #fca5a5;color:#7f1d1d}
+.qfb-ic{font-size:17px;flex-shrink:0}
+.rung-graph{display:none;margin-top:16px}
+.rung-graph.show{display:block;animation:rise .4s ease both}
+.graph-cap{font-size:13px;color:var(--g600);margin-top:8px;text-align:center}
+.rung-cta{display:none;margin-top:16px}
+.rung-cta.show{display:block;animation:rise .35s ease both}
+
+/* QUIZ */
+.qitem{margin-bottom:22px}.qitem:last-of-type{margin-bottom:0}
+.qhead{font-size:12px;font-weight:700;text-transform:uppercase;color:var(--g500);margin-bottom:6px}
+.qtext{font-weight:600;color:var(--navy);font-size:15px;margin-bottom:12px;padding-left:12px;border-left:3px solid var(--blue)}
+.quiz-done{display:none;margin-top:6px;background:var(--navy);color:#bfdbfe;border-radius:var(--r);padding:14px;text-align:center;font-size:14px}
+.quiz-done.show{display:block;animation:rise .4s ease both}.quiz-done b{color:#7dd3fc;font-size:1.3rem}
+
+/* SÍNTESIS */
+.sint-q{font-weight:600;color:var(--navy);font-size:14.5px;margin:14px 0 8px;padding-left:12px;border-left:3px solid var(--warn)}
+.sint-ta{width:100%;min-height:72px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);resize:vertical;background:var(--g50)}
+.sint-ta:focus{outline:none;border-color:var(--warn);background:var(--white)}
+.sint-fill{display:inline-block;min-width:120px;border-bottom:2px dashed var(--g300);color:var(--warn);font-weight:700}
+.sint-done{display:none;margin-top:14px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#065f46}
+.sint-done.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+
+.proto-note{background:#fff7ed;border:1px dashed #fdba74;border-radius:var(--r);padding:12px 16px;font-size:13px;color:#9a3412;margin-bottom:22px;display:flex;gap:10px;align-items:flex-start}
+@media(max-width:520px){
+  .card,.rung{padding:17px}
+  .ltable{grid-template-columns:1fr}
+  .btn{width:100%;justify-content:center}
+  .predict-actions .btn,.explain-next .btn,.rung-cta .btn,.lstep-next{width:auto}
+  .lstep{flex-direction:column;gap:6px}.lstep-label{width:auto;align-self:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar"><b>INSPT · UTN</b> &nbsp;·&nbsp; Análisis Matemático I &nbsp;·&nbsp; Prof. Ariel Cardozo</div>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-badge">⬡ Unidad 2 · Etapa 3 de 7</div>
+    <h2>Indeterminaciones 0/0</h2>
+    <p class="hero-sub">Cuando reemplazás y "da 0/0", no es un callejón sin salida: es una señal para reescribir. Vas a aprender las tres herramientas para salvarla — factorizar, conjugado y el límite trigonométrico — cada una con una escalera que te suelta de a poco.</p>
+    <div class="hero-obj"><b>🎯 Meta:</b> entender que una indeterminación 0/0 <b>no</b> significa que el límite no exista, y dominar las tres técnicas para salvarla: factorización de polinomios, multiplicación por el conjugado en expresiones irracionales, y el límite trigonométrico fundamental.</div>
+  </div>
+</header>
+
+<nav class="ruta">
+  <div class="container ruta-inner" id="ruta">
+    <div class="rstep active" data-go="sec-diag"><span class="rnum">0</span>Idea previa</div>
+    <div class="rstep" data-go="poe-zero"><span class="rnum">1</span>¿Qué es 0/0?</div>
+    <div class="rstep" data-go="sec-ladder"><span class="rnum">2</span>Factorizar</div>
+    <div class="rstep" data-go="sec-conj"><span class="rnum">3</span>Conjugado</div>
+    <div class="rstep" data-go="sec-trig"><span class="rnum">4</span>Trigonométricos</div>
+    <div class="rstep" data-go="sec-quiz"><span class="rnum">5</span>Práctica</div>
+    <div class="rstep" data-go="sec-sint"><span class="rnum">6</span>Síntesis</div>
+  </div>
+</nav>
+
+<div class="wrap"><div class="container">
+
+  <div class="proto-note"><span>🧪</span><div><strong>Prototipo de andamiaje — Etapa 3.</strong> Tres herramientas para salvar 0/0, cada una con su propia escalera de desvanecimiento (resuelto → completás → solo): <strong>factorización</strong>, <strong>conjugado</strong> y el <strong>límite trigonométrico</strong>. Todas comparten la misma idea: 0/0 es señal de reescribir, no de rendirse.</div></div>
+
+  <!-- DIAGNÓSTICO -->
+  <section class="card" id="sec-diag">
+    <div class="card-title"><div class="cti ic-diag">💭</div><h3>Antes de empezar: ¿qué pensás vos?</h3></div>
+    <p class="card-lead">No hay respuesta correcta todavía. Queremos saber con qué idea llegás.</p>
+    <div class="predict-group">
+      <div class="pq">Estás calculando un límite, reemplazás y te queda <strong>0/0</strong>. ¿Qué significa eso?</div>
+      <div class="popts" id="diag-opts">
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Que el límite no existe.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Que hay que reescribir la expresión para poder calcularlo.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Que el límite vale 0.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Que el límite vale 1.</button>
+      </div>
+    </div>
+    <div class="diag-note" id="diag-note"><span>📌</span><div>Anotada tu idea. Vamos a ponerla a prueba ahora mismo con un ejemplo concreto.</div></div>
+  </section>
+
+  <!-- POE: ¿qué es 0/0? -->
+  <section class="card" id="poe-zero">
+    <div class="card-title"><div class="cti ic-poe">🔬</div><h3>¿Qué es realmente 0/0?</h3></div>
+    <p class="card-lead">Tomemos <span class="lim">lim</span><sub>x→1</sub> <span class="frac"><span class="fnum">x²−1</span><span class="fden">x−1</span></span> . Si reemplazás x = 1, numerador y denominador se hacen 0: queda 0/0.</p>
+
+    <div class="poe-states" id="states-poe">
+      <div class="pstate on" data-s="predict"><span class="pn">1</span>Predecí</div><span class="parrow">→</span>
+      <div class="pstate" data-s="observe"><span class="pn">2</span>Observá</div><span class="parrow">→</span>
+      <div class="pstate" data-s="explain"><span class="pn">3</span>Explicá</div>
+    </div>
+
+    <div class="poe-predict">
+      <div class="predict-group">
+        <div class="pq">Reemplazaste y obtuviste 0/0. ¿Qué significa?</div>
+        <div class="popts">
+          <button class="popt" onclick="poeSelect('noexiste',this)"><span class="pdot"></span>El límite no existe.</button>
+          <button class="popt" onclick="poeSelect('reescribir',this)"><span class="pdot"></span>Hay que reescribir la expresión para poder calcularlo.</button>
+          <button class="popt" onclick="poeSelect('es0',this)"><span class="pdot"></span>El límite vale 0.</button>
+          <button class="popt" onclick="poeSelect('es1',this)"><span class="pdot"></span>El límite vale 1.</button>
+        </div>
+      </div>
+      <div class="predict-actions">
+        <button class="btn btn-go dim" id="poe-lock" onclick="poeLock()">Ver qué pasa →</button>
+        <div class="lockmsg" id="poe-lockmsg">Elegí una opción para continuar.</div>
+      </div>
+    </div>
+
+    <div class="poe-observe locked" id="poe-obs">
+      <div class="lock-ov"><div class="lock-ic">🔒</div><div class="lock-tx">Primero hacé tu predicción</div><div class="lock-sub">El gráfico y la tabla se desbloquean al confirmar.</div></div>
+      <div class="observe-inner">
+        <div class="obs-grid">
+          <div class="canvas-wrap"><canvas id="cv-poe" width="540" height="400"></canvas></div>
+          <div>
+            <div class="ltable" id="poe-tbl"></div>
+            <p style="font-size:13px;color:var(--g600);margin-top:10px">Cerca de x = 1 las imágenes se acercan a 2 por ambos lados, aunque en x = 1 la función no está definida (hay un hueco ○).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="poe-explain" id="poe-explain">
+      <div class="explain-head"><div class="eh-ic">💡</div><h4>Lo que muestra el experimento</h4></div>
+      <div class="explain-body" id="poe-expbody"></div>
+      <div class="explain-next"><button class="btn btn-next" data-go="sec-ladder">Ahora a practicar la técnica →</button></div>
+    </div>
+  </section>
+
+  <!-- ESCALERA FACTORIZACIÓN -->
+  <section id="sec-ladder">
+    <div class="card-title" style="margin-bottom:8px"><div class="cti ic-ladder">🪜</div><h3>Herramienta 1 · Factorizar (cociente de polinomios)</h3></div>
+    <div class="ladder-intro"><span>🪜</span><div>Cuando numerador y denominador son polinomios que se anulan, se <strong>factoriza</strong> y se cancela el factor común. Cuatro peldaños con menos ayuda cada vez: en el <strong>Peldaño 1</strong> ves todo resuelto; al final resolvés el <strong>Peldaño 4</strong> solo. Cada uno termina con el <strong>hueco</strong> en el gráfico.</div></div>
+    <div id="ladder-mount"></div>
+  </section>
+
+  <!-- HERRAMIENTA 2: CONJUGADO -->
+  <section id="sec-conj">
+    <div class="card-title" style="margin-bottom:8px"><div class="cti ic-ladder" style="background:#cffafe;color:#0369a1">🪜</div><h3>Herramienta 2 · El conjugado (expresiones irracionales)</h3></div>
+    <div class="ladder-intro" style="background:#ecfeff;border-color:#a5f3fc;color:#155e75"><span>🧩</span><div>Cuando aparece una <strong>raíz</strong> y al reemplazar da 0/0, factorizar no alcanza. El truco: multiplicar arriba y abajo por el <strong>conjugado</strong> (la misma expresión con el signo del medio cambiado). Eso transforma la resta de raíces en una diferencia de cuadrados que se simplifica. Otra escalera: resuelto → completás → solo.</div></div>
+    <div id="conj-mount"></div>
+  </section>
+
+  <!-- HERRAMIENTA 3: TRIGONOMÉTRICOS -->
+  <section class="card" id="sec-trig">
+    <div class="card-title"><div class="cti ic-poe" style="background:#fae8ff;color:#a21caf">📐</div><h3>Herramienta 3 · El límite trigonométrico fundamental</h3></div>
+    <p class="card-lead">Hay un 0/0 que aparece tanto que tiene su propio "ladrillo". Lo vas a descubrir prediciendo primero.</p>
+
+    <div class="poe-states" id="states-trig">
+      <div class="pstate on" data-s="predict"><span class="pn">1</span>Predecí</div><span class="parrow">→</span>
+      <div class="pstate" data-s="observe"><span class="pn">2</span>Observá</div><span class="parrow">→</span>
+      <div class="pstate" data-s="explain"><span class="pn">3</span>Explicá</div>
+    </div>
+
+    <div class="poe-predict">
+      <div class="predict-group">
+        <div class="pq">Si reemplazás x = 0 en <span class="frac"><span class="fnum">sen x</span><span class="fden">x</span></span> te queda 0/0. ¿A qué pensás que tiende?</div>
+        <div class="popts">
+          <button class="popt" onclick="poeTrigSel('uno',this)"><span class="pdot"></span>A 1</button>
+          <button class="popt" onclick="poeTrigSel('cero',this)"><span class="pdot"></span>A 0</button>
+          <button class="popt" onclick="poeTrigSel('noexiste',this)"><span class="pdot"></span>No existe (da 0/0)</button>
+          <button class="popt" onclick="poeTrigSel('inf',this)"><span class="pdot"></span>A infinito</button>
+        </div>
+      </div>
+      <div class="predict-actions">
+        <button class="btn btn-go dim" id="lock-trig" onclick="poeTrigLock()">Ver qué pasa →</button>
+        <div class="lockmsg" id="lockmsg-trig">Elegí una opción para continuar.</div>
+      </div>
+    </div>
+
+    <div class="poe-observe locked" id="obs-trig">
+      <div class="lock-ov"><div class="lock-ic">🔒</div><div class="lock-tx">Primero hacé tu predicción</div><div class="lock-sub">El gráfico y la tabla se desbloquean al confirmar.</div></div>
+      <div class="observe-inner">
+        <div class="obs-grid">
+          <div class="canvas-wrap"><canvas id="cv-trig" width="540" height="400"></canvas></div>
+          <div><div class="ltable" id="tbl-trig"></div>
+            <p style="font-size:13px;color:var(--g600);margin-top:10px">Cerca de x = 0 (en radianes) las imágenes de sen(x)/x se acercan a 1 por ambos lados, aunque en x = 0 la función no esté definida (hueco ○).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="poe-explain" id="exp-trig">
+      <div class="explain-head"><div class="eh-ic">💡</div><h4>El ladrillo trigonométrico</h4></div>
+      <div class="explain-body" id="expbody-trig"></div>
+      <div style="margin-top:14px">
+        <p style="font-size:14px;color:var(--g700);font-weight:600;margin-bottom:8px">Con ese ladrillo se resuelven todos. Mirá el ejemplo del apunte, paso a paso:</p>
+        <div class="lsteps" id="trig-steps"></div>
+      </div>
+      <div class="explain-next"><button class="btn btn-next" data-go="sec-quiz">Ir a la práctica →</button></div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="card" id="sec-quiz">
+    <div class="card-title"><div class="cti ic-quiz">✏️</div><h3>Verificá tu comprensión</h3></div>
+    <p class="card-lead">Si te equivocás, la devolución te dice por qué.</p>
+    <div id="quiz-mount"></div>
+    <div class="quiz-done" id="quiz-done"></div>
+  </section>
+
+  <!-- SÍNTESIS -->
+  <section class="card" id="sec-sint">
+    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Síntesis: ¿qué cambió en tu cabeza?</h3></div>
+    <p class="card-lead">Ponerlo en palabras lo fija mejor que solo leerlo.</p>
+    <div class="sint-q">Completá: <span class="sint-fill">antes pensaba</span> que 0/0 significaba… <span class="sint-fill">ahora entiendo</span> que es…</div>
+    <textarea class="sint-ta" id="sint1" placeholder="Antes pensaba que 0/0 significaba ___ . Ahora entiendo que es ___ ."></textarea>
+    <div class="sint-q">Ya tenés tres herramientas para salvar 0/0. ¿Cómo decidís cuál usar? (pista: ¿qué tiene la expresión — polinomios, raíces o funciones trigonométricas?)</div>
+    <textarea class="sint-ta" id="sint2" placeholder="Si veo polinomios… Si veo una raíz… Si veo seno o tangente…"></textarea>
+    <div style="margin-top:14px"><button class="btn btn-next" onclick="saveSint()">Guardar mi reflexión ✓</button></div>
+    <div class="sint-done" id="sint-done"><span>🎉</span><div><strong>¡Etapa 3 completa!</strong> Ya sabés reconocer un 0/0 y tenés las tres herramientas para salvarlo: factorizar, conjugado y el límite trigonométrico. Fijate que cada 0/0 que salvaste por factorización o conjugado dejó un <strong>hueco</strong>: eso es una discontinuidad evitable, justo el puente con la etapa de continuidad.</div></div>
+  </section>
+
+</div></div>
+
+<script>
+/* ===================== MOTOR DE GRAFICACIÓN ===================== */
+class GraphPlotter{
+  constructor(id,o={}){
+    this.canvas=document.getElementById(id);this.ctx=this.canvas.getContext('2d');
+    this.xMin=o.xMin??-6;this.xMax=o.xMax??6;this.yMin=o.yMin??-8;this.yMax=o.yMax??8;
+    this.pL=46;this.pR=18;this.pT=18;this.pB=34;
+  }
+  get W(){return this.canvas.width-this.pL-this.pR}
+  get H(){return this.canvas.height-this.pT-this.pB}
+  cx(x){return this.pL+(x-this.xMin)/(this.xMax-this.xMin)*this.W}
+  cy(y){return this.pT+(this.yMax-y)/(this.yMax-this.yMin)*this.H}
+  clear(){const c=this.ctx;c.fillStyle='#f8fbff';c.fillRect(0,0,this.canvas.width,this.canvas.height)}
+  drawGrid(){const c=this.ctx;c.strokeStyle='#e2eaf5';c.lineWidth=.75;c.setLineDash([]);
+    for(let x=Math.ceil(this.xMin);x<=Math.floor(this.xMax);x++){if(x===0)continue;c.beginPath();c.moveTo(this.cx(x),this.pT);c.lineTo(this.cx(x),this.pT+this.H);c.stroke();}
+    for(let y=Math.ceil(this.yMin);y<=Math.floor(this.yMax);y++){if(y===0)continue;c.beginPath();c.moveTo(this.pL,this.cy(y));c.lineTo(this.pL+this.W,this.cy(y));c.stroke();}}
+  drawAxes(){const c=this.ctx,y0=this.cy(0),x0=this.cx(0);
+    const inY=y0>=this.pT&&y0<=this.pT+this.H,inX=x0>=this.pL&&x0<=this.pL+this.W;
+    const ay0=inY?y0:this.pT+this.H,ax0=inX?x0:this.pL;
+    c.strokeStyle='#334155';c.lineWidth=1.5;c.fillStyle='#334155';c.setLineDash([]);
+    if(inY){c.beginPath();c.moveTo(this.pL,y0);c.lineTo(this.pL+this.W-6,y0);c.stroke();
+      c.beginPath();c.moveTo(this.pL+this.W,y0);c.lineTo(this.pL+this.W-10,y0-4);c.lineTo(this.pL+this.W-10,y0+4);c.closePath();c.fill();
+      c.fillStyle='#475569';c.font='12px Outfit,sans-serif';c.textAlign='center';c.fillText('x',this.pL+this.W+7,y0+4);}
+    if(inX){c.strokeStyle='#334155';c.fillStyle='#334155';
+      c.beginPath();c.moveTo(x0,this.pT+this.H);c.lineTo(x0,this.pT+6);c.stroke();
+      c.beginPath();c.moveTo(x0,this.pT);c.lineTo(x0-4,this.pT+10);c.lineTo(x0+4,this.pT+10);c.closePath();c.fill();
+      c.fillStyle='#475569';c.font='12px Outfit,sans-serif';c.fillText('y',x0,this.pT-6);}
+    c.fillStyle='#64748b';c.font='10.5px Outfit,sans-serif';
+    for(let x=Math.ceil(this.xMin);x<=Math.floor(this.xMax);x++){if(x===0)continue;const px=this.cx(x);
+      c.strokeStyle='#475569';c.lineWidth=1;c.beginPath();c.moveTo(px,ay0-3);c.lineTo(px,ay0+3);c.stroke();
+      if(inY&&Math.abs(px-this.pL)>5&&Math.abs(px-(this.pL+this.W))>10){c.textAlign='center';c.fillText(x,px,ay0+14);}}
+    for(let y=Math.ceil(this.yMin);y<=Math.floor(this.yMax);y++){if(y===0)continue;const py=this.cy(y);
+      c.strokeStyle='#475569';c.lineWidth=1;c.beginPath();c.moveTo(ax0-3,py);c.lineTo(ax0+3,py);c.stroke();
+      if(inX){c.textAlign='right';c.fillText(y,ax0-6,py+3);}}
+    if(inX&&inY){c.textAlign='right';c.fillStyle='#64748b';c.fillText('0',x0-4,y0+12);}}
+  guide(type,val,label){const c=this.ctx;c.save();c.strokeStyle='#cbd5e1';c.lineWidth=1.25;c.setLineDash([5,5]);
+    if(type==='h'){const y=this.cy(val);if(y>=this.pT&&y<=this.pT+this.H){c.beginPath();c.moveTo(this.pL,y);c.lineTo(this.pL+this.W,y);c.stroke();
+      c.setLineDash([]);c.fillStyle='#64748b';c.font='italic 11px Outfit,sans-serif';c.textAlign='left';c.fillText(label,this.pL+5,y-4);}}
+    c.restore();c.setLineDash([]);}
+  plot(fn,color='#1d6fcc',lw=2.6){const c=this.ctx;c.strokeStyle=color;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';c.setLineDash([]);
+    const steps=800,dx=(this.xMax-this.xMin)/steps;let started=false,prevY=null;c.beginPath();
+    for(let i=0;i<=steps;i++){const x=this.xMin+i*dx;let y;
+      try{y=fn(x)}catch(e){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      if(!isFinite(y)||isNaN(y)){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      if(prevY!==null&&Math.abs(y-prevY)>(this.yMax-this.yMin)*.75){c.stroke();c.beginPath();started=false}
+      const X=this.cx(x),Y=this.cy(y);if(!started){c.moveTo(X,Y);started=true}else c.lineTo(X,Y);prevY=y;}
+    c.stroke();}
+  point(x,y,filled=true,color='#ef4444',r=6){const c=this.ctx,px=this.cx(x),py=this.cy(y);
+    c.beginPath();c.arc(px,py,r,0,Math.PI*2);
+    if(filled){c.fillStyle=color;c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();}
+    else{c.fillStyle='#f8fbff';c.fill();c.strokeStyle=color;c.lineWidth=2.6;c.stroke();}}
+}
+function fmt(n){if(!isFinite(n))return'∄';let s=n.toFixed(4);s=s.replace(/\.?0+$/,'');s=s.replace('.',',');s=s.replace('-','−');return s;}
+
+const DONE={diag:false,poe:false,ladder:false,conj:false,trig:false,quiz:false,sint:false};
+
+/* ===================== DIAGNÓSTICO ===================== */
+function selectDiag(btn){
+  document.querySelectorAll('#diag-opts .popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById('diag-note').classList.add('show');
+  DONE.diag=true;updateRuta();
+}
+
+/* ===================== POE ¿qué es 0/0? ===================== */
+let GPOE,poePred=null;
+function setPoeState(state){
+  document.querySelectorAll('#states-poe .pstate').forEach(el=>{
+    el.classList.remove('on','cleared');const s=el.dataset.s,order=['predict','observe','explain'];
+    if(order.indexOf(s)<order.indexOf(state))el.classList.add('cleared');else if(s===state)el.classList.add('on');
+  });
+}
+function poeSelect(v,btn){
+  btn.closest('.popts').querySelectorAll('.popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');poePred=v;
+  document.getElementById('poe-lock').classList.remove('dim');
+  document.getElementById('poe-lockmsg').classList.remove('show');
+}
+function drawPoeGraph(){
+  GPOE=GPOE||new GraphPlotter('cv-poe',{xMin:-3,xMax:4,yMin:-2,yMax:5});
+  GPOE.clear();GPOE.drawGrid();GPOE.drawAxes();GPOE.guide('h',2,'y = 2');
+  GPOE.plot(x=>x+1,'#1d6fcc',2.8);
+  GPOE.point(1,2,false,'#1d6fcc',7); // hueco
+}
+function buildPoeTable(){
+  const L=[0.9,0.99],R=[1.1,1.01],f=x=>x+1;
+  const row=(x)=>`<div class="trow"><span class="tx">${fmt(x)}</span><span class="tarrow">→</span><span class="tfx">${fmt(f(x))}</span></div>`;
+  document.getElementById('poe-tbl').innerHTML=
+    `<div class="tcol"><div class="tcol-head left">x &lt; 1</div>${L.map(row).join('')}<div class="tcol-foot left">→ <b>2</b></div></div>
+     <div class="tcol"><div class="tcol-head right">x &gt; 1</div>${R.map(row).join('')}<div class="tcol-foot right">→ <b>2</b></div></div>`;
+}
+function poeLock(){
+  if(!poePred){document.getElementById('poe-lockmsg').classList.add('show');return;}
+  document.getElementById('poe-obs').classList.remove('locked');
+  setPoeState('observe');
+  drawPoeGraph();buildPoeTable();
+  document.querySelectorAll('#poe-zero .poe-predict .popt').forEach(b=>b.style.pointerEvents='none');
+  document.getElementById('poe-lock').classList.add('dim');
+  setTimeout(poeExplain,1100);
+}
+function poeExplain(){
+  const exp=document.getElementById('poe-explain');if(exp.classList.contains('show'))return;
+  let h='';
+  if(poePred==='reescribir'){h+=`<p>Bien. 0/0 no es un resultado: es una <strong>señal</strong> de que hay que reescribir la expresión antes de poder calcular el límite.</p>`;}
+  else if(poePred==='noexiste'){h+=`<p>Predijiste que no existe. Pero mirá: las imágenes se acercan a <strong>2</strong> por ambos lados, y hay un hueco. La indeterminación no dice "no existe" — solo dice "reescribí".</p>`;}
+  else {h+=`<p>Predijiste un valor fijo (${poePred==='es0'?'0':'1'}). Pero 0/0 <strong>no</strong> vale 0 ni 1: por eso se llama <em>indeterminación</em>. El valor real aparece al reescribir; en este caso es <strong>2</strong>.</p>`;}
+  h+=`<div class="bigidea">Una <strong>indeterminación 0/0 es una invitación a reescribir</strong>, no un veredicto. Muchas veces el límite existe (acá vale 2) y la función queda con un <strong>hueco</strong> en (1, 2) — una discontinuidad evitable. En la escalera vas a aprender a salvarla.</div>`;
+  document.getElementById('poe-expbody').innerHTML=h;
+  exp.classList.add('show');setPoeState('explain');
+  DONE.poe=true;updateRuta();
+}
+
+/* ===================== ESCALERA ===================== */
+const RUNGS=[
+  {id:'r1',kind:'worked',scaffold:'Te muestro todo',num:'x²−1',den:'x−1',aLabel:'1',
+   graph:{win:{xMin:-3,xMax:4,yMin:-2,yMax:5},fn:x=>x+1,hole:[1,2]},
+   steps:[
+     {label:'Sustituir',math:'f(1) = (1²−1)/(1−1) = 0/0',why:'0/0 no es un número: es una indeterminación. No significa que el límite no exista — avisa que hay que reescribir.'},
+     {label:'Factorizar',math:'x²−1 = (x−1)(x+1)',why:'Diferencia de cuadrados: a²−b² = (a−b)(a+b). El denominador ya es (x−1).'},
+     {label:'Simplificar',math:'(x−1)(x+1) / (x−1) = x+1',why:'Cancelamos el (x−1) común. Es válido porque al tomar el límite x se acerca a 1 pero x ≠ 1.'},
+     {label:'Evaluar',math:'En x = 1: (1) + 1 = 2',why:'La expresión simplificada x+1 ya no se indetermina: ahora sí podemos reemplazar.'},
+     {label:'Resultado',math:'lim = 2',why:'La función original tiene un HUECO en (1; 2): no está definida ahí, pero el límite vale 2.'}
+   ]},
+  {id:'r2',kind:'fill',scaffold:'Completás el último paso',num:'x²−9',den:'x−3',aLabel:'3',
+   graph:{win:{xMin:-1,xMax:5,yMin:-1,yMax:8},fn:x=>x+3,hole:[3,6]},
+   steps:[
+     {label:'Sustituir',math:'f(3) = (3²−9)/(3−3) = 0/0'},
+     {label:'Factorizar',math:'x²−9 = (x−3)(x+3)'},
+     {label:'Simplificar',math:'(x−3)(x+3) / (x−3) = x+3'},
+     {label:'Evaluar',fill:{q:'Ya simplificamos: queda x+3. ¿Cuánto vale en x = 3?',resolved:'En x = 3: 3 + 3 = 6',
+       opts:[
+         {t:'6',ok:true,fb:'Bien. Como x ≠ 3 al tomar el límite, la expresión simplificada x+3 sí se puede evaluar: 3 + 3 = 6.'},
+         {t:'0',ok:false,fb:'0 sería si todavía hubiera un 0 arriba. Pero ya simplificamos: ahora es x+3, que en 3 da 6.'},
+         {t:'No existe',ok:false,fb:'El límite sí existe. Tras simplificar, x+3 está perfectamente definida en x = 3. El 0/0 inicial era solo una señal para reescribir.'},
+         {t:'9',ok:false,fb:'Revisá: x+3 en x = 3 es 3 + 3 = 6, no 9.'}
+       ]}},
+     {label:'Resultado',math:'lim = 6  —  hueco en (3; 6)'}
+   ]},
+  {id:'r3',kind:'fill',scaffold:'Completás casi todo',num:'x²−4',den:'x+2',aLabel:'−2',
+   graph:{win:{xMin:-5,xMax:2,yMin:-6,yMax:2},fn:x=>x-2,hole:[-2,-4]},
+   steps:[
+     {label:'Sustituir',math:'f(−2) = ((−2)²−4)/(−2+2) = 0/0'},
+     {label:'Factorizar',fill:{q:'¿Cómo factorizás x²−4?',resolved:'x²−4 = (x−2)(x+2)',
+       opts:[
+         {t:'(x−2)(x+2)',ok:true,fb:'Diferencia de cuadrados: a²−b² = (a−b)(a+b).'},
+         {t:'(x−2)²',ok:false,fb:'Eso es x²−4x+4, no x²−4.'},
+         {t:'(x+2)²',ok:false,fb:'Eso es x²+4x+4, no x²−4.'},
+         {t:'(x−4)(x+1)',ok:false,fb:'Eso da x²−3x−4. No coincide.'}
+       ]}},
+     {label:'Simplificar',fill:{q:'En (x−2)(x+2) / (x+2), ¿qué factor se cancela?',resolved:'Se cancela (x+2). Queda x−2',
+       opts:[
+         {t:'(x+2)',ok:true,fb:'El (x+2) está en el numerador y en el denominador: se cancela.'},
+         {t:'(x−2)',ok:false,fb:'Ese factor no aparece en el denominador, así que no se puede cancelar.'},
+         {t:'x²',ok:false,fb:'No hay un factor x² para cancelar.'},
+         {t:'No se puede cancelar nada',ok:false,fb:'Sí se puede: el (x+2) es común al numerador y al denominador.'}
+       ]}},
+     {label:'Evaluar',fill:{q:'Evaluá lo que quedó, x−2, en x = −2.',resolved:'En x = −2: −2 − 2 = −4',
+       opts:[
+         {t:'−4',ok:true,fb:'Correcto: −2 − 2 = −4.'},
+         {t:'0',ok:false,fb:'Eso sería el 0/0 original. Ya reescribimos: ahora es x−2, que en −2 da −4.'},
+         {t:'4',ok:false,fb:'Cuidado con el signo: −2 − 2 = −4.'},
+         {t:'No existe',ok:false,fb:'El límite existe: x−2 está definida en −2. Vale −4.'}
+       ]}},
+     {label:'Resultado',math:'lim = −4  —  hueco en (−2; −4)'}
+   ]},
+  {id:'r4',kind:'fill',scaffold:'Lo resolvés solo',num:'x²+x−6',den:'x−2',aLabel:'2',
+   graph:{win:{xMin:-2,xMax:4,yMin:-2,yMax:7},fn:x=>x+3,hole:[2,5]},
+   steps:[
+     {label:'Tu turno',fill:{q:'Resolvé el límite por tu cuenta. ¿Cuánto vale?',
+       opts:[
+         {t:'5',ok:true,fb:'Correcto. x²+x−6 = (x−2)(x+3); cancelás (x−2); en x = 2, x+3 = 5.'},
+         {t:'No existe (queda 0/0)',ok:false,fb:'0/0 es solo el primer paso. Factorizando se resuelve: el límite es 5.'},
+         {t:'0',ok:false,fb:'No: tras simplificar queda x+3, que en 2 da 5.'},
+         {t:'1',ok:false,fb:'Revisá la factorización: (x−2)(x+3)/(x−2) = x+3; en 2 → 5.'}
+       ]}},
+     {label:'Solución',math:'x²+x−6 = (x−2)(x+3) → se cancela (x−2) → x+3 → en x = 2: 5.  ⇒ lim = 5 — hueco en (2; 5)'}
+   ]}
+];
+/* ===== ESCALERA 2: CONJUGADO ===== */
+const CONJ_RUNGS=[
+  {id:'c1',kind:'worked',scaffold:'Te muestro todo',num:'√x − 2',den:'x − 4',aLabel:'4',
+   graph:{win:{xMin:0,xMax:9,yMin:0,yMax:1},fn:x=>1/(Math.sqrt(x)+2),hole:[4,0.25]},
+   steps:[
+     {label:'Sustituir',math:'(√4 − 2)/(4 − 4) = 0/0',why:'Indeterminación. Hay una raíz, así que factorizar no alcanza: usamos el conjugado.'},
+     {label:'Conjugado',math:'× (√x + 2)/(√x + 2)',why:'Multiplicamos arriba y abajo por el conjugado del numerador: la misma expresión con el signo del medio cambiado.'},
+     {label:'Dif. de cuadrados',math:'(√x − 2)(√x + 2) = x − 4',why:'(a−b)(a+b) = a²−b². La raíz desaparece del numerador: queda x − 4.'},
+     {label:'Simplificar',math:'(x − 4) / [(x − 4)(√x + 2)] = 1/(√x + 2)',why:'Se cancela el (x − 4) común. Válido porque x → 4 pero x ≠ 4.'},
+     {label:'Evaluar',math:'1/(√4 + 2) = 1/4',why:'Ya no hay indeterminación: reemplazamos en la expresión simplificada.'},
+     {label:'Resultado',math:'lim = 1/4 = 0,25 — hueco en (4; 0,25)',why:'La función tiene un hueco en (4; 0,25): el límite existe aunque ahí no esté definida.'}
+   ]},
+  {id:'c2',kind:'fill',scaffold:'Completás pasos',num:'√(x+1) − 1',den:'x',aLabel:'0',
+   graph:{win:{xMin:-1,xMax:5,yMin:0,yMax:1},fn:x=>1/(Math.sqrt(x+1)+1),hole:[0,0.5]},
+   steps:[
+     {label:'Sustituir',math:'(√1 − 1)/0 = 0/0'},
+     {label:'Conjugado',fill:{q:'¿Por cuál conjugado multiplicamos arriba y abajo?',resolved:'× (√(x+1) + 1)/(√(x+1) + 1)',
+       opts:[
+         {t:'(√(x+1) + 1)',ok:true,fb:'El conjugado de √(x+1) − 1 es √(x+1) + 1: mismo término, signo del medio cambiado.'},
+         {t:'(√(x+1) − 1)',ok:false,fb:'Ese es el mismo numerador, no su conjugado. El conjugado cambia el signo del medio: + 1.'},
+         {t:'(x + 1)',ok:false,fb:'El conjugado opera sobre la expresión con raíz, no sobre el radicando. Es √(x+1) + 1.'},
+         {t:'(x − 1)',ok:false,fb:'No: el conjugado de √(x+1) − 1 es √(x+1) + 1.'}
+       ]}},
+     {label:'Dif. de cuadrados',math:'(√(x+1))² − 1² = (x+1) − 1 = x'},
+     {label:'Simplificar',fill:{q:'Queda x / [x·(√(x+1)+1)]. ¿Qué se cancela?',resolved:'Se cancela x. Queda 1/(√(x+1)+1)',
+       opts:[
+         {t:'Se cancela x',ok:true,fb:'El x del numerador y del denominador se cancelan: queda 1/(√(x+1)+1).'},
+         {t:'No se puede cancelar',ok:false,fb:'Sí: hay un x común arriba y abajo. Se cancela.'},
+         {t:'Se cancela (√(x+1)+1)',ok:false,fb:'Ese factor está solo en el denominador, no en el numerador. Se cancela el x.'}
+       ]}},
+     {label:'Evaluar',fill:{q:'Evaluá 1/(√(x+1)+1) en x = 0.',resolved:'1/(√1 + 1) = 1/2',
+       opts:[
+         {t:'1/2',ok:true,fb:'√(0+1)+1 = 1+1 = 2, y 1/2 = 0,5. Correcto.'},
+         {t:'0',ok:false,fb:'Eso sería el 0/0 original. Ya reescribimos: ahora da 1/2.'},
+         {t:'1',ok:false,fb:'Revisá el denominador: √1 + 1 = 2, así que 1/2.'},
+         {t:'2',ok:false,fb:'2 es el denominador; el límite es 1/2.'}
+       ]}},
+     {label:'Resultado',math:'lim = 1/2 = 0,5 — hueco en (0; 0,5)'}
+   ]},
+  {id:'c3',kind:'fill',scaffold:'Lo resolvés solo',num:'x − 9',den:'√x − 3',aLabel:'9',
+   graph:{win:{xMin:0,xMax:14,yMin:0,yMax:8},fn:x=>Math.sqrt(x)+3,hole:[9,6]},
+   steps:[
+     {label:'Tu turno',fill:{q:'Acá la raíz está en el denominador. Resolvé el límite. ¿Cuánto da?',
+       opts:[
+         {t:'6',ok:true,fb:'Correcto. Multiplicás por (√x+3)/(√x+3): el denominador se vuelve x−9, se cancela con el numerador y queda √x+3. En x=9: 3+3 = 6.'},
+         {t:'No existe (queda 0/0)',ok:false,fb:'0/0 es el primer paso. Con el conjugado del denominador se resuelve: el límite es 6.'},
+         {t:'0',ok:false,fb:'No: tras simplificar queda √x+3, que en 9 da 6.'},
+         {t:'3',ok:false,fb:'Casi: √9 = 3, pero falta sumar 3 → 6.'}
+       ]}},
+     {label:'Solución',math:'(x−9)/(√x−3) × (√x+3)/(√x+3) = (x−9)(√x+3)/(x−9) = √x+3 → en x=9: 6.  ⇒ lim = 6 — hueco en (9; 6)'}
+   ]}
+];
+const RUNG_BY_ID={};RUNGS.concat(CONJ_RUNGS).forEach(r=>RUNG_BY_ID[r.id]=r);
+const RUNGSTATE={};
+
+function fracHTML(num,den){return `<span class="frac"><span class="fnum">${num}</span><span class="fden">${den}</span></span>`;}
+function stepHTML(r,i,s){
+  let inner='';
+  if(s.fill){
+    inner=`<div class="lstep-q">${s.fill.q}</div><div class="qopts" id="lopts-${r.id}-${i}">`
+      +s.fill.opts.map((o,oi)=>`<button class="qopt" id="lo-${r.id}-${i}-${oi}" onclick="fillAnswer('${r.id}',${i},${oi})"><span class="ql">${['A','B','C','D'][oi]}</span>${o.t}</button>`).join('')
+      +`</div><div class="qfb" id="lfb-${r.id}-${i}"><span class="qfb-ic"></span><span class="qfb-tx"></span></div><div class="lstep-resolved" id="lres-${r.id}-${i}"></div>`;
+  }else{
+    inner=`<div class="lstep-math">${s.math}</div>`+(s.why?`<div class="lstep-why">${s.why}</div>`:'')
+      +((r.kind==='worked'&&i<r.steps.length-1)?`<button class="btn lstep-next" onclick="advanceRung('${r.id}')">Siguiente paso ▾</button>`:'');
+  }
+  return `<div class="lstep" id="lstep-${r.id}-${i}"><div class="lstep-label">${s.label}</div><div class="lstep-body">${inner}</div></div>`;
+}
+function renderLadderInto(rungs,mountId,lastGo,lastLabel){
+  const mount=document.getElementById(mountId);let html='';
+  rungs.forEach((r,ri)=>{
+    const next=ri<rungs.length-1?('rung-'+rungs[ri+1].id):lastGo;
+    const label=ri<rungs.length-1?'Siguiente peldaño →':lastLabel;
+    html+=`<div class="rung" id="rung-${r.id}">
+      <div class="rung-head"><div class="rung-num">Peldaño ${ri+1}</div><div class="fade-badge">${r.scaffold}</div></div>
+      <div class="limit-line"><span class="lim">lim</span><sub>x→${r.aLabel}</sub> ${fracHTML(r.num,r.den)} =</div>
+      <div class="lsteps" id="lsteps-${r.id}">${r.steps.map((s,i)=>stepHTML(r,i,s)).join('')}</div>
+      <div class="rung-graph" id="graph-${r.id}"><div class="canvas-wrap"><canvas id="cvr-${r.id}" width="520" height="330"></canvas></div><div class="graph-cap">La curva simplificada, con el <b>hueco</b> en (${fmt(r.graph.hole[0])}; ${fmt(r.graph.hole[1])}).</div></div>
+      <div class="rung-cta" id="cta-${r.id}"><button class="btn btn-next" data-go="${next}">${label}</button></div>
+    </div>`;
+  });
+  mount.innerHTML=html;
+  rungs.forEach(r=>{RUNGSTATE[r.id]={idx:0,done:false};advanceRung(r.id);});
+}
+function renderLadder(){ renderLadderInto(RUNGS,'ladder-mount','sec-conj','Ir al conjugado →'); }
+function showStepEl(rid,i){document.getElementById('lstep-'+rid+'-'+i).classList.add('show');}
+function advanceRung(rid){
+  const r=RUNG_BY_ID[rid],st=RUNGSTATE[rid];
+  if(st.idx>=r.steps.length)return;
+  const i=st.idx;showStepEl(rid,i);st.idx++;
+  const step=r.steps[i],isLast=st.idx>=r.steps.length;
+  if(step.fill)return;             // esperar respuesta
+  if(isLast){finishRung(rid);return;}
+  if(r.kind==='fill')advanceRung(rid); // auto-avanza por los pasos mostrados
+}
+function fillAnswer(rid,i,oi){
+  const r=RUNG_BY_ID[rid],step=r.steps[i],opt=step.fill.opts[oi];
+  if(step.fill.answered)return;
+  const fb=document.getElementById('lfb-'+rid+'-'+i);
+  if(opt.ok){
+    step.fill.answered=true;
+    step.fill.opts.forEach((o,k)=>{const b=document.getElementById('lo-'+rid+'-'+i+'-'+k);b.classList.add('locked');if(o.ok)b.classList.add('correct');});
+    fb.className='qfb show ok';fb.querySelector('.qfb-ic').textContent='✅';fb.querySelector('.qfb-tx').textContent=opt.fb;
+    if(step.fill.resolved){const rr=document.getElementById('lres-'+rid+'-'+i);rr.innerHTML='<span class="lstep-math">'+step.fill.resolved+'</span>';rr.classList.add('show');}
+    advanceRung(rid);
+    if(RUNGSTATE[rid].idx>=r.steps.length)finishRung(rid);
+  }else{
+    document.getElementById('lo-'+rid+'-'+i+'-'+oi).classList.add('wrong');
+    fb.className='qfb show bad';fb.querySelector('.qfb-ic').textContent='❌';fb.querySelector('.qfb-tx').textContent=opt.fb;
+  }
+}
+function finishRung(rid){
+  const r=RUNG_BY_ID[rid],st=RUNGSTATE[rid];if(st.done)return;st.done=true;
+  document.getElementById('graph-'+rid).classList.add('show');
+  const G=new GraphPlotter('cvr-'+rid,r.graph.win);
+  G.clear();G.drawGrid();G.drawAxes();G.plot(r.graph.fn,'#1d6fcc',2.8);
+  G.point(r.graph.hole[0],r.graph.hole[1],false,'#1d6fcc',7);
+  document.getElementById('cta-'+rid).classList.add('show');
+  if(RUNGS.every(rr=>RUNGSTATE[rr.id]&&RUNGSTATE[rr.id].done)){DONE.ladder=true;updateRuta();}
+  if(CONJ_RUNGS.every(rr=>RUNGSTATE[rr.id]&&RUNGSTATE[rr.id].done)){DONE.conj=true;updateRuta();}
+}
+
+/* ===================== CONJUGADO (escalera 2) ===================== */
+function renderConj(){ renderLadderInto(CONJ_RUNGS,'conj-mount','sec-trig','Ir a los trigonométricos →'); }
+
+/* ===================== TRIGONOMÉTRICOS (POE + ejemplo) ===================== */
+let trigPred=null,GT;
+function setTrigState(state){
+  document.querySelectorAll('#states-trig .pstate').forEach(el=>{
+    el.classList.remove('on','cleared');const s=el.dataset.s,order=['predict','observe','explain'];
+    if(order.indexOf(s)<order.indexOf(state))el.classList.add('cleared');else if(s===state)el.classList.add('on');
+  });
+}
+function poeTrigSel(v,btn){
+  btn.closest('.popts').querySelectorAll('.popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');trigPred=v;
+  document.getElementById('lock-trig').classList.remove('dim');
+  document.getElementById('lockmsg-trig').classList.remove('show');
+}
+function drawTrig(){
+  GT=GT||new GraphPlotter('cv-trig',{xMin:-8,xMax:8,yMin:-0.5,yMax:1.4});
+  GT.clear();GT.drawGrid();GT.drawAxes();GT.guide('h',1,'y = 1');
+  GT.plot(x=>Math.sin(x)/x,'#1d6fcc',2.6);
+  GT.point(0,1,false,'#1d6fcc',7); // hueco en (0,1)
+}
+function buildTrigTable(){
+  const L=[-0.5,-0.1,-0.01],R=[0.5,0.1,0.01],f=x=>Math.sin(x)/x;
+  const row=x=>`<div class="trow"><span class="tx">${fmt(x)}</span><span class="tarrow">→</span><span class="tfx">${fmt(f(x))}</span></div>`;
+  document.getElementById('tbl-trig').innerHTML=
+    `<div class="tcol"><div class="tcol-head left">x → 0⁻</div>${L.map(row).join('')}<div class="tcol-foot left">→ <b>1</b></div></div>
+     <div class="tcol"><div class="tcol-head right">x → 0⁺</div>${R.map(row).join('')}<div class="tcol-foot right">→ <b>1</b></div></div>`;
+}
+const TRIG_STEPS=[
+  {label:'Reescribir',math:'sen(3x)/(7x) = [sen(3x)/(3x)] · (3x)/(7x)',why:'Multiplicamos y dividimos por 3x para "fabricar" el patrón sen(u)/u con u = 3x.'},
+  {label:'Ladrillo',math:'lim sen(3x)/(3x) = 1',why:'Es el límite fundamental: sen(u)/u → 1 cuando u → 0. Acá u = 3x → 0.'},
+  {label:'Simplificar',math:'(3x)/(7x) = 3/7',why:'Se cancela la x: queda la constante 3/7.'},
+  {label:'Resultado',math:'lim = 1 · 3/7 = 3/7',why:'El ladrillo aporta 1 y queda el cociente de coeficientes 3/7.'}
+];
+function renderTrigSteps(){
+  const m=document.getElementById('trig-steps');
+  m.innerHTML=TRIG_STEPS.map((s,i)=>`<div class="lstep" id="trig-step-${i}"><div class="lstep-label">${s.label}</div><div class="lstep-body"><div class="lstep-math">${s.math}</div><div class="lstep-why">${s.why}</div>${i<TRIG_STEPS.length-1?`<button class="btn lstep-next" onclick="trigAdvance()">Siguiente paso ▾</button>`:''}</div></div>`).join('');
+  document.getElementById('trig-step-0').classList.add('show');
+}
+let TRIGidx=0;
+function trigAdvance(){TRIGidx++;const el=document.getElementById('trig-step-'+TRIGidx);if(el)el.classList.add('show');}
+function poeTrigLock(){
+  if(!trigPred){document.getElementById('lockmsg-trig').classList.add('show');return;}
+  document.getElementById('obs-trig').classList.remove('locked');
+  setTrigState('observe');drawTrig();buildTrigTable();
+  document.querySelectorAll('#sec-trig .poe-predict .popt').forEach(b=>b.style.pointerEvents='none');
+  document.getElementById('lock-trig').classList.add('dim');
+  setTimeout(explainTrig,1000);
+}
+function explainTrig(){
+  const exp=document.getElementById('exp-trig');if(exp.classList.contains('show'))return;
+  let h='';
+  if(trigPred==='uno'){h+=`<p>¡Correcto! Tiende a <strong>1</strong>. Es uno de los resultados más útiles de todo el análisis.</p>`;}
+  else if(trigPred==='cero'){h+=`<p>Es tentador, pero no: mirá la tabla, las imágenes se acercan a <strong>1</strong>, no a 0. Cerca de 0, sen(x) y x valen casi lo mismo, así que su cociente → 1.</p>`;}
+  else if(trigPred==='noexiste'){h+=`<p>El 0/0 es solo la primera impresión. La tabla muestra que el límite <strong>sí existe</strong> y vale <strong>1</strong>.</p>`;}
+  else{h+=`<p>No se va a infinito: numerador y denominador son casi iguales cerca de 0, así que el cociente se acerca a <strong>1</strong>.</p>`;}
+  h+=`<div class="bigidea"><strong>El límite trigonométrico fundamental:</strong> <span class="lim">lim</span><sub>u→0</sub> sen(u)/u = <strong>1</strong> (con u en radianes). Es un "ladrillo" — como los de la etapa anterior — con el que se arman todos los límites trigonométricos 0/0. La idea para usarlo: reescribir la expresión hasta que aparezca el patrón sen(u)/u.</p></div>`;
+  document.getElementById('expbody-trig').innerHTML=h;
+  exp.classList.add('show');setTrigState('explain');DONE.trig=true;updateRuta();
+}
+
+/* ===================== QUIZ ===================== */
+const QUIZ=[
+ {q:'Al calcular <span class="lim">lim</span><sub>x→1</sub> (x²−1)/(x−1) sustituís y da 0/0. ¿Qué concluís?',
+  opts:[
+   {t:'El límite no existe.',ok:false,fb:'Indeterminado no es inexistente. Una indeterminación es una invitación a reescribir, no un veredicto. Acá el límite existe y vale 2.'},
+   {t:'El límite es 0.',ok:false,fb:'0/0 no vale 0. Justamente por eso se llama indeterminación: no tiene un valor fijo hasta reescribir.'},
+   {t:'El límite es 1.',ok:false,fb:'0/0 tampoco vale 1. El valor real recién aparece al simplificar; en este caso es 2.'},
+   {t:'Hay una indeterminación: debo factorizar y simplificar antes de evaluar.',ok:true,fb:'Exacto. 0/0 es la señal para reescribir; tras factorizar y simplificar, el límite es 2.'}
+  ]},
+ {q:'¿Cuál afirmación sobre las indeterminaciones es correcta?',
+  opts:[
+   {t:'Si da 0/0, el límite no existe.',ok:false,fb:'No: 0/0 es indeterminado, no inexistente. Tras reescribir, muchas veces el límite existe.'},
+   {t:'0/0 siempre vale 1.',ok:false,fb:'0/0 no tiene un valor fijo: por eso es una indeterminación. Su valor depende de la expresión.'},
+   {t:'Es una señal de que hay que reescribir; el límite puede existir o no.',ok:true,fb:'Correcto. La indeterminación obliga a reescribir; recién ahí se ve el valor (o que no existe).'},
+   {t:'Si da 0/0, el resultado es 0.',ok:false,fb:'0/0 no vale 0. Hay que reescribir para conocer el valor real.'}
+  ]},
+ {q:'Para <span class="lim">lim</span><sub>x→4</sub> (√x − 2)/(x − 4) da 0/0. ¿Qué técnica conviene usar?',
+  opts:[
+   {t:'Factorizar como diferencia de cuadrados de polinomios.',ok:false,fb:'Hay una raíz: factorizar polinomios no la elimina. Se usa el conjugado.'},
+   {t:'Multiplicar arriba y abajo por el conjugado (√x + 2).',ok:true,fb:'Exacto: el conjugado convierte (√x−2)(√x+2) en x−4, que se cancela. El límite da 1/4.'},
+   {t:'Concluir que no existe porque hay una raíz.',ok:false,fb:'Sí existe: con el conjugado se resuelve y da 1/4.'},
+   {t:'Aplicar el límite trigonométrico.',ok:false,fb:'No hay funciones trigonométricas acá. La herramienta para raíces es el conjugado.'}
+  ]},
+ {q:'<span class="lim">lim</span><sub>x→0</sub> <span class="frac"><span class="fnum">sen(5x)</span><span class="fden">2x</span></span> = ?',
+  opts:[
+   {t:'5/2',ok:true,fb:'Correcto. Reescribís como [sen(5x)/(5x)]·(5x/2x); el primer factor → 1 y queda 5/2.'},
+   {t:'0',ok:false,fb:'No: sen(u)/u → 1, no a 0. El límite da 5/2.'},
+   {t:'1',ok:false,fb:'Sería 1 si numerador y denominador tuvieran el mismo coeficiente. Acá es 5/2.'},
+   {t:'No existe (da 0/0)',ok:false,fb:'El 0/0 se salva con el límite fundamental. Da 5/2.'}
+  ]}
+];
+const quizState=QUIZ.map(()=>({answered:false}));
+function renderQuiz(){
+  const m=document.getElementById('quiz-mount'),L=['A','B','C','D'];let h='';
+  QUIZ.forEach((it,qi)=>{
+    h+=`<div class="qitem"><div class="qhead">Pregunta ${qi+1} de ${QUIZ.length}</div><div class="qtext">${it.q}</div><div class="qopts">`;
+    it.opts.forEach((o,oi)=>{h+=`<button class="qopt" id="q-${qi}-${oi}" onclick="answerQuiz(${qi},${oi})"><span class="ql">${L[oi]}</span>${o.t}</button>`;});
+    h+=`</div><div class="qfb" id="qfb-${qi}"><span class="qfb-ic"></span><span class="qfb-tx"></span></div></div>`;
+  });
+  m.innerHTML=h;
+}
+function answerQuiz(qi,oi){
+  if(quizState[qi].answered)return;quizState[qi].answered=true;
+  const it=QUIZ[qi],chosen=it.opts[oi];
+  it.opts.forEach((o,i)=>{const b=document.getElementById('q-'+qi+'-'+i);b.classList.add('locked');if(o.ok)b.classList.add('correct');else if(i===oi)b.classList.add('wrong');});
+  const fb=document.getElementById('qfb-'+qi);fb.className='qfb show '+(chosen.ok?'ok':'bad');
+  fb.querySelector('.qfb-ic').textContent=chosen.ok?'✅':'❌';fb.querySelector('.qfb-tx').textContent=chosen.fb;
+  if(quizState.every(q=>q.answered)){
+    const n=QUIZ.reduce((a,it,i)=>a+(document.getElementById('qfb-'+i).classList.contains('ok')?1:0),0);
+    const d=document.getElementById('quiz-done');
+    d.innerHTML=`Respondiste correctamente <b>${n}</b> de ${QUIZ.length}. ${n===QUIZ.length?'Tenés la idea clara 💪':'Repasá la devolución en rojo.'}`;
+    d.classList.add('show');DONE.quiz=true;updateRuta();
+  }
+}
+
+/* ===================== SÍNTESIS ===================== */
+function saveSint(){document.getElementById('sint-done').classList.add('show');DONE.sint=true;updateRuta();}
+
+/* ===================== RUTA ===================== */
+function updateRuta(){
+  const map=['diag','poe','ladder','conj','trig','quiz','sint'];
+  document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('done',DONE[map[i]]));
+}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-go]');if(el){const t=document.getElementById(el.dataset.go);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}});
+
+/* ===================== INIT ===================== */
+document.addEventListener('DOMContentLoaded',()=>{
+  drawPoeGraph();           // dibuja detrás del blur
+  renderLadder();
+  renderConj();
+  renderTrigSteps();
+  drawTrig();               // dibuja detrás del blur del POE trig
+  renderQuiz();
+  const secs=[['sec-diag',0],['poe-zero',1],['sec-ladder',2],['sec-conj',3],['sec-trig',4],['sec-quiz',5],['sec-sint',6]];
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const idx=secs.find(s=>s[0]===e.target.id);if(!idx)return;document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('active',i===idx[1]));}});},{rootMargin:'-40% 0px -55% 0px'});
+  secs.forEach(s=>{const el=document.getElementById(s[0]);if(el)obs.observe(el);});
+});
+</script>
+</body>
+</html>

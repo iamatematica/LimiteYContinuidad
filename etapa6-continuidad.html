@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 6 · Continuidad y discontinuidades — Prototipo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0f2244;--blue:#1d6fcc;--blue2:#2d82e6;--sky:#0ea5e9;
+  --bg:#eef6ff;--bg2:#f8fbff;--white:#fff;
+  --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;--g400:#94a3b8;
+  --g500:#64748b;--g600:#475569;--g700:#334155;--g800:#1e293b;
+  --ok:#059669;--ok-bg:#d1fae5;--err:#dc2626;--err-bg:#fee2e2;
+  --warn:#d97706;--warn-bg:#fef3c7;--hint:#7c3aed;--hint-bg:#ede9fe;
+  --amber:#f59e0b;
+  --r:12px;--rl:16px;--rxl:24px;
+  --sh:0 4px 6px -1px rgba(0,0,0,.08),0 2px 4px -1px rgba(0,0,0,.05);
+  --shl:0 10px 25px -5px rgba(0,0,0,.1),0 4px 8px -2px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--g800);line-height:1.6;font-size:16px}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;line-height:1.25}
+h2{font-size:clamp(1.4rem,3vw,2rem);color:var(--navy)}
+h3{font-size:1.15rem;color:var(--navy)}
+p{margin-bottom:.7em}strong{color:var(--navy)}em{font-style:italic}
+sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
+.container{max-width:980px;margin:0 auto;padding:0 20px}
+
+.topbar{background:var(--navy);color:#94a3b8;font-size:12px;font-weight:600;letter-spacing:.04em;padding:8px 0;text-align:center}
+.topbar b{color:#7dd3fc}
+.hero{background:linear-gradient(135deg,#0f2244 0%,#1d6fcc 70%,#0ea5e9 120%);color:#fff;padding:38px 0 44px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(56,189,248,.18),transparent 60%);pointer-events:none}
+.hero .container{position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#bfdbfe;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px}
+.hero h2{color:#fff;margin-bottom:10px;font-size:clamp(1.6rem,4vw,2.5rem)}
+.hero-sub{color:#bfdbfe;font-size:1.02rem;max-width:680px}
+.hero-obj{margin-top:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:var(--r);padding:12px 16px;font-size:13.5px;color:#e0f2fe;max-width:720px}
+.hero-obj b{color:#fff}
+
+.ruta{position:sticky;top:0;z-index:50;background:var(--navy);padding:10px 0;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.ruta-inner{display:flex;align-items:center;gap:6px;flex-wrap:wrap;overflow-x:auto}
+.rstep{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.rstep:hover{background:rgba(255,255,255,.12)}
+.rstep.active{background:rgba(29,111,204,.6);border-color:var(--blue2);color:#dbeafe}
+.rstep.done{background:rgba(5,150,105,.22);border-color:#10b981;color:#6ee7b7}
+.rnum{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.rstep.done .rnum{background:#10b981;color:#fff}.rstep.active .rnum{background:var(--blue2);color:#fff}
+
+.wrap{padding:28px 0 70px}
+.card{background:var(--white);border-radius:var(--rl);box-shadow:var(--sh);border:1px solid var(--g200);padding:24px;margin-bottom:22px;scroll-margin-top:64px;animation:rise .4s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.card-title{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.cti{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ic-diag{background:var(--hint-bg);color:var(--hint)}
+.ic-poe{background:#dbeafe;color:var(--blue)}
+.ic-cond{background:#dcfce7;color:var(--ok)}
+.ic-class{background:#fef3c7;color:var(--warn)}
+.ic-k{background:#fae8ff;color:#a21caf}
+.ic-quiz{background:#fce7f3;color:#be185d}
+.ic-sint{background:var(--warn-bg);color:var(--warn)}
+.card-title h3{margin:0}
+.card-lead{color:var(--g600);font-size:14.5px;margin-bottom:16px}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px}
+.fnum{border-bottom:1.6px solid currentColor;padding:0 8px 1px}
+.fden{padding:1px 8px 0}
+.lim{font-style:italic}.mono{font-family:'Courier New',monospace}
+.cases-fn{font-family:'Courier New',monospace;background:var(--g50);border:1px solid var(--g200);border-radius:10px;padding:10px 14px;display:inline-block;font-size:14px;color:var(--navy);line-height:1.8}
+
+.poe-states{display:flex;gap:6px;margin:14px 0 18px;flex-wrap:wrap}
+.pstate{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--g500);padding:5px 13px;border-radius:50px;background:var(--g100);border:1px solid var(--g200);transition:all .25s}
+.pstate .pn{width:18px;height:18px;border-radius:50%;background:var(--g300);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px}
+.pstate.on{background:#eff6ff;border-color:var(--blue);color:var(--blue)}.pstate.on .pn{background:var(--blue)}
+.pstate.cleared{background:var(--ok-bg);border-color:#10b981;color:#047857}.pstate.cleared .pn{background:#10b981}
+.parrow{color:var(--g300);align-self:center;font-weight:700}
+.predict-group{margin-bottom:16px}
+.pq{font-weight:600;color:var(--navy);font-size:15px;margin-bottom:10px;padding-left:12px;border-left:3px solid var(--hint)}
+.popts{display:flex;flex-direction:column;gap:8px}
+.popt{width:100%;text-align:left;padding:11px 15px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--white);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:11px}
+.popt:hover{border-color:var(--hint);background:#faf5ff;color:var(--navy)}
+.popt.sel{border-color:var(--hint);background:var(--hint-bg);color:var(--navy);font-weight:600}
+.pdot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--g300);flex-shrink:0;transition:all .18s}
+.popt.sel .pdot{border-color:var(--hint);background:var(--hint);box-shadow:inset 0 0 0 3px var(--white)}
+.predict-actions{margin-top:6px}
+.btn{padding:11px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-go{background:var(--hint);color:#fff}.btn-go:hover{background:#6d28d9;transform:translateY(-1px)}
+.btn-go.dim{opacity:.45;pointer-events:none}
+.btn-ghost{background:var(--g100);color:var(--g700);border:1px solid var(--g200)}.btn-ghost:hover{background:var(--g200)}
+.btn-next{background:var(--navy);color:#bfdbfe}.btn-next:hover{background:var(--blue);color:#fff;transform:translateY(-1px)}
+.lockmsg{font-size:13px;color:var(--hint);margin-top:8px;font-weight:600;display:none}
+.lockmsg.show{display:block}
+.poe-observe{position:relative;margin-top:6px;border-top:1px dashed var(--g200);padding-top:18px}
+.observe-inner{transition:filter .5s,opacity .5s}
+.poe-observe.locked .observe-inner{filter:blur(7px);opacity:.45;pointer-events:none;user-select:none}
+.lock-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;z-index:3}
+.poe-observe:not(.locked) .lock-ov{display:none}
+.lock-ic{font-size:30px}.lock-tx{font-weight:700;color:var(--navy);font-size:15px}.lock-sub{font-size:13px;color:var(--g500);max-width:280px}
+.obs-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+@media(max-width:760px){.obs-grid{grid-template-columns:1fr}}
+.canvas-wrap{background:var(--bg2);border-radius:var(--r);border:1px solid var(--g200);overflow:hidden}
+.canvas-wrap canvas{display:block;width:100%;height:auto}
+.poe-explain{margin-top:18px;border-top:1px dashed var(--g200);padding-top:18px;display:none;animation:rise .4s ease both}
+.poe-explain.show{display:block}
+.explain-head{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.explain-head .eh-ic{width:30px;height:30px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.explain-head h4{color:var(--navy);font-size:16px}
+.explain-body{font-size:14.5px;color:var(--g700)}.explain-body p{margin-bottom:.6em}
+.bigidea{background:linear-gradient(90deg,#eff6ff,var(--white));border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;margin-top:12px;font-size:14.5px;color:var(--g700)}
+.explain-next{margin-top:16px}
+.diag-note{display:none;margin-top:14px;background:var(--hint-bg);border:1px solid #c4b5fd;border-radius:var(--r);padding:13px 16px;font-size:14px;color:#4c1d95}
+.diag-note.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+
+/* VERIFICADOR 3 CONDICIONES */
+.cond-fn{display:flex;align-items:center;gap:10px;font-size:1.05rem;color:var(--navy);background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:12px 16px;margin-bottom:8px;flex-wrap:wrap}
+.cond-list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.cond{border:1.5px solid var(--g200);border-radius:var(--r);overflow:hidden;transition:all .25s}
+.cond-head{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--g50)}
+.cond-badge{width:30px;height:30px;border-radius:50%;background:var(--g300);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;transition:all .25s}
+.cond.ok .cond-badge{background:var(--ok)}.cond.bad .cond-badge{background:var(--err)}
+.cond-q{flex:1;font-size:14px;color:var(--navy);font-weight:600}
+.cond-body{padding:0 16px 14px}
+.cond-predict{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.mini-opt{padding:7px 14px;border-radius:50px;border:1.5px solid var(--g200);background:var(--white);font-size:13px;font-weight:600;color:var(--g700);cursor:pointer;transition:all .18s;font-family:'Outfit',sans-serif}
+.mini-opt:hover:not(.locked){border-color:var(--blue);background:#f0f7ff;color:var(--navy)}
+.mini-opt.correct{border-color:var(--ok);background:var(--ok-bg);color:#065f46}
+.mini-opt.wrong{border-color:var(--err);background:var(--err-bg);color:#991b1b}
+.mini-opt.locked{cursor:default}
+.cond-verdict{display:none;margin-top:10px;font-size:13.5px;padding:9px 12px;border-radius:10px}
+.cond-verdict.show{display:block;animation:rise .3s ease both}
+.cond-verdict.ok{background:var(--ok-bg);color:#065f46;border:1px solid #6ee7b7}
+.cond-verdict.bad{background:var(--err-bg);color:#991b1b;border:1px solid #fca5a5}
+.cond-conclusion{display:none;margin-top:16px;border-radius:var(--r);padding:14px 16px;font-size:14.5px;font-weight:600}
+.cond-conclusion.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+.cond-conclusion.cont{background:var(--ok-bg);color:#065f46;border:1px solid #6ee7b7}
+.cond-conclusion.disc{background:var(--warn-bg);color:#92400e;border:1px solid #fcd34d}
+
+/* CLASIFICADOR */
+.clf-intro{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#92400e;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start}
+.clf-card{background:var(--white);border:1.5px solid var(--g200);border-radius:var(--rl);padding:18px;margin-bottom:16px}
+.clf-top{display:grid;grid-template-columns:230px 1fr;gap:18px;align-items:center}
+@media(max-width:640px){.clf-top{grid-template-columns:1fr}}
+.clf-q{font-size:14px;color:var(--navy);font-weight:600;margin-bottom:10px}
+.clf-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:480px){.clf-opts{grid-template-columns:1fr}}
+.clf-opt{padding:10px 12px;border-radius:10px;border:1.5px solid var(--g200);background:var(--white);font-size:13px;font-weight:600;color:var(--g700);cursor:pointer;transition:all .18s;text-align:left;font-family:'Outfit',sans-serif}
+.clf-opt:hover:not(.locked){border-color:var(--blue);background:#f0f7ff;color:var(--navy)}
+.clf-opt.correct{border-color:var(--ok);background:var(--ok-bg);color:#065f46}
+.clf-opt.wrong{border-color:var(--err);background:var(--err-bg);color:#991b1b}
+.clf-opt.locked{cursor:default;opacity:.85}
+.clf-fb{display:none;margin-top:10px;font-size:13.5px;padding:10px 12px;border-radius:10px;gap:8px;align-items:flex-start}
+.clf-fb.show{display:flex;animation:rise .3s ease both}
+.clf-fb.ok{background:var(--ok-bg);color:#065f46;border:1px solid #6ee7b7}
+.clf-fb.bad{background:var(--err-bg);color:#991b1b;border:1px solid #fca5a5}
+.clf-score{text-align:center;font-size:14px;color:var(--g600);margin-top:6px}
+
+/* CUADRO TIPOS */
+.types-table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px;overflow:hidden;border-radius:var(--r);box-shadow:var(--sh)}
+.types-table th{background:var(--navy);color:#dbeafe;padding:10px 12px;text-align:left;font-family:'Outfit',sans-serif;font-weight:700;font-size:12.5px}
+.types-table td{padding:10px 12px;border-bottom:1px solid var(--g200);background:var(--white);vertical-align:top}
+.types-table tr:last-child td{border-bottom:none}
+.tt-name{font-weight:700;color:var(--navy);white-space:nowrap}
+.tt-evit{color:var(--ok)}.tt-esen{color:var(--err)}
+.tt-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:50px;margin-bottom:3px}
+.tag-ev{background:var(--ok-bg);color:#065f46}.tag-es{background:var(--err-bg);color:#991b1b}
+
+/* DESAFÍO K */
+.k-fn{text-align:center;margin:6px 0 16px}
+.k-steps{display:flex;flex-direction:column;gap:12px}
+.k-step{display:none;gap:14px;align-items:flex-start;animation:rise .35s ease both}
+.k-step.show{display:flex}
+.k-label{flex-shrink:0;width:120px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--g500);background:var(--g100);border:1px solid var(--g200);border-radius:8px;padding:6px 8px;text-align:center;margin-top:2px}
+.k-body{flex:1;min-width:0}
+.k-q{font-size:14px;color:var(--navy);font-weight:600;margin-bottom:8px}
+.k-opts{display:flex;gap:8px;flex-wrap:wrap}
+.k-fb{display:none;margin-top:9px;font-size:13.5px;padding:9px 12px;border-radius:10px;gap:8px;align-items:flex-start}
+.k-fb.show{display:flex;animation:rise .3s ease both}
+.k-fb.ok{background:var(--ok-bg);color:#065f46;border:1px solid #6ee7b7}
+.k-fb.bad{background:var(--err-bg);color:#991b1b;border:1px solid #fca5a5}
+.k-result{display:none;margin-top:16px;background:#f0fdfa;border:1px solid #99f6e4;border-left:4px solid var(--teal,#0d9e87);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;font-size:14px;color:#115e59}
+.k-result.show{display:block;animation:rise .4s ease both}
+
+.qopts{display:flex;flex-direction:column;gap:8px}
+.qopt{width:100%;text-align:left;padding:11px 15px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--white);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:11px}
+.qopt:hover:not(.locked){border-color:var(--blue);background:#f0f7ff;color:var(--navy)}
+.qopt .ql{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--g300);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--g600);flex-shrink:0;transition:all .18s}
+.qopt.correct{border-color:var(--ok);background:var(--ok-bg);color:#065f46;font-weight:600}.qopt.correct .ql{border-color:var(--ok);background:var(--ok);color:#fff}
+.qopt.wrong{border-color:var(--err);background:var(--err-bg);color:#991b1b}.qopt.wrong .ql{border-color:var(--err);background:var(--err);color:#fff}
+.qopt.locked{cursor:default}
+.qfb{border-radius:var(--r);padding:13px 15px;margin-top:11px;font-size:14px;display:none;gap:10px;align-items:flex-start}
+.qfb.show{display:flex;animation:rise .35s ease both}
+.qfb.ok{background:var(--ok-bg);border:1px solid #6ee7b7;color:#065f46}.qfb.bad{background:var(--err-bg);border:1px solid #fca5a5;color:#7f1d1d}
+.qfb-ic{font-size:17px;flex-shrink:0}
+.qitem{margin-bottom:22px}.qitem:last-of-type{margin-bottom:0}
+.qhead{font-size:12px;font-weight:700;text-transform:uppercase;color:var(--g500);margin-bottom:6px}
+.qtext{font-weight:600;color:var(--navy);font-size:15px;margin-bottom:12px;padding-left:12px;border-left:3px solid var(--blue)}
+.quiz-done{display:none;margin-top:6px;background:var(--navy);color:#bfdbfe;border-radius:var(--r);padding:14px;text-align:center;font-size:14px}
+.quiz-done.show{display:block;animation:rise .4s ease both}.quiz-done b{color:#7dd3fc;font-size:1.3rem}
+
+.sint-q{font-weight:600;color:var(--navy);font-size:14.5px;margin:14px 0 8px;padding-left:12px;border-left:3px solid var(--warn)}
+.sint-ta{width:100%;min-height:72px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);resize:vertical;background:var(--g50)}
+.sint-ta:focus{outline:none;border-color:var(--warn);background:var(--white)}
+.sint-done{display:none;margin-top:14px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#065f46}
+.sint-done.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+
+.proto-note{background:#fff7ed;border:1px dashed #fdba74;border-radius:var(--r);padding:12px 16px;font-size:13px;color:#9a3412;margin-bottom:22px;display:flex;gap:10px;align-items:flex-start}
+@media(max-width:520px){
+  .card{padding:17px}
+  .btn{width:100%;justify-content:center}
+  .predict-actions .btn,.explain-next .btn{width:auto}
+  .k-step{flex-direction:column;gap:6px}.k-label{width:auto;align-self:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar"><b>INSPT · UTN</b> &nbsp;·&nbsp; Análisis Matemático I &nbsp;·&nbsp; Prof. Ariel Cardozo</div>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-badge">⬡ Unidad 2 · Etapa 6 de 7</div>
+    <h2>Continuidad y discontinuidades</h2>
+    <p class="hero-sub">Acá se cosecha todo lo anterior. El salto, el hueco de la 0/0, la asíntota: cada uno resulta ser un tipo de discontinuidad. Vas a aprender las tres condiciones de continuidad y a clasificar por qué una función se "rompe" en un punto.</p>
+    <div class="hero-obj"><b>🎯 Meta:</b> verificar las tres condiciones de continuidad en un punto (∃f(a), ∃límite finito, límite = f(a)) y clasificar las discontinuidades en evitable y esencial (salto finito, infinita, oscilatoria).</div>
+  </div>
+</header>
+
+<nav class="ruta">
+  <div class="container ruta-inner" id="ruta">
+    <div class="rstep active" data-go="sec-diag"><span class="rnum">0</span>Idea previa</div>
+    <div class="rstep" data-go="poe-open"><span class="rnum">1</span>¿1/x es continua?</div>
+    <div class="rstep" data-go="sec-cond"><span class="rnum">2</span>3 condiciones</div>
+    <div class="rstep" data-go="sec-class"><span class="rnum">3</span>Clasificador</div>
+    <div class="rstep" data-go="sec-k"><span class="rnum">4</span>Desafío k</div>
+    <div class="rstep" data-go="sec-quiz"><span class="rnum">5</span>Práctica</div>
+    <div class="rstep" data-go="sec-sint"><span class="rnum">6</span>Síntesis</div>
+  </div>
+</nav>
+
+<div class="wrap"><div class="container">
+
+  <div class="proto-note"><span>🧪</span><div><strong>Prototipo de andamiaje — Etapa 6.</strong> POE de apertura que confronta la intuición del "lápiz", verificador de las 3 condiciones con desvanecimiento (primero chequea la app, después predecís vos), y un clasificador-juego de discontinuidades con los cinco tipos del cuadro (incluida la oscilatoria).</div></div>
+
+  <!-- DIAGNÓSTICO -->
+  <section class="card" id="sec-diag">
+    <div class="card-title"><div class="cti ic-diag">💭</div><h3>Antes de empezar: ¿qué pensás vos?</h3></div>
+    <p class="card-lead">No hay respuesta correcta todavía. Queremos saber con qué idea llegás.</p>
+    <div class="predict-group">
+      <div class="pq">¿Cuándo dirías que una función es <strong>continua en un punto</strong> x = a?</div>
+      <div class="popts" id="diag-opts">
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Cuando puedo dibujarla sin levantar el lápiz en ese punto.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Cuando está definida, tiene límite finito y ambos coinciden.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Cuando no tiene asíntotas.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Cuando es una fórmula y no una función partida.</button>
+      </div>
+    </div>
+    <div class="diag-note" id="diag-note"><span>📌</span><div>Anotada tu idea. La intuición del lápiz es un buen comienzo, pero vas a ver que necesitamos algo más preciso — y que a veces la intuición falla.</div></div>
+  </section>
+
+  <!-- POE APERTURA: 1/x -->
+  <section class="card" id="poe-open">
+    <div class="card-title"><div class="cti ic-poe">🔬</div><h3>El conflicto: ¿es 1/x continua?</h3></div>
+    <p class="card-lead">Una pregunta tramposa para empezar. Comprometete antes de ver el gráfico.</p>
+
+    <div class="poe-states" id="states-open">
+      <div class="pstate on" data-s="predict"><span class="pn">1</span>Predecí</div><span class="parrow">→</span>
+      <div class="pstate" data-s="observe"><span class="pn">2</span>Observá</div><span class="parrow">→</span>
+      <div class="pstate" data-s="explain"><span class="pn">3</span>Explicá</div>
+    </div>
+
+    <div class="poe-predict">
+      <div class="predict-group">
+        <div class="pq">La función f(x) = <span class="frac"><span class="fnum">1</span><span class="fden">x</span></span> "se rompe" en x = 0. ¿Es discontinua <strong>en x = 0</strong>?</div>
+        <div class="popts">
+          <button class="popt" onclick="poeSel('disc',this)"><span class="pdot"></span>Sí: en x = 0 hay un salto al infinito, así que es discontinua ahí.</button>
+          <button class="popt" onclick="poeSel('nodef',this)"><span class="pdot"></span>La pregunta no tiene sentido: x = 0 no está en el dominio.</button>
+          <button class="popt" onclick="poeSel('cont',this)"><span class="pdot"></span>Es continua: la fórmula 1/x es una sola expresión.</button>
+        </div>
+      </div>
+      <div class="predict-actions">
+        <button class="btn btn-go dim" id="lock-open" onclick="poeLock()">Ver qué pasa →</button>
+        <div class="lockmsg" id="lockmsg-open">Elegí una opción para continuar.</div>
+      </div>
+    </div>
+
+    <div class="poe-observe locked" id="obs-open">
+      <div class="lock-ov"><div class="lock-ic">🔒</div><div class="lock-tx">Primero comprometete con una respuesta</div><div class="lock-sub">El gráfico se desbloquea al confirmar.</div></div>
+      <div class="observe-inner">
+        <div class="obs-grid">
+          <div class="canvas-wrap"><canvas id="cv-open" width="540" height="400"></canvas></div>
+          <div>
+            <p style="font-size:13.5px;color:var(--g700)">La curva 1/x se dispara a −∞ por la izquierda de 0 y a +∞ por la derecha. Parece el caso más discontinuo posible…</p>
+            <p style="font-size:13.5px;color:var(--g700)">…pero hay una sutileza: la continuidad <strong>solo se pregunta en puntos del dominio</strong>, y x = 0 no está en el dominio de 1/x.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="poe-explain" id="exp-open">
+      <div class="explain-head"><div class="eh-ic">💡</div><h4>Lo que muestra el experimento</h4></div>
+      <div class="explain-body" id="expbody-open"></div>
+      <div class="explain-next"><button class="btn btn-next" data-go="sec-cond">Ver las tres condiciones →</button></div>
+    </div>
+  </section>
+
+  <!-- VERIFICADOR 3 CONDICIONES -->
+  <section class="card" id="sec-cond">
+    <div class="card-title"><div class="cti ic-cond">✓</div><h3>Las tres condiciones de continuidad</h3></div>
+    <p class="card-lead">f es continua en x = a si se cumplen las <strong>tres</strong> a la vez. Vamos a verificarlas con un ejemplo — y en cada una vas a predecir antes de comprobar.</p>
+
+    <div class="cond-fn">Analizamos &nbsp;f(x) = x² − 6x + 5&nbsp; en &nbsp;x = 2</div>
+
+    <div class="cond-list" id="cond-list">
+      <div class="cond" id="cond-1">
+        <div class="cond-head"><div class="cond-badge" id="cb-1">1</div><div class="cond-q">¿Existe f(2)? (¿está definida la función en el punto?)</div></div>
+        <div class="cond-body">
+          <p style="font-size:13.5px;color:var(--g600);margin-bottom:6px">Tu predicción:</p>
+          <div class="cond-predict" id="cp-1">
+            <button class="mini-opt" onclick="condAns(1,'si')">Sí, existe</button>
+            <button class="mini-opt" onclick="condAns(1,'no')">No, no está definida</button>
+          </div>
+          <div class="cond-verdict" id="cv-1"></div>
+        </div>
+      </div>
+      <div class="cond" id="cond-2">
+        <div class="cond-head"><div class="cond-badge" id="cb-2">2</div><div class="cond-q">¿Existe el límite en x = 2 y es finito? (¿coinciden los laterales en un número real?)</div></div>
+        <div class="cond-body">
+          <p style="font-size:13.5px;color:var(--g600);margin-bottom:6px">Tu predicción:</p>
+          <div class="cond-predict" id="cp-2">
+            <button class="mini-opt" onclick="condAns(2,'si')">Sí, existe y es finito</button>
+            <button class="mini-opt" onclick="condAns(2,'no')">No existe / es infinito</button>
+          </div>
+          <div class="cond-verdict" id="cv-2"></div>
+        </div>
+      </div>
+      <div class="cond" id="cond-3">
+        <div class="cond-head"><div class="cond-badge" id="cb-3">3</div><div class="cond-q">¿El límite coincide con f(2)?</div></div>
+        <div class="cond-body">
+          <p style="font-size:13.5px;color:var(--g600);margin-bottom:6px">Tu predicción:</p>
+          <div class="cond-predict" id="cp-3">
+            <button class="mini-opt" onclick="condAns(3,'si')">Sí, son iguales</button>
+            <button class="mini-opt" onclick="condAns(3,'no')">No coinciden</button>
+          </div>
+          <div class="cond-verdict" id="cv-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cond-conclusion" id="cond-concl"></div>
+
+    <div class="bigidea" style="margin-top:18px"><strong>La fórmula que resume todo:</strong> f es continua en x = a ⟺ <span class="lim">lim</span><sub>x→a</sub> f(x) = f(a). Esa única igualdad encierra las tres condiciones: para escribirla, f(a) tiene que existir, el límite tiene que existir y finito, y tienen que ser iguales. <strong>Ojo con el infinito:</strong> "existe y es finito" van juntos — si el límite es ±∞, la condición 2 no se cumple.</div>
+  </section>
+
+  <!-- CLASIFICADOR -->
+  <section class="card" id="sec-class">
+    <div class="card-title"><div class="cti ic-class">🎯</div><h3>Clasificador de discontinuidades</h3></div>
+    <p class="card-lead">Cuando falla alguna condición, hay discontinuidad — pero no todas son iguales. Primero el mapa, después lo practicás.</p>
+
+    <table class="types-table">
+      <thead><tr><th>Tipo</th><th>¿Qué pasa?</th><th>¿Se arregla?</th></tr></thead>
+      <tbody>
+        <tr><td class="tt-name"><span class="tt-tag tag-ev">EVITABLE</span></td><td>El límite existe y es finito, pero f(a) no coincide con él o no está definida.</td><td class="tt-evit">Sí, redefiniendo f(a)</td></tr>
+        <tr><td class="tt-name"><span class="tt-tag tag-es">ESENCIAL · salto finito</span></td><td>Los límites laterales existen y son finitos, pero distintos.</td><td class="tt-esen">No</td></tr>
+        <tr><td class="tt-name"><span class="tt-tag tag-es">ESENCIAL · infinita</span></td><td>Algún límite lateral vale +∞ o −∞.</td><td class="tt-esen">No</td></tr>
+        <tr><td class="tt-name"><span class="tt-tag tag-es">ESENCIAL · oscilatoria</span></td><td>El límite no existe porque la función oscila cerca del punto.</td><td class="tt-esen">No</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:13px;color:var(--g500);margin-top:8px">En una frase: <strong>evitable</strong> = se arregla cambiando solo f(a); <strong>esencial</strong> = no se arregla cambiando solo f(a).</p>
+
+    <div class="clf-intro" style="margin-top:18px"><span>🎯</span><div>Para cada gráfico, decidí qué tipo de discontinuidad hay en el punto marcado. La devolución te explica por qué.</div></div>
+    <div id="clf-mount"></div>
+    <div class="clf-score" id="clf-score"></div>
+  </section>
+
+  <!-- DESAFÍO K -->
+  <section class="card" id="sec-k">
+    <div class="card-title"><div class="cti ic-k">🏆</div><h3>Desafío: el valor de k</h3></div>
+    <p class="card-lead">Un clásico de examen. En vez de resolverlo de una, lo vamos a descomponer en pasos — que es como conviene pensarlo siempre.</p>
+    <div class="k-fn">
+      <div class="cases-fn">f(x) = { &nbsp; x² + 1 &nbsp; si x &lt; 1 &nbsp;|&nbsp; k &nbsp; si x = 1 &nbsp;|&nbsp; 2x &nbsp; si x &gt; 1 }</div>
+      <p style="font-size:14px;color:var(--g700);margin-top:10px">¿Existe algún valor de <strong>k</strong> que haga a f continua en x = 1?</p>
+    </div>
+    <div class="k-steps" id="k-steps"></div>
+    <div class="k-result" id="k-result"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="card" id="sec-quiz">
+    <div class="card-title"><div class="cti ic-quiz">✏️</div><h3>Verificá tu comprensión</h3></div>
+    <p class="card-lead">Si te equivocás, la devolución te dice por qué.</p>
+    <div id="quiz-mount"></div>
+    <div class="quiz-done" id="quiz-done"></div>
+  </section>
+
+  <!-- SÍNTESIS -->
+  <section class="card" id="sec-sint">
+    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Síntesis: ¿qué cambió en tu cabeza?</h3></div>
+    <p class="card-lead">Ponerlo en palabras lo fija mejor que solo leerlo.</p>
+    <div class="sint-q">Con tus palabras: ¿cuál es la diferencia entre que una función <strong>tenga valor</strong> en un punto y que <strong>tenga límite</strong> en ese punto?</div>
+    <textarea class="sint-ta" id="sint1" placeholder="Tener valor significa… Tener límite significa… Para ser continua hace falta…"></textarea>
+    <div class="sint-q">¿Por qué una discontinuidad <strong>evitable</strong> se puede arreglar y una <strong>esencial</strong> no? Conectalo con lo que viste de la 0/0 (Etapa 3) y las asíntotas (Etapas 4 y 5).</div>
+    <textarea class="sint-ta" id="sint2" placeholder="La evitable se arregla porque… La de salto/infinita no, porque… El hueco de la 0/0 es…"></textarea>
+    <div style="margin-top:14px"><button class="btn btn-next" onclick="saveSint()">Guardar mi reflexión ✓</button></div>
+    <div class="sint-done" id="sint-done"><span>🎉</span><div><strong>¡Etapa 6 completa!</strong> Ya tenés las tres condiciones y sabés clasificar discontinuidades. Mirá todo lo que se reunió acá: el <strong>salto</strong> de la Etapa 1 era una discontinuidad esencial de salto; el <strong>hueco</strong> de la 0/0 (Etapas 3 y 5), una evitable; la <strong>asíntota</strong> (Etapas 4 y 5), una esencial infinita. Solo queda el cierre integrador.</div></div>
+  </section>
+
+</div></div>
+
+<script>
+/* ===================== MOTOR DE GRAFICACIÓN ===================== */
+class GraphPlotter{
+  constructor(id,o={}){
+    this.canvas=document.getElementById(id);this.ctx=this.canvas.getContext('2d');
+    this.xMin=o.xMin??-6;this.xMax=o.xMax??6;this.yMin=o.yMin??-8;this.yMax=o.yMax??8;
+    this.pL=46;this.pR=18;this.pT=18;this.pB=34;
+  }
+  get W(){return this.canvas.width-this.pL-this.pR}
+  get H(){return this.canvas.height-this.pT-this.pB}
+  cx(x){return this.pL+(x-this.xMin)/(this.xMax-this.xMin)*this.W}
+  cy(y){return this.pT+(this.yMax-y)/(this.yMax-this.yMin)*this.H}
+  clear(){const c=this.ctx;c.fillStyle='#f8fbff';c.fillRect(0,0,this.canvas.width,this.canvas.height)}
+  drawGrid(){const c=this.ctx;c.strokeStyle='#e2eaf5';c.lineWidth=.75;c.setLineDash([]);
+    for(let x=Math.ceil(this.xMin);x<=Math.floor(this.xMax);x++){if(x===0)continue;c.beginPath();c.moveTo(this.cx(x),this.pT);c.lineTo(this.cx(x),this.pT+this.H);c.stroke();}
+    for(let y=Math.ceil(this.yMin);y<=Math.floor(this.yMax);y++){if(y===0)continue;c.beginPath();c.moveTo(this.pL,this.cy(y));c.lineTo(this.pL+this.W,this.cy(y));c.stroke();}}
+  drawAxes(){const c=this.ctx,y0=this.cy(0),x0=this.cx(0);
+    const inY=y0>=this.pT&&y0<=this.pT+this.H,inX=x0>=this.pL&&x0<=this.pL+this.W;
+    const ay0=inY?y0:this.pT+this.H,ax0=inX?x0:this.pL;
+    c.strokeStyle='#334155';c.lineWidth=1.5;c.fillStyle='#334155';c.setLineDash([]);
+    if(inY){c.beginPath();c.moveTo(this.pL,y0);c.lineTo(this.pL+this.W-6,y0);c.stroke();
+      c.beginPath();c.moveTo(this.pL+this.W,y0);c.lineTo(this.pL+this.W-10,y0-4);c.lineTo(this.pL+this.W-10,y0+4);c.closePath();c.fill();
+      c.fillStyle='#475569';c.font='12px Outfit,sans-serif';c.textAlign='center';c.fillText('x',this.pL+this.W+7,y0+4);}
+    if(inX){c.strokeStyle='#334155';c.fillStyle='#334155';
+      c.beginPath();c.moveTo(x0,this.pT+this.H);c.lineTo(x0,this.pT+6);c.stroke();
+      c.beginPath();c.moveTo(x0,this.pT);c.lineTo(x0-4,this.pT+10);c.lineTo(x0+4,this.pT+10);c.closePath();c.fill();
+      c.fillStyle='#475569';c.font='12px Outfit,sans-serif';c.fillText('y',x0,this.pT-6);}
+    c.fillStyle='#64748b';c.font='10.5px Outfit,sans-serif';
+    for(let x=Math.ceil(this.xMin);x<=Math.floor(this.xMax);x++){if(x===0)continue;const px=this.cx(x);
+      c.strokeStyle='#475569';c.lineWidth=1;c.beginPath();c.moveTo(px,ay0-3);c.lineTo(px,ay0+3);c.stroke();
+      if(inY&&Math.abs(px-this.pL)>5&&Math.abs(px-(this.pL+this.W))>10){c.textAlign='center';c.fillText(x,px,ay0+14);}}
+    for(let y=Math.ceil(this.yMin);y<=Math.floor(this.yMax);y++){if(y===0)continue;const py=this.cy(y);
+      c.strokeStyle='#475569';c.lineWidth=1;c.beginPath();c.moveTo(ax0-3,py);c.lineTo(ax0+3,py);c.stroke();
+      if(inX){c.textAlign='right';c.fillText(y,ax0-6,py+3);}}
+    if(inX&&inY){c.textAlign='right';c.fillStyle='#64748b';c.fillText('0',x0-4,y0+12);}}
+  vGuide(val){const c=this.ctx;c.save();c.strokeStyle='#cbd5e1';c.lineWidth=1.1;c.setLineDash([4,4]);
+    const x=this.cx(val);c.beginPath();c.moveTo(x,this.pT);c.lineTo(x,this.pT+this.H);c.stroke();c.restore();c.setLineDash([]);}
+  plot(fn,color='#1d6fcc',lw=2.6,xlo,xhi){const c=this.ctx;c.strokeStyle=color;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';c.setLineDash([]);
+    const lo=xlo??this.xMin,hi=xhi??this.xMax,steps=900,dx=(hi-lo)/steps;let started=false,prevY=null;c.beginPath();
+    for(let i=0;i<=steps;i++){const x=lo+i*dx;let y;
+      try{y=fn(x)}catch(e){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      if(!isFinite(y)||isNaN(y)){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      if(prevY!==null&&Math.abs(y-prevY)>(this.yMax-this.yMin)*.6){c.stroke();c.beginPath();started=false}
+      const X=this.cx(x),Y=this.cy(y);if(!started){c.moveTo(X,Y);started=true}else c.lineTo(X,Y);prevY=y;}
+    c.stroke();}
+  point(x,y,filled=true,color='#ef4444',r=6){const c=this.ctx,px=this.cx(x),py=this.cy(y);
+    c.beginPath();c.arc(px,py,r,0,Math.PI*2);
+    if(filled){c.fillStyle=color;c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();}
+    else{c.fillStyle='#f8fbff';c.fill();c.strokeStyle=color;c.lineWidth=2.6;c.stroke();}}
+}
+function fmt(n){if(!isFinite(n))return n>0?'+∞':'−∞';let s=(+n).toFixed(4);s=s.replace(/\.?0+$/,'');s=s.replace('.',',');s=s.replace('-','−');return s;}
+
+const DONE={diag:false,open:false,cond:false,class:false,k:false,quiz:false,sint:false};
+
+/* ===================== DIAGNÓSTICO ===================== */
+function selectDiag(btn){
+  document.querySelectorAll('#diag-opts .popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');document.getElementById('diag-note').classList.add('show');
+  DONE.diag=true;updateRuta();
+}
+
+/* ===================== POE APERTURA 1/x ===================== */
+let GO,poePred=null;
+function setStatesOpen(state){
+  document.querySelectorAll('#states-open .pstate').forEach(el=>{
+    el.classList.remove('on','cleared');const s=el.dataset.s,order=['predict','observe','explain'];
+    if(order.indexOf(s)<order.indexOf(state))el.classList.add('cleared');else if(s===state)el.classList.add('on');
+  });
+}
+function poeSel(v,btn){
+  btn.closest('.popts').querySelectorAll('.popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');poePred=v;
+  document.getElementById('lock-open').classList.remove('dim');
+  document.getElementById('lockmsg-open').classList.remove('show');
+}
+function drawOpen(){
+  GO=GO||new GraphPlotter('cv-open',{xMin:-6,xMax:6,yMin:-6,yMax:6});
+  GO.clear();GO.drawGrid();GO.drawAxes();GO.vGuide(0);
+  GO.plot(x=>1/x,'#1d6fcc',2.6,GO.xMin,-0.05);
+  GO.plot(x=>1/x,'#1d6fcc',2.6,0.05,GO.xMax);
+}
+function poeLock(){
+  if(!poePred){document.getElementById('lockmsg-open').classList.add('show');return;}
+  document.getElementById('obs-open').classList.remove('locked');
+  setStatesOpen('observe');drawOpen();
+  document.querySelectorAll('#poe-open .poe-predict .popt').forEach(b=>b.style.pointerEvents='none');
+  document.getElementById('lock-open').classList.add('dim');
+  setTimeout(explainOpen,1000);
+}
+function explainOpen(){
+  const exp=document.getElementById('exp-open');if(exp.classList.contains('show'))return;
+  let h='';
+  if(poePred==='nodef'){h+=`<p>Muy bien — y es la respuesta más fina. La continuidad <strong>solo se evalúa en puntos del dominio</strong>. Como x = 0 no pertenece al dominio de 1/x, no tiene sentido preguntar si es continua o discontinua <em>en x = 0</em>.</p>`;}
+  else if(poePred==='disc'){h+=`<p>Es la respuesta intuitiva, pero hay una trampa: para decir "discontinua en x = 0" la función tendría que estar <em>definida</em> ahí, y 1/x no lo está. La continuidad solo se pregunta en puntos del dominio. En x = 0 no decimos "discontinua": decimos que no pertenece al dominio.</p>`;}
+  else{h+=`<p>Cuidado: que sea una sola fórmula no la hace continua en todos lados. Pero el punto clave es otro: en x = 0 la función <strong>no está definida</strong>, así que la continuidad ni siquiera se evalúa ahí.</p>`;}
+  h+=`<div class="bigidea"><strong>La idea que rompe la intuición del lápiz:</strong> 1/x <em>es continua en todo su dominio</em> (en cada x ≠ 0 cumple las tres condiciones). El "agujero" en x = 0 no es una discontinuidad de la función: es un punto que simplemente no le pertenece. La continuidad es una propiedad <strong>punto a punto, y solo en el dominio</strong>.</div>`;
+  document.getElementById('expbody-open').innerHTML=h;
+  exp.classList.add('show');setStatesOpen('explain');DONE.open=true;updateRuta();
+}
+
+/* ===================== VERIFICADOR 3 CONDICIONES ===================== */
+/* f(x)=x²-6x+5 en x=2: f(2)=-3, lim=-3 -> continua. Las 3 dan "sí". */
+const COND={
+  1:{ok:'si',vOk:'✅ Correcto. f(2) = 2² − 6·2 + 5 = 4 − 12 + 5 = −3. La función está definida en x = 2.',
+        vBad:'Mirá: f(2) = 2² − 6·2 + 5 = −3. Sí está definida (es un polinomio, definido en todo ℝ).'},
+  2:{ok:'si',vOk:'✅ Correcto. Es un polinomio: el límite existe y se calcula por sustitución directa. lim = −3, finito.',
+        vBad:'En un polinomio el límite siempre existe y es finito (Etapa 2). Acá lim_{x→2}(x²−6x+5) = −3.'},
+  3:{ok:'si',vOk:'✅ Correcto. lim = −3 y f(2) = −3: coinciden. Se cumple la condición 3.',
+        vBad:'Los dos valores son −3 (el límite) y −3 (la función): coinciden. La condición 3 se cumple.'}
+};
+const condState={1:false,2:false,3:false};
+function condAns(n,v){
+  if(condState[n])return;
+  const c=COND[n],correct=(v===c.ok);
+  document.querySelectorAll('#cp-'+n+' .mini-opt').forEach(b=>{
+    b.classList.add('locked');
+    const isThis=b.getAttribute('onclick').includes("'"+v+"'");
+    const isCorrectOpt=b.getAttribute('onclick').includes("'"+c.ok+"'");
+    if(isCorrectOpt)b.classList.add('correct');else if(isThis)b.classList.add('wrong');
+  });
+  const vd=document.getElementById('cv-'+n);
+  vd.className='cond-verdict show '+(correct?'ok':'bad');
+  vd.innerHTML=correct?c.vOk:c.vBad;
+  document.getElementById('cond-'+n).classList.add('ok'); // las 3 se cumplen en este ejemplo
+  document.getElementById('cb-'+n).textContent='✓';
+  condState[n]=true;
+  if(condState[1]&&condState[2]&&condState[3]){
+    const cc=document.getElementById('cond-concl');
+    cc.className='cond-conclusion show cont';
+    cc.innerHTML='<span>🎉</span><div>Las <strong>tres condiciones</strong> se cumplen ⇒ f(x) = x² − 6x + 5 <strong>es continua en x = 2</strong>. (En realidad, todo polinomio es continuo en todo ℝ.)</div>';
+    DONE.cond=true;updateRuta();
+  }
+}
+
+/* ===================== CLASIFICADOR ===================== */
+const CLF=[
+ {id:0,fn:x=>(x*x-4)/(x-2),win:{xMin:-3,xMax:6,yMin:-2,yMax:8},a:2,hole:[2,4],
+  q:'El denominador se anula en x=2, pero el factor se cancela: lím = 4 y f(2) no existe.',
+  correct:'evit',
+  opts:[['evit','Evitable'],['salto','Esencial · salto'],['inf','Esencial · infinita'],['osc','Esencial · oscilatoria']],
+  fb:{evit:'✅ Evitable: el límite existe y es finito (4), solo falta definir f(2)=4 para "tapar" el hueco.',
+      salto:'No es salto: los laterales coinciden (ambos → 4). Como el límite existe y finito pero f(2) no, es EVITABLE.',
+      inf:'No es infinita: el límite es 4, finito. Es evitable (hueco).',
+      osc:'No oscila: tiende ordenadamente a 4. Es evitable.'}},
+ {id:1,fnPieces:true,win:{xMin:-3,xMax:5,yMin:-2,yMax:6},a:1,
+  draw:(G)=>{G.plot(x=>x+2,'#1d6fcc',2.6,G.xMin,1);G.plot(x=>x,'#1d6fcc',2.6,1,G.xMax);G.point(1,3,true,'#1d6fcc',5);G.point(1,1,false,'#1d6fcc',6);},
+  q:'Por izquierda f→3 y por derecha f→1: los laterales existen, son finitos, pero distintos.',
+  correct:'salto',
+  opts:[['evit','Evitable'],['salto','Esencial · salto'],['inf','Esencial · infinita'],['osc','Esencial · oscilatoria']],
+  fb:{salto:'✅ Salto finito: ambos laterales son finitos (3 y 1) pero distintos. No se arregla cambiando solo f(1).',
+      evit:'No es evitable: para eso el límite tendría que existir, pero acá los laterales difieren (3≠1), así que NO hay límite.',
+      inf:'No es infinita: los laterales son 3 y 1, finitos. Es un salto finito.',
+      osc:'No oscila: cada lado tiende a un valor fijo. Es un salto finito.'}},
+ {id:2,fn:x=>1/((x-2)*(x-2)),win:{xMin:-1,xMax:5,yMin:-1,yMax:8},a:2,asy:2,
+  q:'Al acercarse a x=2, la función se dispara: ambos laterales → +∞.',
+  correct:'inf',
+  opts:[['evit','Evitable'],['salto','Esencial · salto'],['inf','Esencial · infinita'],['osc','Esencial · oscilatoria']],
+  fb:{inf:'✅ Infinita: el límite es +∞ (no finito), hay una asíntota vertical en x=2. Esencial, no se arregla.',
+      evit:'No es evitable: el límite no es finito (es +∞), así que no hay valor para "tapar" nada.',
+      salto:'No es salto finito: un salto finito tiene laterales finitos distintos. Acá ambos son +∞.',
+      osc:'No oscila: crece sin tope hacia +∞. Es una discontinuidad infinita.'}},
+ {id:3,fn:x=>Math.sin(1/x),win:{xMin:-0.6,xMax:0.6,yMin:-1.6,yMax:1.6},a:0,osc:true,
+  q:'Cerca de x=0, sen(1/x) oscila entre −1 y 1 infinitas veces, cada vez más rápido.',
+  correct:'osc',
+  opts:[['evit','Evitable'],['salto','Esencial · salto'],['inf','Esencial · infinita'],['osc','Esencial · oscilatoria']],
+  fb:{osc:'✅ Oscilatoria: el límite no existe porque la función oscila sin acercarse a ningún valor. Esencial.',
+      evit:'No es evitable: no hay un límite finito al que tienda — oscila para siempre.',
+      salto:'No es salto: un salto necesita dos valores laterales fijos. Acá no hay ningún valor de aproximación.',
+      inf:'No es infinita: no se dispara a ±∞, queda atrapada entre −1 y 1 — pero oscilando.'}}
+];
+const clfState=CLF.map(()=>false);
+function renderClassifier(){
+  const mount=document.getElementById('clf-mount');let html='';
+  CLF.forEach((c,i)=>{
+    html+=`<div class="clf-card"><div class="clf-top">
+      <div class="canvas-wrap"><canvas id="clf-cv-${i}" width="230" height="180"></canvas></div>
+      <div><div class="clf-q">Caso ${i+1}. ${c.q} <br><span style="color:var(--g500);font-weight:500">¿Qué tipo de discontinuidad hay en x = ${fmt(c.a)}?</span></div>
+        <div class="clf-opts" id="clf-opts-${i}">${c.opts.map(o=>`<button class="clf-opt" onclick="clfAns(${i},'${o[0]}')">${o[1]}</button>`).join('')}</div>
+        <div class="clf-fb" id="clf-fb-${i}"><span></span><span class="clf-fb-tx"></span></div>
+      </div></div></div>`;
+  });
+  mount.innerHTML=html;
+  CLF.forEach((c,i)=>drawClf(i));
+  updateClfScore();
+}
+function drawClf(i){
+  const c=CLF[i],G=new GraphPlotter('clf-cv-'+i,c.win);
+  G.clear();G.drawGrid();G.drawAxes();
+  if(c.asy!==undefined)G.vGuide(c.asy);
+  if(c.osc){G.vGuide(0);
+    // dibujar la oscilación en dos tramos evitando x=0
+    G.plot(c.fn,'#1d6fcc',1.8,c.win.xMin,-0.012);
+    G.plot(c.fn,'#1d6fcc',1.8,0.012,c.win.xMax);
+  } else if(c.fnPieces){c.draw(G);}
+  else if(c.asy!==undefined){G.plot(c.fn,'#1d6fcc',2.4,c.win.xMin,c.asy-0.03);G.plot(c.fn,'#1d6fcc',2.4,c.asy+0.03,c.win.xMax);}
+  else {G.plot(c.fn,'#1d6fcc',2.4);}
+  if(c.hole)G.point(c.hole[0],c.hole[1],false,'#1d6fcc',6);
+}
+function clfAns(i,v){
+  if(clfState[i])return;
+  const c=CLF[i],correct=(v===c.correct);
+  document.querySelectorAll('#clf-opts-'+i+' .clf-opt').forEach(b=>{
+    b.classList.add('locked');
+    const isThis=b.getAttribute('onclick').includes("'"+v+"'");
+    const isCorrectOpt=b.getAttribute('onclick').includes("'"+c.correct+"'");
+    if(isCorrectOpt)b.classList.add('correct');else if(isThis)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('clf-fb-'+i);
+  fb.className='clf-fb show '+(correct?'ok':'bad');
+  fb.querySelector('span').textContent=correct?'✅':'❌';
+  fb.querySelector('.clf-fb-tx').textContent=c.fb[v];
+  clfState[i]=true;updateClfScore();
+}
+function updateClfScore(){
+  const done=clfState.filter(Boolean).length;
+  document.getElementById('clf-score').textContent=`Clasificados: ${done} de ${CLF.length}`;
+  if(done===CLF.length){DONE.class=true;updateRuta();}
+}
+
+/* ===================== DESAFÍO K ===================== */
+const KSTEPS=[
+ {label:'Límite izq.',q:'¿Cuánto vale el límite por izquierda? (x→1⁻, rama x²+1)',opts:['2','1','0'],ok:'2',
+  fb:{'2':'✅ lím_{x→1⁻}(x²+1) = 1²+1 = 2.','1':'Revisá: 1²+1 = 2, no 1.','0':'No: 1²+1 = 2.'}},
+ {label:'Límite der.',q:'¿Cuánto vale el límite por derecha? (x→1⁺, rama 2x)',opts:['2','1','3'],ok:'2',
+  fb:{'2':'✅ lím_{x→1⁺}(2x) = 2·1 = 2.','1':'No: 2·1 = 2.','3':'Revisá: 2·1 = 2, no 3.'}},
+ {label:'¿Existe lím?',q:'Entonces, ¿existe el límite en x=1? ¿Cuánto vale?',opts:['Sí, vale 2','No, los laterales difieren','Sí, vale 1'],ok:'Sí, vale 2',
+  fb:{'Sí, vale 2':'✅ Como ambos laterales valen 2, el límite existe y vale 2.','No, los laterales difieren':'Acá sí coinciden: ambos dan 2, así que el límite existe.','Sí, vale 1':'Los laterales dan 2, no 1: el límite es 2.'}},
+ {label:'Valor de k',q:'Para que f sea continua en x=1, ¿cuánto debe valer k = f(1)?',opts:['k = 2','k = 1','No existe k posible'],ok:'k = 2',
+  fb:{'k = 2':'✅ Para continuidad: f(1) = lím = 2, así que k = 2.','k = 1':'No: f(1) debe igualar al límite, que es 2.','No existe k posible':'Sí existe: como el límite es 2 (finito), basta tomar k=2.'}}
+];
+const kState=KSTEPS.map(()=>false);let kIdx=0;
+function renderK(){
+  const m=document.getElementById('k-steps');
+  m.innerHTML=KSTEPS.map((s,i)=>`<div class="k-step" id="k-step-${i}"><div class="k-label">${s.label}</div><div class="k-body"><div class="k-q">${s.q}</div><div class="k-opts" id="k-opts-${i}">${s.opts.map(o=>`<button class="mini-opt" onclick="kAns(${i},this)" data-v="${o}">${o}</button>`).join('')}</div><div class="k-fb" id="k-fb-${i}"><span></span><span class="k-fb-tx"></span></div></div></div>`).join('');
+  document.getElementById('k-step-0').classList.add('show');
+}
+function kAns(i,btn){
+  if(kState[i])return;
+  const s=KSTEPS[i],v=btn.getAttribute('data-v'),correct=(v===s.ok);
+  const fb=document.getElementById('k-fb-'+i);
+  if(correct){
+    kState[i]=true;
+    document.querySelectorAll('#k-opts-'+i+' .mini-opt').forEach(b=>{b.classList.add('locked');if(b.getAttribute('data-v')===s.ok)b.classList.add('correct');});
+    fb.className='k-fb show ok';fb.querySelector('span').textContent='✅';fb.querySelector('.k-fb-tx').textContent=s.fb[v];
+    if(i+1<KSTEPS.length){const nx=document.getElementById('k-step-'+(i+1));if(nx)nx.classList.add('show');}
+    else{const r=document.getElementById('k-result');r.className='k-result show';
+      r.innerHTML='<strong>✅ Sí existe: k = 2.</strong> Los dos laterales coinciden en 2, entonces el límite existe y vale 2; tomando f(1)=k=2 se cumplen las tres condiciones y f resulta continua en x=1. Fijate que el desafío se vuelve simple cuando lo descomponés: lateral izquierdo → lateral derecho → límite → valor de f.';
+      DONE.k=true;updateRuta();}
+  }else{
+    btn.classList.add('wrong');
+    fb.className='k-fb show bad';fb.querySelector('span').textContent='❌';fb.querySelector('.k-fb-tx').textContent=s.fb[v];
+  }
+}
+
+/* ===================== QUIZ ===================== */
+const QUIZ=[
+ {q:'¿Cuáles son las tres condiciones para que f sea continua en x = a?',
+  opts:[
+   {t:'Que f sea positiva, creciente y acotada en a.',ok:false,fb:'Esas no son las condiciones de continuidad. Son: f(a) existe, el límite existe y es finito, y ambos coinciden.'},
+   {t:'Que f(a) exista, que el límite exista y sea finito, y que ambos coincidan.',ok:true,fb:'Exacto: las tres juntas equivalen a lím_{x→a} f(x) = f(a).'},
+   {t:'Que el dominio incluya a y que la función no tenga asíntotas.',ok:false,fb:'No alcanza: puede estar definida y aun así fallar el límite o la coincidencia. Las tres condiciones son las precisas.'},
+   {t:'Que f sea derivable en a.',ok:false,fb:'La derivabilidad es otra cosa (y más fuerte). La continuidad pide las tres condiciones del límite y el valor.'}
+  ]},
+ {q:'Si <span class="lim">lim</span><sub>x→a</sub> f(x) existe y es finito, pero f(a) no está definida, la discontinuidad es…',
+  opts:[
+   {t:'Esencial de salto.',ok:false,fb:'No: el salto necesita laterales finitos distintos. Acá el límite existe (los laterales coinciden), solo falta f(a): es evitable.'},
+   {t:'Evitable.',ok:true,fb:'Correcto: como el límite existe y es finito, se "tapa" el hueco definiendo f(a) igual al límite.'},
+   {t:'Esencial infinita.',ok:false,fb:'No: el límite es finito, no ±∞. Es evitable.'},
+   {t:'No hay discontinuidad.',ok:false,fb:'Sí la hay: si f(a) no existe, falla la condición 1. Pero es del tipo evitable.'}
+  ]},
+ {q:'¿Es f(x) = 1/x discontinua en x = 0?',
+  opts:[
+   {t:'Sí, es una discontinuidad infinita en x = 0.',ok:false,fb:'Sutileza clave: x = 0 no está en el dominio de 1/x, así que la continuidad no se evalúa ahí. No decimos "discontinua en 0".'},
+   {t:'No corresponde: x = 0 no pertenece al dominio. 1/x es continua en todo su dominio.',ok:true,fb:'Exacto. La continuidad es punto a punto y solo en el dominio. En cada x≠0, 1/x es continua.'},
+   {t:'Es continua en x = 0 porque es una sola fórmula.',ok:false,fb:'Que sea una fórmula no decide nada. El punto es que x=0 no está en el dominio, así que ni se evalúa.'},
+   {t:'Es evitable: se arregla definiendo f(0).',ok:false,fb:'No: en x=0 los laterales son ±∞, no hay límite finito. No es evitable, y además el punto no está en el dominio.'}
+  ]},
+ {q:'Una función por tramos tiene <span class="lim">lim</span><sub>x→1⁻</sub> f = 3 y <span class="lim">lim</span><sub>x→1⁺</sub> f = 5. ¿Qué tipo de discontinuidad hay en x = 1?',
+  opts:[
+   {t:'Evitable.',ok:false,fb:'No: para evitable el límite debe existir, pero acá los laterales difieren (3≠5), así que NO hay límite.'},
+   {t:'Esencial de salto finito.',ok:true,fb:'Correcto: laterales finitos (3 y 5) pero distintos. No se arregla cambiando solo f(1).'},
+   {t:'Esencial infinita.',ok:false,fb:'No: los laterales son 3 y 5, finitos. Es un salto finito.'},
+   {t:'Oscilatoria.',ok:false,fb:'No: cada lado tiende a un valor fijo. Es un salto finito.'}
+  ]}
+];
+const quizState=QUIZ.map(()=>({answered:false}));
+function renderQuiz(){
+  const m=document.getElementById('quiz-mount'),L=['A','B','C','D'];let h='';
+  QUIZ.forEach((it,qi)=>{
+    h+=`<div class="qitem"><div class="qhead">Pregunta ${qi+1} de ${QUIZ.length}</div><div class="qtext">${it.q}</div><div class="qopts">`;
+    it.opts.forEach((o,oi)=>{h+=`<button class="qopt" id="q-${qi}-${oi}" onclick="answerQuiz(${qi},${oi})"><span class="ql">${L[oi]}</span>${o.t}</button>`;});
+    h+=`</div><div class="qfb" id="qfb-${qi}"><span class="qfb-ic"></span><span class="qfb-tx"></span></div></div>`;
+  });
+  m.innerHTML=h;
+}
+function answerQuiz(qi,oi){
+  if(quizState[qi].answered)return;quizState[qi].answered=true;
+  const it=QUIZ[qi],chosen=it.opts[oi];
+  it.opts.forEach((o,i)=>{const b=document.getElementById('q-'+qi+'-'+i);b.classList.add('locked');if(o.ok)b.classList.add('correct');else if(i===oi)b.classList.add('wrong');});
+  const fb=document.getElementById('qfb-'+qi);fb.className='qfb show '+(chosen.ok?'ok':'bad');
+  fb.querySelector('.qfb-ic').textContent=chosen.ok?'✅':'❌';fb.querySelector('.qfb-tx').textContent=chosen.fb;
+  if(quizState.every(q=>q.answered)){
+    const n=QUIZ.reduce((a,it,i)=>a+(document.getElementById('qfb-'+i).classList.contains('ok')?1:0),0);
+    const d=document.getElementById('quiz-done');
+    d.innerHTML=`Respondiste correctamente <b>${n}</b> de ${QUIZ.length}. ${n===QUIZ.length?'Dominás continuidad 💪':'Repasá la devolución en rojo.'}`;
+    d.classList.add('show');DONE.quiz=true;updateRuta();
+  }
+}
+
+/* ===================== SÍNTESIS ===================== */
+function saveSint(){document.getElementById('sint-done').classList.add('show');DONE.sint=true;updateRuta();}
+
+/* ===================== RUTA ===================== */
+function updateRuta(){
+  const map=['diag','open','cond','class','k','quiz','sint'];
+  document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('done',DONE[map[i]]));
+}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-go]');if(el){const t=document.getElementById(el.dataset.go);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}});
+
+/* ===================== INIT ===================== */
+document.addEventListener('DOMContentLoaded',()=>{
+  drawOpen();
+  renderClassifier();
+  renderK();
+  renderQuiz();
+  const secs=[['sec-diag',0],['poe-open',1],['sec-cond',2],['sec-class',3],['sec-k',4],['sec-quiz',5],['sec-sint',6]];
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const idx=secs.find(s=>s[0]===e.target.id);if(!idx)return;document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('active',i===idx[1]));}});},{rootMargin:'-40% 0px -55% 0px'});
+  secs.forEach(s=>{const el=document.getElementById(s[0]);if(el)obs.observe(el);});
+});
+window.addEventListener('resize',()=>{if(GO&&!document.getElementById('obs-open').classList.contains('locked'))drawOpen();renderClassifierRedraw();});
+function renderClassifierRedraw(){CLF.forEach((c,i)=>{if(document.getElementById('clf-cv-'+i))drawClf(i);});}
+</script>
+</body>
+</html>

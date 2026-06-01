@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 5 · Funciones racionales — Prototipo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0f2244;--blue:#1d6fcc;--blue2:#2d82e6;--sky:#0ea5e9;
+  --bg:#eef6ff;--bg2:#f8fbff;--white:#fff;
+  --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
+  --g500:#64748b;--g600:#475569;--g700:#334155;--g800:#1e293b;
+  --ok:#059669;--ok-bg:#d1fae5;--err:#dc2626;--err-bg:#fee2e2;
+  --warn:#d97706;--warn-bg:#fef3c7;--hint:#7c3aed;--hint-bg:#ede9fe;
+  --amber:#f59e0b;
+  --r:12px;--rl:16px;--rxl:24px;
+  --sh:0 4px 6px -1px rgba(0,0,0,.08),0 2px 4px -1px rgba(0,0,0,.05);
+  --shl:0 10px 25px -5px rgba(0,0,0,.1),0 4px 8px -2px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--g800);line-height:1.6;font-size:16px}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;line-height:1.25}
+h2{font-size:clamp(1.4rem,3vw,2rem);color:var(--navy)}
+h3{font-size:1.15rem;color:var(--navy)}
+p{margin-bottom:.7em}strong{color:var(--navy)}em{font-style:italic}
+sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
+.container{max-width:980px;margin:0 auto;padding:0 20px}
+
+.topbar{background:var(--navy);color:#94a3b8;font-size:12px;font-weight:600;letter-spacing:.04em;padding:8px 0;text-align:center}
+.topbar b{color:#7dd3fc}
+.hero{background:linear-gradient(135deg,#0f2244 0%,#1d6fcc 70%,#0ea5e9 120%);color:#fff;padding:38px 0 44px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(56,189,248,.18),transparent 60%);pointer-events:none}
+.hero .container{position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#bfdbfe;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px}
+.hero h2{color:#fff;margin-bottom:10px;font-size:clamp(1.6rem,4vw,2.5rem)}
+.hero-sub{color:#bfdbfe;font-size:1.02rem;max-width:680px}
+.hero-obj{margin-top:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:var(--r);padding:12px 16px;font-size:13.5px;color:#e0f2fe;max-width:700px}
+.hero-obj b{color:#fff}
+
+.ruta{position:sticky;top:0;z-index:50;background:var(--navy);padding:10px 0;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.ruta-inner{display:flex;align-items:center;gap:6px;flex-wrap:wrap;overflow-x:auto}
+.rstep{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.rstep:hover{background:rgba(255,255,255,.12)}
+.rstep.active{background:rgba(29,111,204,.6);border-color:var(--blue2);color:#dbeafe}
+.rstep.done{background:rgba(5,150,105,.22);border-color:#10b981;color:#6ee7b7}
+.rnum{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.rstep.done .rnum{background:#10b981;color:#fff}.rstep.active .rnum{background:var(--blue2);color:#fff}
+
+.wrap{padding:28px 0 70px}
+.card{background:var(--white);border-radius:var(--rl);box-shadow:var(--sh);border:1px solid var(--g200);padding:24px;margin-bottom:22px;scroll-margin-top:64px;animation:rise .4s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.card-title{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.cti{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ic-diag{background:var(--hint-bg);color:var(--hint)}
+.ic-map{background:#dbeafe;color:var(--blue)}
+.ic-ladder{background:#dcfce7;color:var(--ok)}
+.ic-quiz{background:#fce7f3;color:#be185d}
+.ic-sint{background:var(--warn-bg);color:var(--warn)}
+.card-title h3{margin:0}
+.card-lead{color:var(--g600);font-size:14.5px;margin-bottom:16px}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px}
+.fnum{border-bottom:1.6px solid currentColor;padding:0 8px 1px}
+.fden{padding:1px 8px 0}
+.lim{font-style:italic}.mono{font-family:'Courier New',monospace}
+
+.poe-states{display:flex;gap:6px;margin:14px 0 18px;flex-wrap:wrap}
+.pstate{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--g500);padding:5px 13px;border-radius:50px;background:var(--g100);border:1px solid var(--g200);transition:all .25s}
+.pstate .pn{width:18px;height:18px;border-radius:50%;background:var(--g300);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px}
+.pstate.on{background:#eff6ff;border-color:var(--blue);color:var(--blue)}.pstate.on .pn{background:var(--blue)}
+.pstate.cleared{background:var(--ok-bg);border-color:#10b981;color:#047857}.pstate.cleared .pn{background:#10b981}
+.parrow{color:var(--g300);align-self:center;font-weight:700}
+.predict-group{margin-bottom:16px}
+.pq{font-weight:600;color:var(--navy);font-size:15px;margin-bottom:10px;padding-left:12px;border-left:3px solid var(--hint)}
+.popts{display:flex;flex-direction:column;gap:8px}
+.popt{width:100%;text-align:left;padding:11px 15px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--white);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:11px}
+.popt:hover{border-color:var(--hint);background:#faf5ff;color:var(--navy)}
+.popt.sel{border-color:var(--hint);background:var(--hint-bg);color:var(--navy);font-weight:600}
+.pdot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--g300);flex-shrink:0;transition:all .18s}
+.popt.sel .pdot{border-color:var(--hint);background:var(--hint);box-shadow:inset 0 0 0 3px var(--white)}
+.predict-actions{margin-top:6px}
+.btn{padding:11px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-go{background:var(--hint);color:#fff}.btn-go:hover{background:#6d28d9;transform:translateY(-1px)}
+.btn-go.dim{opacity:.45;pointer-events:none}
+.btn-ghost{background:var(--g100);color:var(--g700);border:1px solid var(--g200)}.btn-ghost:hover{background:var(--g200)}
+.btn-next{background:var(--navy);color:#bfdbfe}.btn-next:hover{background:var(--blue);color:#fff;transform:translateY(-1px)}
+.lockmsg{font-size:13px;color:var(--hint);margin-top:8px;font-weight:600;display:none}
+.lockmsg.show{display:block}
+.diag-note{display:none;margin-top:14px;background:var(--hint-bg);border:1px solid #c4b5fd;border-radius:var(--r);padding:13px 16px;font-size:14px;color:#4c1d95}
+.diag-note.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+.bigidea{background:linear-gradient(90deg,#eff6ff,var(--white));border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;margin-top:12px;font-size:14.5px;color:var(--g700)}
+
+/* ROADMAP */
+.roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+@media(max-width:760px){.roadmap{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.roadmap{grid-template-columns:1fr}}
+.rm-step{background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:12px;display:flex;gap:10px;align-items:flex-start}
+.rm-n{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.rm-t{font-size:13px;color:var(--g700)}
+.rm-t b{color:var(--navy);display:block;font-size:13.5px}
+
+/* LADDER / RUNGS */
+.ladder-intro{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#14532d;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start}
+.rung{background:var(--white);border-radius:var(--rl);box-shadow:var(--sh);border:1px solid var(--g200);border-left:4px solid var(--ok);padding:22px;margin-bottom:18px;scroll-margin-top:64px}
+.rung-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.rung-num{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#bfdbfe;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.fade-badge{font-size:12px;font-weight:700;color:var(--ok);background:var(--ok-bg);border:1px solid #6ee7b7;padding:4px 12px;border-radius:50px}
+.fn-line{display:flex;align-items:center;gap:8px;font-size:1.2rem;color:var(--navy);font-family:'Outfit',sans-serif;background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;flex-wrap:wrap}
+.lsteps{display:flex;flex-direction:column;gap:10px}
+.lstep{display:none;gap:14px;align-items:flex-start;animation:rise .35s ease both}
+.lstep.show{display:flex}
+.lstep-label{flex-shrink:0;width:104px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--g500);background:var(--g100);border:1px solid var(--g200);border-radius:8px;padding:6px 8px;text-align:center;margin-top:2px}
+.lstep-body{flex:1;min-width:0}
+.lstep-math{font-family:'Courier New',monospace;font-size:1rem;color:var(--navy);font-weight:700}
+.lstep-why{font-size:13px;color:var(--g600);margin-top:4px}
+.lstep-next{margin-top:10px;background:var(--g100);color:var(--g700);border:1px solid var(--g200);font-size:13px;padding:8px 16px}
+.lstep-next:hover{background:var(--g200)}
+.lstep-q{font-weight:600;color:var(--navy);font-size:14.5px;margin-bottom:9px}
+.lstep-resolved{display:none;margin-top:9px;padding:9px 12px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r)}
+.lstep-resolved.show{display:block;animation:rise .3s ease both}
+.qopts{display:flex;flex-direction:column;gap:8px}
+.qopt{width:100%;text-align:left;padding:10px 14px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--white);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:10px}
+.qopt:hover:not(.locked){border-color:var(--blue);background:#f0f7ff;color:var(--navy)}
+.qopt .ql{width:23px;height:23px;border-radius:50%;border:1.5px solid var(--g300);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--g600);flex-shrink:0;transition:all .18s}
+.qopt.correct{border-color:var(--ok);background:var(--ok-bg);color:#065f46;font-weight:600}.qopt.correct .ql{border-color:var(--ok);background:var(--ok);color:#fff}
+.qopt.wrong{border-color:var(--err);background:var(--err-bg);color:#991b1b}.qopt.wrong .ql{border-color:var(--err);background:var(--err);color:#fff}
+.qopt.locked{cursor:default}
+.qfb{border-radius:var(--r);padding:12px 14px;margin-top:10px;font-size:14px;display:none;gap:10px;align-items:flex-start}
+.qfb.show{display:flex;animation:rise .3s ease both}
+.qfb.ok{background:var(--ok-bg);border:1px solid #6ee7b7;color:#065f46}.qfb.bad{background:var(--err-bg);border:1px solid #fca5a5;color:#7f1d1d}
+.qfb-ic{font-size:17px;flex-shrink:0}
+.rung-result{display:none;margin-top:18px}
+.rung-result.show{display:block;animation:rise .4s ease both}
+.result-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+@media(max-width:760px){.result-grid{grid-template-columns:1fr}}
+.canvas-wrap{background:var(--bg2);border-radius:var(--r);border:1px solid var(--g200);overflow:hidden}
+.canvas-wrap canvas{display:block;width:100%;height:auto}
+.summary{background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:6px 14px}
+.sum-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--g100);font-size:13px}
+.sum-row:last-child{border-bottom:none}
+.sum-k{color:var(--g600);font-weight:500}
+.sum-v{color:var(--navy);font-weight:700;font-family:'Courier New',monospace;font-size:12.5px;text-align:right}
+.sum-v.hole{color:#c2410c}.sum-v.va{color:var(--amber)}.sum-v.none{color:var(--g400);font-style:italic;font-family:'Outfit',sans-serif;font-weight:600}
+.rung-cta{display:none;margin-top:16px}
+.rung-cta.show{display:block;animation:rise .35s ease both}
+.graph-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:12px;color:var(--g600)}
+.lg{display:flex;align-items:center;gap:6px}
+.lg-line{width:18px;height:3px;border-radius:2px}.lg-dot{width:11px;height:11px;border-radius:50%;border:2px solid}
+
+/* QUIZ */
+.qitem{margin-bottom:22px}.qitem:last-of-type{margin-bottom:0}
+.qhead{font-size:12px;font-weight:700;text-transform:uppercase;color:var(--g500);margin-bottom:6px}
+.qtext{font-weight:600;color:var(--navy);font-size:15px;margin-bottom:12px;padding-left:12px;border-left:3px solid var(--blue)}
+.quiz-done{display:none;margin-top:6px;background:var(--navy);color:#bfdbfe;border-radius:var(--r);padding:14px;text-align:center;font-size:14px}
+.quiz-done.show{display:block;animation:rise .4s ease both}.quiz-done b{color:#7dd3fc;font-size:1.3rem}
+
+.sint-q{font-weight:600;color:var(--navy);font-size:14.5px;margin:14px 0 8px;padding-left:12px;border-left:3px solid var(--warn)}
+.sint-ta{width:100%;min-height:72px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);resize:vertical;background:var(--g50)}
+.sint-ta:focus{outline:none;border-color:var(--warn);background:var(--white)}
+.sint-fill{display:inline-block;min-width:120px;border-bottom:2px dashed var(--g300);color:var(--warn);font-weight:700}
+.sint-done{display:none;margin-top:14px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#065f46}
+.sint-done.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+
+.proto-note{background:#fff7ed;border:1px dashed #fdba74;border-radius:var(--r);padding:12px 16px;font-size:13px;color:#9a3412;margin-bottom:22px;display:flex;gap:10px;align-items:flex-start}
+@media(max-width:520px){
+  .card,.rung{padding:17px}
+  .btn{width:100%;justify-content:center}
+  .predict-actions .btn,.rung-cta .btn,.lstep-next{width:auto}
+  .lstep{flex-direction:column;gap:6px}.lstep-label{width:auto;align-self:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar"><b>INSPT · UTN</b> &nbsp;·&nbsp; Análisis Matemático I &nbsp;·&nbsp; Prof. Ariel Cardozo</div>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-badge">⬡ Unidad 2 · Etapa 5 de 7</div>
+    <h2>Funciones racionales</h2>
+    <p class="hero-sub">Acá se junta todo: dominio, asíntotas, intersecciones, gráfico, imagen y signos. Vas a analizar funciones racionales completas con una escalera que te suelta de a poco — y vas a descubrir cuándo un cero del denominador es una asíntota y cuándo es solo un agujero.</p>
+    <div class="hero-obj"><b>🎯 Meta:</b> realizar el análisis completo de una función racional, distinguiendo —desde la factorización— cuándo un valor prohibido del dominio produce una <b>asíntota vertical</b> y cuándo un <b>hueco</b> (discontinuidad evitable).</div>
+  </div>
+</header>
+
+<nav class="ruta">
+  <div class="container ruta-inner" id="ruta">
+    <div class="rstep active" data-go="sec-diag"><span class="rnum">0</span>Idea previa</div>
+    <div class="rstep" data-go="sec-map"><span class="rnum">1</span>El protocolo</div>
+    <div class="rstep" data-go="rung-m1"><span class="rnum">2</span>Resuelto</div>
+    <div class="rstep" data-go="rung-e1"><span class="rnum">3</span>Guiado</div>
+    <div class="rstep" data-go="rung-e2"><span class="rnum">4</span>Solo</div>
+    <div class="rstep" data-go="sec-quiz"><span class="rnum">5</span>Práctica</div>
+    <div class="rstep" data-go="sec-sint"><span class="rnum">6</span>Síntesis</div>
+  </div>
+</nav>
+
+<div class="wrap"><div class="container">
+
+  <div class="proto-note"><span>🧪</span><div><strong>Prototipo de andamiaje — Etapa 5.</strong> La escalera de desvanecimiento aplicada al protocolo completo de análisis: <strong>resuelto</strong> (te muestro los 7 pasos) → <strong>guiado</strong> (completás las decisiones clave) → <strong>solo</strong>. El hilo conductor: distinguir hueco de asíntota desde la factorización.</div></div>
+
+  <!-- DIAGNÓSTICO -->
+  <section class="card" id="sec-diag">
+    <div class="card-title"><div class="cti ic-diag">💭</div><h3>Antes de empezar: ¿qué pensás vos?</h3></div>
+    <p class="card-lead">No hay respuesta correcta todavía. Queremos saber con qué idea llegás.</p>
+    <div class="predict-group">
+      <div class="pq">En f(x) = <span class="frac"><span class="fnum">x − 2</span><span class="fden">x² − 4</span></span>, el denominador se anula en x = 2 y en x = −2. ¿Cuántas asíntotas verticales pensás que hay?</div>
+      <div class="popts" id="diag-opts">
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Dos: una en x = 2 y otra en x = −2.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Una sola; en el otro punto pasa algo distinto.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Ninguna: las racionales no tienen asíntotas verticales.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>No se puede saber sin graficar.</button>
+      </div>
+    </div>
+    <div class="diag-note" id="diag-note"><span>📌</span><div>Anotada tu idea. La vas a poder confirmar vos mismo en el primer ejemplo: la clave está en <strong>factorizar y ver qué se cancela</strong>.</div></div>
+  </section>
+
+  <!-- PROTOCOLO -->
+  <section class="card" id="sec-map">
+    <div class="card-title"><div class="cti ic-map">🗺️</div><h3>El protocolo de análisis</h3></div>
+    <p class="card-lead">Analizar una función racional es seguir siempre los mismos pasos, en orden. Este es el mapa que vas a recorrer en cada ejemplo:</p>
+    <div class="roadmap">
+      <div class="rm-step"><div class="rm-n">1</div><div class="rm-t"><b>Dominio</b>Excluir los ceros del denominador.</div></div>
+      <div class="rm-step"><div class="rm-n">2</div><div class="rm-t"><b>Factorizar</b>Numerador y denominador; simplificar.</div></div>
+      <div class="rm-step"><div class="rm-n">3</div><div class="rm-t"><b>Hueco o AV</b>El factor que se cancela = hueco; el que no = asíntota.</div></div>
+      <div class="rm-step"><div class="rm-n">4</div><div class="rm-t"><b>Asíntotas H/O</b>Comparar grados (Etapa 4).</div></div>
+      <div class="rm-step"><div class="rm-n">5</div><div class="rm-t"><b>Intersecciones</b>Con el eje x y con el eje y.</div></div>
+      <div class="rm-step"><div class="rm-n">6</div><div class="rm-t"><b>Gráfico</b>Con asíntotas, hueco e intersecciones.</div></div>
+      <div class="rm-step"><div class="rm-n">7</div><div class="rm-t"><b>Imagen y signos</b>Imagen, C⁺ y C⁻.</div></div>
+      <div class="rm-step" style="background:#eff6ff;border-color:#bfdbfe"><div class="rm-n" style="background:var(--hint)">★</div><div class="rm-t"><b>El paso 3 es la clave</b>Distingue hueco de asíntota.</div></div>
+    </div>
+  </section>
+
+  <!-- ESCALERA -->
+  <section id="sec-ladder">
+    <div class="ladder-intro"><span>🪜</span><div>Tres ejemplos, con menos ayuda cada vez. En el <strong>Peldaño 1</strong> ves los 7 pasos resueltos; en el <strong>2</strong> completás las decisiones clave; en el <strong>3</strong> lo resolvés casi solo. Cada uno termina con el <strong>gráfico</strong> y un <strong>resumen del análisis</strong>.</div></div>
+    <div id="ladder-mount"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="card" id="sec-quiz">
+    <div class="card-title"><div class="cti ic-quiz">✏️</div><h3>Verificá tu comprensión</h3></div>
+    <p class="card-lead">Si te equivocás, la devolución te dice por qué.</p>
+    <div id="quiz-mount"></div>
+    <div class="quiz-done" id="quiz-done"></div>
+  </section>
+
+  <!-- SÍNTESIS -->
+  <section class="card" id="sec-sint">
+    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Síntesis: ¿qué cambió en tu cabeza?</h3></div>
+    <p class="card-lead">Ponerlo en palabras lo fija mejor que solo leerlo.</p>
+    <div class="sint-q">Mirando solo la <strong>factorización</strong>, ¿cómo sabés si un valor prohibido del dominio va a ser un <strong>hueco</strong> o una <strong>asíntota vertical</strong>?</div>
+    <textarea class="sint-ta" id="sint1" placeholder="Si el factor del denominador también está en el numerador (se cancela)… Si no se cancela…"></textarea>
+    <div class="sint-q">¿Cuál es el primer paso que hacés siempre al analizar una racional, y por qué es tan importante?</div>
+    <textarea class="sint-ta" id="sint2" placeholder="Lo primero es… porque…"></textarea>
+    <div style="margin-top:14px"><button class="btn btn-next" onclick="saveSint()">Guardar mi reflexión ✓</button></div>
+    <div class="sint-done" id="sint-done"><span>🎉</span><div><strong>¡Etapa 5 completa!</strong> Ya sabés analizar una racional de punta a punta y, sobre todo, distinguir hueco de asíntota. Ese hueco que aparece al cancelar un factor es una <strong>discontinuidad evitable</strong> — el concepto central de la próxima y última etapa: continuidad.</div></div>
+  </section>
+
+</div></div>
+
+<script>
+/* ===================== MOTOR DE GRAFICACIÓN ===================== */
+class GraphPlotter{
+  constructor(id,o={}){
+    this.canvas=document.getElementById(id);this.ctx=this.canvas.getContext('2d');
+    this.xMin=o.xMin??-6;this.xMax=o.xMax??6;this.yMin=o.yMin??-8;this.yMax=o.yMax??8;
+    this.pL=46;this.pR=18;this.pT=18;this.pB=34;
+  }
+  get W(){return this.canvas.width-this.pL-this.pR}
+  get H(){return this.canvas.height-this.pT-this.pB}
+  cx(x){return this.pL+(x-this.xMin)/(this.xMax-this.xMin)*this.W}
+  cy(y){return this.pT+(this.yMax-y)/(this.yMax-this.yMin)*this.H}
+  clear(){const c=this.ctx;c.fillStyle='#f8fbff';c.fillRect(0,0,this.canvas.width,this.canvas.height)}
+  drawGrid(){const c=this.ctx;c.strokeStyle='#e2eaf5';c.lineWidth=.75;c.setLineDash([]);
+    for(let x=Math.ceil(this.xMin);x<=Math.floor(this.xMax);x++){if(x===0)continue;c.beginPath();c.moveTo(this.cx(x),this.pT);c.lineTo(this.cx(x),this.pT+this.H);c.stroke();}
+    for(let y=Math.ceil(this.yMin);y<=Math.floor(this.yMax);y++){if(y===0)continue;c.beginPath();c.moveTo(this.pL,this.cy(y));c.lineTo(this.pL+this.W,this.cy(y));c.stroke();}}
+  drawAxes(){const c=this.ctx,y0=this.cy(0),x0=this.cx(0);
+    const inY=y0>=this.pT&&y0<=this.pT+this.H,inX=x0>=this.pL&&x0<=this.pL+this.W;
+    const ay0=inY?y0:this.pT+this.H,ax0=inX?x0:this.pL;
+    c.strokeStyle='#334155';c.lineWidth=1.5;c.fillStyle='#334155';c.setLineDash([]);
+    if(inY){c.beginPath();c.moveTo(this.pL,y0);c.lineTo(this.pL+this.W-6,y0);c.stroke();
+      c.beginPath();c.moveTo(this.pL+this.W,y0);c.lineTo(this.pL+this.W-10,y0-4);c.lineTo(this.pL+this.W-10,y0+4);c.closePath();c.fill();
+      c.fillStyle='#475569';c.font='12px Outfit,sans-serif';c.textAlign='center';c.fillText('x',this.pL+this.W+7,y0+4);}
+    if(inX){c.strokeStyle='#334155';c.fillStyle='#334155';
+      c.beginPath();c.moveTo(x0,this.pT+this.H);c.lineTo(x0,this.pT+6);c.stroke();
+      c.beginPath();c.moveTo(x0,this.pT);c.lineTo(x0-4,this.pT+10);c.lineTo(x0+4,this.pT+10);c.closePath();c.fill();
+      c.fillStyle='#475569';c.font='12px Outfit,sans-serif';c.fillText('y',x0,this.pT-6);}
+    c.fillStyle='#64748b';c.font='10.5px Outfit,sans-serif';
+    for(let x=Math.ceil(this.xMin);x<=Math.floor(this.xMax);x++){if(x===0)continue;const px=this.cx(x);
+      c.strokeStyle='#475569';c.lineWidth=1;c.beginPath();c.moveTo(px,ay0-3);c.lineTo(px,ay0+3);c.stroke();
+      if(inY&&Math.abs(px-this.pL)>5&&Math.abs(px-(this.pL+this.W))>10){c.textAlign='center';c.fillText(x,px,ay0+14);}}
+    for(let y=Math.ceil(this.yMin);y<=Math.floor(this.yMax);y++){if(y===0)continue;const py=this.cy(y);
+      c.strokeStyle='#475569';c.lineWidth=1;c.beginPath();c.moveTo(ax0-3,py);c.lineTo(ax0+3,py);c.stroke();
+      if(inX){c.textAlign='right';c.fillText(y,ax0-6,py+3);}}
+    if(inX&&inY){c.textAlign='right';c.fillStyle='#64748b';c.fillText('0',x0-4,y0+12);}}
+  hLine(val,label){const c=this.ctx;c.save();c.strokeStyle='#0ea5e9';c.lineWidth=1.6;c.setLineDash([8,4]);
+    const y=this.cy(val);if(y>=this.pT&&y<=this.pT+this.H){c.beginPath();c.moveTo(this.pL,y);c.lineTo(this.pL+this.W,y);c.stroke();
+      c.setLineDash([]);c.fillStyle='#0284c7';c.font='italic 11.5px Outfit,sans-serif';c.textAlign='right';c.fillText(label,this.pL+this.W-3,y-5);}c.restore();c.setLineDash([]);}
+  vLine(val,label){const c=this.ctx;c.save();c.strokeStyle='#f59e0b';c.lineWidth=1.6;c.setLineDash([8,4]);
+    const x=this.cx(val);if(x>=this.pL&&x<=this.pL+this.W){c.beginPath();c.moveTo(x,this.pT);c.lineTo(x,this.pT+this.H);c.stroke();
+      c.setLineDash([]);c.fillStyle='#d97706';c.font='italic 11.5px Outfit,sans-serif';c.textAlign='center';c.fillText(label,x,this.pT+13);}c.restore();c.setLineDash([]);}
+  oblique(m,b,label){const c=this.ctx;c.save();c.strokeStyle='#7c3aed';c.lineWidth=1.6;c.setLineDash([8,4]);
+    c.beginPath();c.moveTo(this.cx(this.xMin),this.cy(m*this.xMin+b));c.lineTo(this.cx(this.xMax),this.cy(m*this.xMax+b));c.stroke();
+    c.setLineDash([]);c.fillStyle='#6d28d9';c.font='italic 11.5px Outfit,sans-serif';c.textAlign='left';
+    const lx=this.xMax-2.2,ly=m*lx+b;c.fillText(label,this.cx(lx),this.cy(ly)-6);c.restore();c.setLineDash([]);}
+  plot(fn,color='#1d6fcc',lw=2.6,skip=[]){const c=this.ctx;c.strokeStyle=color;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';c.setLineDash([]);
+    const steps=1000,dx=(this.xMax-this.xMin)/steps;let started=false,prevY=null;c.beginPath();
+    for(let i=0;i<=steps;i++){const x=this.xMin+i*dx;let y;
+      if(skip.some(s=>Math.abs(x-s)<dx*0.9)){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      try{y=fn(x)}catch(e){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      if(!isFinite(y)||isNaN(y)){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      if(prevY!==null&&Math.abs(y-prevY)>(this.yMax-this.yMin)*.6){c.stroke();c.beginPath();started=false}
+      const X=this.cx(x),Y=this.cy(y);if(!started){c.moveTo(X,Y);started=true}else c.lineTo(X,Y);prevY=y;}
+    c.stroke();}
+  point(x,y,filled=true,color='#ef4444',r=6){const c=this.ctx,px=this.cx(x),py=this.cy(y);
+    c.beginPath();c.arc(px,py,r,0,Math.PI*2);
+    if(filled){c.fillStyle=color;c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();}
+    else{c.fillStyle='#f8fbff';c.fill();c.strokeStyle=color;c.lineWidth=2.6;c.stroke();}}
+}
+function fmt(n){if(!isFinite(n))return n>0?'+∞':'−∞';let s=(+n).toFixed(4);s=s.replace(/\.?0+$/,'');s=s.replace('.',',');s=s.replace('-','−');return s;}
+
+const DONE={diag:false,map:true,ladder:false,quiz:false,sint:false};
+
+/* ===================== DIAGNÓSTICO ===================== */
+function selectDiag(btn){
+  document.querySelectorAll('#diag-opts .popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');document.getElementById('diag-note').classList.add('show');
+  DONE.diag=true;updateRuta();
+}
+
+/* ===================== DATOS DE LA ESCALERA ===================== */
+const RUNGS=[
+ {id:'m1',kind:'worked',scaffold:'Te muestro los 7 pasos',fnHTML:'<span class="frac"><span class="fnum">x³ − 6x² + 11x − 6</span><span class="fden">x² − 2x − 3</span></span>',
+  graph:{win:{xMin:-8,xMax:9,yMin:-12,yMax:14},fn:x=>(x*x-3*x+2)/(x+1),va:[-1],ha:null,obl:[1,-4],hole:[3,0.5],xints:[[1,0],[2,0]],yint:[0,2]},
+  steps:[
+    {label:'1·Dominio',math:'x² − 2x − 3 = (x+1)(x−3) ≠ 0  ⇒  Dom = ℝ − {−1, 3}',why:'Excluimos los valores que anulan el denominador.'},
+    {label:'2·Factorizar',math:'Numerador: x³−6x²+11x−6 = (x−1)(x−2)(x−3)',why:'Factorizamos arriba y abajo para ver qué factores comparten.'},
+    {label:'3·Simplificar',math:'(x−1)(x−2)(x−3) / [(x+1)(x−3)] = (x−1)(x−2)/(x+1)',why:'Se cancela el factor (x−3), común a numerador y denominador.'},
+    {label:'3·Hueco o AV',math:'(x−3) se cancela → HUECO en x=3.  (x+1) NO se cancela → AV en x=−1',why:'★ El paso clave: el factor que se cancela deja un hueco; el que queda en el denominador es asíntota vertical.'},
+    {label:'Valor del hueco',math:'En x=3 la simplificada vale (3−1)(3−2)/(3+1) = 1/2  ⇒  hueco (3; 1/2)',why:'El hueco está a la altura que da la función simplificada.'},
+    {label:'4·Asíntota H/O',math:'Grado arriba (2) > grado abajo (1) ⇒ no hay AH. Oblicua: y = x − 4',why:'Como el numerador supera al denominador en un grado, hay asíntota oblicua (Etapa 4).'},
+    {label:'5·Intersec.',math:'Eje x: (1;0) y (2;0).   Eje y: f(0)=2 ⇒ (0;2)',why:'Ceros de la simplificada para el eje x; f(0) para el eje y.'},
+    {label:'6·7·Cierre',math:'Con AV x=−1, oblicua y=x−4, hueco (3;1/2) e intersecciones, armamos el gráfico.',why:'Todo junto da la forma de la curva. Mirá el gráfico y el resumen.'}
+  ],
+  summary:[['Dominio','ℝ − {−1, 3}'],['Simplificada','(x−1)(x−2)/(x+1)'],['Asíntota vertical','x = −1','va'],['Asíntota horizontal','no tiene','none'],['Asíntota oblicua','y = x − 4'],['Hueco','(3; 1/2)','hole'],['Intersección x','(1;0) y (2;0)'],['Intersección y','(0; 2)']]
+ },
+ {id:'e1',kind:'guided',scaffold:'Completás las decisiones',fnHTML:'<span class="frac"><span class="fnum">x − 2</span><span class="fden">x² − 4</span></span>',
+  graph:{win:{xMin:-7,xMax:6,yMin:-4,yMax:4},fn:x=>1/(x+2),va:[-2],ha:0,obl:null,hole:[2,0.25],xints:[],yint:[0,0.5]},
+  steps:[
+    {label:'1·Dominio',fill:{q:'El denominador es x²−4 = (x−2)(x+2). ¿Cuál es el dominio?',resolved:'Dom = ℝ − {−2, 2}',
+      opts:[
+        {t:'ℝ − {−2, 2}',ok:true,fb:'Correcto: se anulan x=2 y x=−2, así que se excluyen ambos.'},
+        {t:'ℝ − {2}',ok:false,fb:'Falta −2: el denominador (x−2)(x+2) también se anula ahí.'},
+        {t:'ℝ (todos los reales)',ok:false,fb:'No: en x=2 y x=−2 el denominador es 0, así que se excluyen.'},
+        {t:'(−2, 2)',ok:false,fb:'El dominio es todo ℝ salvo esos dos puntos, no el intervalo entre ellos.'}
+      ]}},
+    {label:'2·3·Simplif.',fill:{q:'Factorizando: (x−2)/[(x−2)(x+2)]. ¿Qué queda al simplificar?',resolved:'Se cancela (x−2) → queda 1/(x+2)',
+      opts:[
+        {t:'1/(x+2), cancelando (x−2)',ok:true,fb:'Exacto: el (x−2) está arriba y abajo, se cancela. Queda 1/(x+2).'},
+        {t:'No se puede simplificar',ok:false,fb:'Sí: el factor (x−2) es común al numerador y al denominador.'},
+        {t:'1/(x−2)',ok:false,fb:'Se cancela el (x−2), no el (x+2). Queda 1/(x+2).'},
+        {t:'(x−2)/(x+2)',ok:false,fb:'El (x−2) de arriba se cancela con el de abajo; no queda en el resultado.'}
+      ]}},
+    {label:'3·Hueco/AV',fill:{q:'★ ¿Qué pasa en x=2 y en x=−2?',resolved:'x=2: HUECO (se canceló).  x=−2: ASÍNTOTA VERTICAL (no se canceló).',
+      opts:[
+        {t:'Hueco en x=2; asíntota vertical en x=−2',ok:true,fb:'¡Esa es la idea central! El (x−2) se canceló → hueco. El (x+2) quedó en el denominador → AV.'},
+        {t:'Dos asíntotas verticales: x=2 y x=−2',ok:false,fb:'No: el (x−2) se canceló, así que en x=2 hay un HUECO, no una asíntota. AV solo en x=−2.'},
+        {t:'Hueco en x=−2; asíntota en x=2',ok:false,fb:'Al revés: se canceló (x−2) → hueco en x=2. El (x+2) no se cancela → AV en x=−2.'},
+        {t:'Dos huecos',ok:false,fb:'Solo (x−2) se cancela (hueco en 2). El (x+2) queda → asíntota vertical en −2.'}
+      ]}},
+    {label:'Valor del hueco',math:'En x=2 la simplificada 1/(x+2) vale 1/(2+2) = 1/4 ⇒ hueco (2; 1/4)'},
+    {label:'4·AH',fill:{q:'En 1/(x+2): grado de arriba 0, de abajo 1. ¿Hay asíntota horizontal?',resolved:'Grado abajo > arriba ⇒ AH en y = 0',
+      opts:[
+        {t:'Sí, y = 0',ok:true,fb:'Correcto: como el denominador tiene mayor grado, el límite en ∞ es 0 (Etapa 4).'},
+        {t:'No tiene asíntota horizontal',ok:false,fb:'Sí tiene: con el denominador de mayor grado, la función tiende a 0 en el infinito.'},
+        {t:'Sí, y = 2',ok:false,fb:'El valor es 0, no 2. El denominador domina, así que f→0.'},
+        {t:'Hay asíntota oblicua',ok:false,fb:'No: la oblicua aparece cuando arriba supera por uno a abajo. Acá abajo es mayor: hay AH en y=0.'}
+      ]}},
+    {label:'5·Intersec.',math:'Eje x: 1/(x+2) nunca es 0 ⇒ no hay. Eje y: f(0)=1/2 ⇒ (0; 1/2)'}
+  ],
+  summary:[['Dominio','ℝ − {−2, 2}'],['Simplificada','1/(x+2)'],['Asíntota vertical','x = −2','va'],['Asíntota horizontal','y = 0'],['Hueco','(2; 1/4)','hole'],['Intersección x','no tiene','none'],['Intersección y','(0; 1/2)'],['Positividad C⁺','x > −2 (x≠2)'],['Negatividad C⁻','x < −2']]
+ },
+ {id:'e2',kind:'guided',scaffold:'Lo resolvés casi solo',fnHTML:'<span class="frac"><span class="fnum">2x² − x</span><span class="fden">x</span></span>',
+  graph:{win:{xMin:-4,xMax:5,yMin:-6,yMax:8},fn:x=>2*x-1,va:[],ha:null,obl:null,hole:[0,-1],xints:[[0.5,0]],yint:null},
+  steps:[
+    {label:'1·2·3',fill:{q:'Factorizá y simplificá (2x²−x)/x. ¿Qué obtenés?',resolved:'x(2x−1)/x = 2x−1, con x ≠ 0',
+      opts:[
+        {t:'2x − 1, con x ≠ 0',ok:true,fb:'Correcto: 2x²−x = x(2x−1); el x se cancela y queda la recta 2x−1, pero con x≠0.'},
+        {t:'2x − 1, para todo x',ok:false,fb:'Casi: la expresión es 2x−1, pero x=0 NO está en el dominio (era el denominador). Queda el hueco.'},
+        {t:'2x',ok:false,fb:'Revisá: 2x²−x = x(2x−1), no x·2x. Al cancelar el x queda 2x−1.'},
+        {t:'No se puede simplificar',ok:false,fb:'Sí: 2x²−x = x(2x−1), y el x del numerador se cancela con el denominador.'}
+      ]}},
+    {label:'★ Hueco/AV',fill:{q:'★ El denominador (x) se anula en x=0. ¿Hay asíntota vertical ahí?',resolved:'NO: el x se cancela → HUECO en x=0, no asíntota.',
+      opts:[
+        {t:'No: como el x se cancela, en x=0 hay un HUECO',ok:true,fb:'¡Exacto! Acá está el corazón de la etapa: el x se cancela, así que NO hay asíntota — hay un hueco. La función es la recta 2x−1 con un agujero en x=0.'},
+        {t:'Sí, hay una asíntota vertical en x=0',ok:false,fb:'No: el x del denominador se cancela con el del numerador. Eso deja un HUECO, no una asíntota. Es el error más común.'},
+        {t:'Sí, y además una asíntota horizontal',ok:false,fb:'Ninguna de las dos: el x se cancela (hueco) y lo que queda es una recta, que no tiene asíntotas.'}
+      ]}},
+    {label:'Valor del hueco',math:'En x=0 la simplificada 2x−1 vale 2·0−1 = −1 ⇒ hueco (0; −1)'},
+    {label:'5·Intersec.',fill:{q:'¿Dónde corta al eje x la recta 2x−1?',resolved:'2x−1=0 ⇒ x=1/2 ⇒ (1/2; 0)',
+      opts:[
+        {t:'En x = 1/2',ok:true,fb:'Correcto: 2x−1=0 ⇒ x=1/2. Y al eje y NO corta, porque x=0 es el hueco.'},
+        {t:'En x = 1',ok:false,fb:'Revisá: 2x−1=0 ⇒ 2x=1 ⇒ x=1/2.'},
+        {t:'En x = −1',ok:false,fb:'Ese es el valor del hueco (la y), no el corte con el eje x. El corte es x=1/2.'},
+        {t:'No corta al eje x',ok:false,fb:'Sí: la recta 2x−1 vale 0 en x=1/2.'}
+      ]}}
+  ],
+  summary:[['Dominio','ℝ − {0}'],['Simplificada','2x − 1 (x≠0)'],['Asíntota vertical','no tiene','none'],['Asíntotas H/O','no tiene (es una recta)','none'],['Hueco','(0; −1)','hole'],['Intersección x','(1/2; 0)'],['Intersección y','no tiene (x=0 es el hueco)','none'],['Positividad C⁺','x > 1/2'],['Negatividad C⁻','x < 1/2 (x≠0)']]
+ }
+];
+const RUNG_BY_ID={};RUNGS.forEach(r=>RUNG_BY_ID[r.id]=r);
+const RUNGSTATE={};
+
+function stepHTML(r,i,s){
+  let inner='';
+  if(s.fill){
+    inner=`<div class="lstep-q">${s.fill.q}</div><div class="qopts" id="lopts-${r.id}-${i}">`
+      +s.fill.opts.map((o,oi)=>`<button class="qopt" id="lo-${r.id}-${i}-${oi}" onclick="fillAnswer('${r.id}',${i},${oi})"><span class="ql">${['A','B','C','D'][oi]}</span>${o.t}</button>`).join('')
+      +`</div><div class="qfb" id="lfb-${r.id}-${i}"><span class="qfb-ic"></span><span class="qfb-tx"></span></div><div class="lstep-resolved" id="lres-${r.id}-${i}"></div>`;
+  }else{
+    inner=`<div class="lstep-math">${s.math}</div>`+(s.why?`<div class="lstep-why">${s.why}</div>`:'')
+      +((r.kind==='worked'&&i<r.steps.length-1)?`<button class="btn lstep-next" onclick="advanceRung('${r.id}')">Siguiente paso ▾</button>`:'');
+  }
+  return `<div class="lstep" id="lstep-${r.id}-${i}"><div class="lstep-label">${s.label}</div><div class="lstep-body">${inner}</div></div>`;
+}
+function renderLadder(){
+  const mount=document.getElementById('ladder-mount');let html='';
+  RUNGS.forEach((r,ri)=>{
+    const next=ri<RUNGS.length-1?('rung-'+RUNGS[ri+1].id):'sec-quiz';
+    const label=ri<RUNGS.length-1?'Siguiente peldaño →':'Ir a la práctica →';
+    html+=`<div class="rung" id="rung-${r.id}">
+      <div class="rung-head"><div class="rung-num">Peldaño ${ri+1}</div><div class="fade-badge">${r.scaffold}</div></div>
+      <div class="fn-line">f(x) = ${r.fnHTML}</div>
+      <div class="lsteps" id="lsteps-${r.id}">${r.steps.map((s,i)=>stepHTML(r,i,s)).join('')}</div>
+      <div class="rung-result" id="result-${r.id}">
+        <div class="result-grid">
+          <div><div class="canvas-wrap"><canvas id="cvr-${r.id}" width="520" height="380"></canvas></div>
+            <div class="graph-legend">
+              <div class="lg"><span class="lg-line" style="background:#1d6fcc"></span>f(x)</div>
+              <div class="lg"><span class="lg-line" style="background:#f59e0b;height:2px;border-top:2px dashed #f59e0b"></span>asíntota vert.</div>
+              <div class="lg"><span class="lg-line" style="background:#0ea5e9"></span>asíntota horiz.</div>
+              <div class="lg"><span class="lg-line" style="background:#7c3aed"></span>oblicua</div>
+              <div class="lg"><span class="lg-dot" style="border-color:#1d6fcc;background:#f8fbff"></span>hueco</div>
+              <div class="lg"><span class="lg-dot" style="border-color:#ef4444;background:#ef4444"></span>intersección</div>
+            </div>
+          </div>
+          <div class="summary" id="summary-${r.id}"></div>
+        </div>
+      </div>
+      <div class="rung-cta" id="cta-${r.id}"><button class="btn btn-next" data-go="${next}">${label}</button></div>
+    </div>`;
+  });
+  mount.innerHTML=html;
+  RUNGS.forEach(r=>{RUNGSTATE[r.id]={idx:0,done:false};advanceRung(r.id);});
+}
+function advanceRung(rid){
+  const r=RUNG_BY_ID[rid],st=RUNGSTATE[rid];
+  if(st.idx>=r.steps.length)return;
+  const i=st.idx;document.getElementById('lstep-'+rid+'-'+i).classList.add('show');st.idx++;
+  const step=r.steps[i],isLast=st.idx>=r.steps.length;
+  if(step.fill)return;
+  if(isLast){finishRung(rid);return;}
+  if(r.kind!=='worked')advanceRung(rid);
+}
+function fillAnswer(rid,i,oi){
+  const r=RUNG_BY_ID[rid],step=r.steps[i],opt=step.fill.opts[oi];
+  if(step.fill.answered)return;
+  const fb=document.getElementById('lfb-'+rid+'-'+i);
+  if(opt.ok){
+    step.fill.answered=true;
+    step.fill.opts.forEach((o,k)=>{const b=document.getElementById('lo-'+rid+'-'+i+'-'+k);b.classList.add('locked');if(o.ok)b.classList.add('correct');});
+    fb.className='qfb show ok';fb.querySelector('.qfb-ic').textContent='✅';fb.querySelector('.qfb-tx').textContent=opt.fb;
+    if(step.fill.resolved){const rr=document.getElementById('lres-'+rid+'-'+i);rr.innerHTML='<span class="lstep-math">'+step.fill.resolved+'</span>';rr.classList.add('show');}
+    advanceRung(rid);
+    if(RUNGSTATE[rid].idx>=r.steps.length)finishRung(rid);
+  }else{
+    document.getElementById('lo-'+rid+'-'+i+'-'+oi).classList.add('wrong');
+    fb.className='qfb show bad';fb.querySelector('.qfb-ic').textContent='❌';fb.querySelector('.qfb-tx').textContent=opt.fb;
+  }
+}
+function finishRung(rid){
+  const r=RUNG_BY_ID[rid],st=RUNGSTATE[rid];if(st.done)return;st.done=true;
+  document.getElementById('result-'+rid).classList.add('show');
+  const g=r.graph,G=new GraphPlotter('cvr-'+rid,g.win);
+  G.clear();G.drawGrid();G.drawAxes();
+  if(g.ha!==null&&g.ha!==undefined)G.hLine(g.ha,'y = '+fmt(g.ha));
+  if(g.obl)G.oblique(g.obl[0],g.obl[1],'y = '+(g.obl[0]===1?'x':fmt(g.obl[0])+'x')+(g.obl[1]<0?' − '+fmt(-g.obl[1]):' + '+fmt(g.obl[1])));
+  (g.va||[]).forEach(v=>G.vLine(v,'x = '+fmt(v)));
+  G.plot(g.fn,'#1d6fcc',2.6,g.va);
+  (g.xints||[]).forEach(p=>G.point(p[0],p[1],true,'#ef4444',5));
+  if(g.yint)G.point(g.yint[0],g.yint[1],true,'#ef4444',5);
+  if(g.hole)G.point(g.hole[0],g.hole[1],false,'#1d6fcc',6);
+  // resumen
+  const sm=document.getElementById('summary-'+rid);
+  sm.innerHTML=r.summary.map(row=>`<div class="sum-row"><span class="sum-k">${row[0]}</span><span class="sum-v ${row[2]||''}">${row[1]}</span></div>`).join('');
+  document.getElementById('cta-'+rid).classList.add('show');
+  if(RUNGS.every(rr=>RUNGSTATE[rr.id]&&RUNGSTATE[rr.id].done)){DONE.ladder=true;updateRuta();}
+}
+
+/* ===================== QUIZ ===================== */
+const QUIZ=[
+ {q:'En f(x) = <span class="frac"><span class="fnum">x − 5</span><span class="fden">x² − 25</span></span>, el denominador se anula en x = 5 y x = −5. ¿Qué ocurre en cada punto?',
+  opts:[
+   {t:'Dos asíntotas verticales.',ok:false,fb:'No: x²−25 = (x−5)(x+5), y el (x−5) se cancela con el numerador. En x=5 hay un HUECO; AV solo en x=−5.'},
+   {t:'Hueco en x=5; asíntota vertical en x=−5.',ok:true,fb:'Exacto: (x−5) se cancela (hueco en 5); (x+5) queda en el denominador (AV en −5).'},
+   {t:'Asíntota en x=5; hueco en x=−5.',ok:false,fb:'Al revés: el factor que se cancela es (x−5) → hueco en 5. El (x+5) no se cancela → AV en −5.'},
+   {t:'Dos huecos.',ok:false,fb:'Solo (x−5) se cancela. El (x+5) queda en el denominador, así que en x=−5 hay asíntota vertical.'}
+  ]},
+ {q:'¿Cómo se distingue, mirando la factorización, un hueco de una asíntota vertical?',
+  opts:[
+   {t:'Todo cero del denominador es una asíntota vertical.',ok:false,fb:'Ese es el error clásico. Si el factor también está en el numerador y se cancela, es un HUECO, no una asíntota.'},
+   {t:'Si el factor del denominador se cancela con el numerador es hueco; si no se cancela, es asíntota.',ok:true,fb:'Correcto: cancelado → hueco (discontinuidad evitable); no cancelado → asíntota vertical.'},
+   {t:'Depende del grado del numerador.',ok:false,fb:'El grado decide la asíntota horizontal/oblicua, no si un punto es hueco o AV. Eso lo decide la cancelación del factor.'},
+   {t:'Solo se puede saber mirando el gráfico.',ok:false,fb:'No hace falta: la factorización ya lo dice. Factor que se cancela = hueco; factor que queda = asíntota.'}
+  ]},
+ {q:'Al simplificar, f(x) = <span class="frac"><span class="fnum">2x² − x</span><span class="fden">x</span></span> queda como 2x − 1 (con x ≠ 0). ¿Qué tiene esta función?',
+  opts:[
+   {t:'Una asíntota vertical en x = 0.',ok:false,fb:'No: el x se canceló. En x=0 hay un HUECO, no una asíntota. La función es una recta con un agujero.'},
+   {t:'Un hueco en (0; −1) y ninguna asíntota.',ok:true,fb:'Exacto: el x se cancela (hueco en x=0, a la altura 2·0−1=−1) y lo que queda es la recta 2x−1, sin asíntotas.'},
+   {t:'Una asíntota horizontal en y = −1.',ok:false,fb:'No: 2x−1 es una recta que crece sin tope, no tiene asíntota horizontal. En x=0 hay un hueco.'},
+   {t:'No tiene dominio.',ok:false,fb:'Sí tiene dominio: ℝ − {0}. Solo se excluye x=0, donde queda el hueco.'}
+  ]}
+];
+const quizState=QUIZ.map(()=>({answered:false}));
+function renderQuiz(){
+  const m=document.getElementById('quiz-mount'),L=['A','B','C','D'];let h='';
+  QUIZ.forEach((it,qi)=>{
+    h+=`<div class="qitem"><div class="qhead">Pregunta ${qi+1} de ${QUIZ.length}</div><div class="qtext">${it.q}</div><div class="qopts">`;
+    it.opts.forEach((o,oi)=>{h+=`<button class="qopt" id="q-${qi}-${oi}" onclick="answerQuiz(${qi},${oi})"><span class="ql">${L[oi]}</span>${o.t}</button>`;});
+    h+=`</div><div class="qfb" id="qfb-${qi}"><span class="qfb-ic"></span><span class="qfb-tx"></span></div></div>`;
+  });
+  m.innerHTML=h;
+}
+function answerQuiz(qi,oi){
+  if(quizState[qi].answered)return;quizState[qi].answered=true;
+  const it=QUIZ[qi],chosen=it.opts[oi];
+  it.opts.forEach((o,i)=>{const b=document.getElementById('q-'+qi+'-'+i);b.classList.add('locked');if(o.ok)b.classList.add('correct');else if(i===oi)b.classList.add('wrong');});
+  const fb=document.getElementById('qfb-'+qi);fb.className='qfb show '+(chosen.ok?'ok':'bad');
+  fb.querySelector('.qfb-ic').textContent=chosen.ok?'✅':'❌';fb.querySelector('.qfb-tx').textContent=chosen.fb;
+  if(quizState.every(q=>q.answered)){
+    const n=QUIZ.reduce((a,it,i)=>a+(document.getElementById('qfb-'+i).classList.contains('ok')?1:0),0);
+    const d=document.getElementById('quiz-done');
+    d.innerHTML=`Respondiste correctamente <b>${n}</b> de ${QUIZ.length}. ${n===QUIZ.length?'Dominás la distinción hueco/asíntota 💪':'Repasá la devolución en rojo: el factor que se cancela es la clave.'}`;
+    d.classList.add('show');DONE.quiz=true;updateRuta();
+  }
+}
+
+/* ===================== SÍNTESIS ===================== */
+function saveSint(){document.getElementById('sint-done').classList.add('show');DONE.sint=true;updateRuta();}
+
+/* ===================== RUTA ===================== */
+function updateRuta(){
+  const map=['diag','map','ladder','ladder','ladder','quiz','sint'];
+  document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('done',DONE[map[i]]));
+}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-go]');if(el){const t=document.getElementById(el.dataset.go);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}});
+
+/* ===================== INIT ===================== */
+document.addEventListener('DOMContentLoaded',()=>{
+  renderLadder();
+  renderQuiz();
+  const secs=[['sec-diag',0],['sec-map',1],['rung-m1',2],['rung-e1',3],['rung-e2',4],['sec-quiz',5],['sec-sint',6]];
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const idx=secs.find(s=>s[0]===e.target.id);if(!idx)return;document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('active',i===idx[1]));}});},{rootMargin:'-40% 0px -55% 0px'});
+  secs.forEach(s=>{const el=document.getElementById(s[0]);if(el)obs.observe(el);});
+});
+</script>
+</body>
+</html>

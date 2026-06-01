@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etapa 2 · Álgebra de límites e infinitésimos — Prototipo</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0f2244;--blue:#1d6fcc;--blue2:#2d82e6;--sky:#0ea5e9;
+  --bg:#eef6ff;--bg2:#f8fbff;--white:#fff;
+  --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
+  --g500:#64748b;--g600:#475569;--g700:#334155;--g800:#1e293b;
+  --ok:#059669;--ok-bg:#d1fae5;--err:#dc2626;--err-bg:#fee2e2;
+  --warn:#d97706;--warn-bg:#fef3c7;--hint:#7c3aed;--hint-bg:#ede9fe;
+  --r:12px;--rl:16px;--rxl:24px;
+  --sh:0 4px 6px -1px rgba(0,0,0,.08),0 2px 4px -1px rgba(0,0,0,.05);
+  --shl:0 10px 25px -5px rgba(0,0,0,.1),0 4px 8px -2px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--g800);line-height:1.6;font-size:16px}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;line-height:1.25}
+h2{font-size:clamp(1.4rem,3vw,2rem);color:var(--navy)}
+h3{font-size:1.15rem;color:var(--navy)}
+p{margin-bottom:.7em}strong{color:var(--navy)}em{font-style:italic}
+sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
+.container{max-width:980px;margin:0 auto;padding:0 20px}
+
+.topbar{background:var(--navy);color:#94a3b8;font-size:12px;font-weight:600;letter-spacing:.04em;padding:8px 0;text-align:center}
+.topbar b{color:#7dd3fc}
+.hero{background:linear-gradient(135deg,#0f2244 0%,#1d6fcc 70%,#0ea5e9 120%);color:#fff;padding:38px 0 44px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(56,189,248,.18),transparent 60%);pointer-events:none}
+.hero .container{position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#bfdbfe;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:14px}
+.hero h2{color:#fff;margin-bottom:10px;font-size:clamp(1.6rem,4vw,2.5rem)}
+.hero-sub{color:#bfdbfe;font-size:1.02rem;max-width:680px}
+.hero-obj{margin-top:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:var(--r);padding:12px 16px;font-size:13.5px;color:#e0f2fe;max-width:700px}
+.hero-obj b{color:#fff}
+
+.ruta{position:sticky;top:0;z-index:50;background:var(--navy);padding:10px 0;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.ruta-inner{display:flex;align-items:center;gap:6px;flex-wrap:wrap;overflow-x:auto}
+.rstep{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#94a3b8;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.rstep:hover{background:rgba(255,255,255,.12)}
+.rstep.active{background:rgba(29,111,204,.6);border-color:var(--blue2);color:#dbeafe}
+.rstep.done{background:rgba(5,150,105,.22);border-color:#10b981;color:#6ee7b7}
+.rnum{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.rstep.done .rnum{background:#10b981;color:#fff}.rstep.active .rnum{background:var(--blue2);color:#fff}
+
+.wrap{padding:28px 0 70px}
+.card{background:var(--white);border-radius:var(--rl);box-shadow:var(--sh);border:1px solid var(--g200);padding:24px;margin-bottom:22px;scroll-margin-top:64px;animation:rise .4s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.card-title{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.cti{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ic-diag{background:var(--hint-bg);color:var(--hint)}
+.ic-poe{background:#dbeafe;color:var(--blue)}
+.ic-props{background:#dcfce7;color:var(--ok)}
+.ic-uniq{background:#e0e7ff;color:#4338ca}
+.ic-inf{background:#ffedd5;color:#c2410c}
+.ic-quiz{background:#fce7f3;color:#be185d}
+.ic-sint{background:var(--warn-bg);color:var(--warn)}
+.card-title h3{margin:0}
+.card-lead{color:var(--g600);font-size:14.5px;margin-bottom:16px}
+
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px}
+.fnum{border-bottom:1.6px solid currentColor;padding:0 8px 1px}
+.fden{padding:1px 8px 0}
+.lim{font-style:italic}
+.mono{font-family:'Courier New',monospace}
+
+.poe-states{display:flex;gap:6px;margin:14px 0 18px;flex-wrap:wrap}
+.pstate{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--g500);padding:5px 13px;border-radius:50px;background:var(--g100);border:1px solid var(--g200);transition:all .25s}
+.pstate .pn{width:18px;height:18px;border-radius:50%;background:var(--g300);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px}
+.pstate.on{background:#eff6ff;border-color:var(--blue);color:var(--blue)}.pstate.on .pn{background:var(--blue)}
+.pstate.cleared{background:var(--ok-bg);border-color:#10b981;color:#047857}.pstate.cleared .pn{background:#10b981}
+.parrow{color:var(--g300);align-self:center;font-weight:700}
+.predict-group{margin-bottom:16px}
+.pq{font-weight:600;color:var(--navy);font-size:15px;margin-bottom:10px;padding-left:12px;border-left:3px solid var(--hint)}
+.popts{display:flex;flex-direction:column;gap:8px}
+.popt{width:100%;text-align:left;padding:11px 15px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--white);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:11px}
+.popt:hover{border-color:var(--hint);background:#faf5ff;color:var(--navy)}
+.popt.sel{border-color:var(--hint);background:var(--hint-bg);color:var(--navy);font-weight:600}
+.pdot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--g300);flex-shrink:0;transition:all .18s}
+.popt.sel .pdot{border-color:var(--hint);background:var(--hint);box-shadow:inset 0 0 0 3px var(--white)}
+.predict-actions{margin-top:6px}
+.btn{padding:11px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-go{background:var(--hint);color:#fff}.btn-go:hover{background:#6d28d9;transform:translateY(-1px)}
+.btn-go.dim{opacity:.45;pointer-events:none}
+.btn-ghost{background:var(--g100);color:var(--g700);border:1px solid var(--g200)}.btn-ghost:hover{background:var(--g200)}
+.btn-next{background:var(--navy);color:#bfdbfe}.btn-next:hover{background:var(--blue);color:#fff;transform:translateY(-1px)}
+.lockmsg{font-size:13px;color:var(--hint);margin-top:8px;font-weight:600;display:none}
+.lockmsg.show{display:block}
+.poe-observe{position:relative;margin-top:6px;border-top:1px dashed var(--g200);padding-top:18px}
+.observe-inner{transition:filter .5s,opacity .5s}
+.poe-observe.locked .observe-inner{filter:blur(7px);opacity:.45;pointer-events:none;user-select:none}
+.lock-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;z-index:3}
+.poe-observe:not(.locked) .lock-ov{display:none}
+.lock-ic{font-size:30px}.lock-tx{font-weight:700;color:var(--navy);font-size:15px}.lock-sub{font-size:13px;color:var(--g500);max-width:280px}
+.obs-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+@media(max-width:760px){.obs-grid{grid-template-columns:1fr}}
+.canvas-wrap{background:var(--bg2);border-radius:var(--r);border:1px solid var(--g200);overflow:hidden}
+.canvas-wrap canvas{display:block;width:100%;height:auto}
+.ltable{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tcol{background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:10px}
+.tcol-head{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;text-align:center;padding-bottom:8px;margin-bottom:6px;border-bottom:1px solid var(--g200)}
+.tcol-head.left{color:var(--blue)}.tcol-head.right{color:var(--sky)}
+.trow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;padding:4px 2px;font-family:'Courier New',monospace;font-size:12.5px}
+.trow .tx{color:var(--g600);text-align:right}.trow .tarrow{color:var(--g300);font-size:11px}.trow .tfx{color:var(--navy);font-weight:700;text-align:left}
+.tcol-foot{margin-top:8px;padding-top:8px;border-top:1.5px dashed var(--g300);text-align:center;font-size:13px;color:var(--g600)}
+.tcol-foot b{font-family:'Courier New',monospace}.tcol-foot.left b{color:var(--blue)}.tcol-foot.right b{color:var(--sky)}
+.poe-explain{margin-top:18px;border-top:1px dashed var(--g200);padding-top:18px;display:none;animation:rise .4s ease both}
+.poe-explain.show{display:block}
+.explain-head{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.explain-head .eh-ic{width:30px;height:30px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.explain-head h4{color:var(--navy);font-size:16px}
+.explain-body{font-size:14.5px;color:var(--g700)}.explain-body p{margin-bottom:.6em}
+.bigidea{background:linear-gradient(90deg,#eff6ff,var(--white));border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;margin-top:12px;font-size:14.5px;color:var(--g700)}
+.explain-next{margin-top:16px}
+.diag-note{display:none;margin-top:14px;background:var(--hint-bg);border:1px solid #c4b5fd;border-radius:var(--r);padding:13px 16px;font-size:14px;color:#4c1d95}
+.diag-note.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+
+/* PROPERTY BLOCKS */
+.blocks{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.block{border:1.5px solid var(--g200);border-radius:var(--r);overflow:hidden;background:var(--white)}
+.block-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .2s;background:var(--g50)}
+.block-head:hover{background:#f0f7ff}
+.block.open .block-head{background:#eff6ff;border-bottom:1px solid var(--g200)}
+.block-badge{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;flex-shrink:0;font-family:'Fraunces',serif;font-weight:700}
+.bb-a{background:var(--blue)}.bb-b{background:var(--ok)}.bb-c{background:var(--hint)}
+.block-title{flex:1}
+.block-title .bt-name{font-weight:700;color:var(--navy);font-size:15px}
+.block-title .bt-sub{font-size:12.5px;color:var(--g500)}
+.block-chev{color:var(--g400);transition:transform .25s;font-size:14px;color:var(--g500)}
+.block.open .block-chev{transform:rotate(180deg)}
+.block-body{display:none;padding:16px;animation:rise .3s ease both}
+.block.open .block-body{display:block}
+.prop-row{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--g100)}
+.prop-row:last-child{border-bottom:none}
+.prop-eq{flex:1;min-width:0;font-family:'Courier New',monospace;font-size:13.5px;color:var(--navy);font-weight:700}
+.prop-ex{flex-shrink:0;font-family:'Courier New',monospace;font-size:12.5px;color:var(--g500);background:var(--g50);border:1px solid var(--g200);border-radius:7px;padding:4px 9px}
+@media(max-width:600px){.prop-row{flex-direction:column;gap:4px}.prop-ex{align-self:flex-start}}
+
+/* WORKED DECOMPOSITION */
+.lsteps{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.lstep{display:none;gap:14px;align-items:flex-start;animation:rise .35s ease both}
+.lstep.show{display:flex}
+.lstep-label{flex-shrink:0;width:104px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--g500);background:var(--g100);border:1px solid var(--g200);border-radius:8px;padding:6px 8px;text-align:center;margin-top:2px}
+.lstep-body{flex:1;min-width:0}
+.lstep-math{font-family:'Courier New',monospace;font-size:1.02rem;color:var(--navy);font-weight:700}
+.lstep-why{font-size:13px;color:var(--g600);margin-top:4px}
+.lstep-next{margin-top:10px;background:var(--g100);color:var(--g700);border:1px solid var(--g200);font-size:13px;padding:8px 16px}
+.lstep-next:hover{background:var(--g200)}
+
+/* UNIQUENESS */
+.uniq-box{background:linear-gradient(90deg,#eef2ff,var(--white));border:1px solid #c7d2fe;border-left:4px solid #4338ca;border-radius:0 var(--r) var(--r) 0;padding:16px 18px;font-size:14.5px;color:var(--g700)}
+
+/* INFINITÉSIMO TESTER */
+.tester{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+.tchip{padding:9px 15px;border-radius:50px;border:1.5px solid var(--g200);background:var(--white);font-family:'Courier New',monospace;font-size:13px;color:var(--g700);cursor:pointer;transition:all .18s}
+.tchip:hover{border-color:var(--blue);background:#f0f7ff}
+.tchip.on{border-color:var(--blue);background:#eff6ff;color:var(--navy);font-weight:700}
+.tester-out{display:none;margin-top:8px}
+.tester-out.show{display:block;animation:rise .3s ease both}
+.verdict{display:inline-flex;align-items:center;gap:8px;padding:7px 15px;border-radius:50px;font-weight:700;font-size:14px;margin-top:10px}
+.verdict.yes{background:var(--ok-bg);color:#065f46;border:1px solid #6ee7b7}
+.verdict.no{background:var(--err-bg);color:#991b1b;border:1px solid #fca5a5}
+
+.qopts{display:flex;flex-direction:column;gap:8px}
+.qopt{width:100%;text-align:left;padding:11px 15px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--white);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:11px}
+.qopt:hover:not(.locked){border-color:var(--blue);background:#f0f7ff;color:var(--navy)}
+.qopt .ql{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--g300);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--g600);flex-shrink:0;transition:all .18s}
+.qopt.correct{border-color:var(--ok);background:var(--ok-bg);color:#065f46;font-weight:600}.qopt.correct .ql{border-color:var(--ok);background:var(--ok);color:#fff}
+.qopt.wrong{border-color:var(--err);background:var(--err-bg);color:#991b1b}.qopt.wrong .ql{border-color:var(--err);background:var(--err);color:#fff}
+.qopt.locked{cursor:default}
+.qfb{border-radius:var(--r);padding:13px 15px;margin-top:11px;font-size:14px;display:none;gap:10px;align-items:flex-start}
+.qfb.show{display:flex;animation:rise .35s ease both}
+.qfb.ok{background:var(--ok-bg);border:1px solid #6ee7b7;color:#065f46}.qfb.bad{background:var(--err-bg);border:1px solid #fca5a5;color:#7f1d1d}
+.qfb-ic{font-size:17px;flex-shrink:0}
+.qitem{margin-bottom:22px}.qitem:last-of-type{margin-bottom:0}
+.qhead{font-size:12px;font-weight:700;text-transform:uppercase;color:var(--g500);margin-bottom:6px}
+.qtext{font-weight:600;color:var(--navy);font-size:15px;margin-bottom:12px;padding-left:12px;border-left:3px solid var(--blue)}
+.quiz-done{display:none;margin-top:6px;background:var(--navy);color:#bfdbfe;border-radius:var(--r);padding:14px;text-align:center;font-size:14px}
+.quiz-done.show{display:block;animation:rise .4s ease both}.quiz-done b{color:#7dd3fc;font-size:1.3rem}
+
+.sint-q{font-weight:600;color:var(--navy);font-size:14.5px;margin:14px 0 8px;padding-left:12px;border-left:3px solid var(--warn)}
+.sint-ta{width:100%;min-height:72px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);resize:vertical;background:var(--g50)}
+.sint-ta:focus{outline:none;border-color:var(--warn);background:var(--white)}
+.sint-fill{display:inline-block;min-width:120px;border-bottom:2px dashed var(--g300);color:var(--warn);font-weight:700}
+.sint-done{display:none;margin-top:14px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#065f46}
+.sint-done.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
+
+.proto-note{background:#fff7ed;border:1px dashed #fdba74;border-radius:var(--r);padding:12px 16px;font-size:13px;color:#9a3412;margin-bottom:22px;display:flex;gap:10px;align-items:flex-start}
+@media(max-width:520px){
+  .card{padding:17px}
+  .ltable{grid-template-columns:1fr}
+  .btn{width:100%;justify-content:center}
+  .predict-actions .btn,.explain-next .btn,.lstep-next{width:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar"><b>INSPT · UTN</b> &nbsp;·&nbsp; Análisis Matemático I &nbsp;·&nbsp; Prof. Ariel Cardozo</div>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-badge">⬡ Unidad 2 · Etapa 2 de 7</div>
+    <h2>Álgebra de límites e infinitésimos</h2>
+    <p class="hero-sub">¿Por qué muchas veces basta con "reemplazar y listo"? Las propiedades del límite son el permiso formal para hacerlo — y los infinitésimos son la pieza que explica por qué a veces no se puede.</p>
+    <div class="hero-obj"><b>🎯 Meta:</b> usar las propiedades del límite para descomponer y calcular límites por sustitución directa, y reconocer un infinitésimo (una función cuyo límite es 0) como el ladrillo de las indeterminaciones 0/0.</div>
+  </div>
+</header>
+
+<nav class="ruta">
+  <div class="container ruta-inner" id="ruta">
+    <div class="rstep active" data-go="sec-diag"><span class="rnum">0</span>Idea previa</div>
+    <div class="rstep" data-go="poe-sub"><span class="rnum">1</span>Sustitución directa</div>
+    <div class="rstep" data-go="sec-props"><span class="rnum">2</span>Las propiedades</div>
+    <div class="rstep" data-go="sec-uniq"><span class="rnum">3</span>Unicidad</div>
+    <div class="rstep" data-go="sec-inf"><span class="rnum">4</span>Infinitésimos</div>
+    <div class="rstep" data-go="sec-quiz"><span class="rnum">5</span>Práctica</div>
+    <div class="rstep" data-go="sec-sint"><span class="rnum">6</span>Síntesis</div>
+  </div>
+</nav>
+
+<div class="wrap"><div class="container">
+
+  <div class="proto-note"><span>🧪</span><div><strong>Prototipo de andamiaje — Etapa 2.</strong> En vez de listar las 12 propiedades de golpe (como en el apunte), las agrupamos en 3 bloques con ejemplos y mostramos una descomposición paso a paso. Cierra con infinitésimos, que tienden el puente hacia la indeterminación 0/0.</div></div>
+
+  <!-- DIAGNÓSTICO -->
+  <section class="card" id="sec-diag">
+    <div class="card-title"><div class="cti ic-diag">💭</div><h3>Antes de empezar: ¿qué pensás vos?</h3></div>
+    <p class="card-lead">No hay respuesta correcta todavía. Queremos saber con qué idea llegás.</p>
+    <div class="predict-group">
+      <div class="pq">Para calcular <span class="lim">lim</span><sub>x→3</sub> (5x + 1), ¿qué te parece que hay que hacer?</div>
+      <div class="popts" id="diag-opts">
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Reemplazar x = 3 directamente: da 16.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>Hacer una tabla acercándose a 3 por los dos lados.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>No se puede calcular sin más información.</button>
+        <button class="popt" onclick="selectDiag(this)"><span class="pdot"></span>El límite siempre es distinto del valor de la función.</button>
+      </div>
+    </div>
+    <div class="diag-note" id="diag-note"><span>📌</span><div>Anotada tu idea. Vamos a ver por qué, para funciones "buenas", reemplazar está perfectamente justificado — y cuándo deja de funcionar.</div></div>
+  </section>
+
+  <!-- POE: SUSTITUCIÓN DIRECTA -->
+  <section class="card" id="poe-sub">
+    <div class="card-title"><div class="cti ic-poe">🔬</div><h3>¿Reemplazar y listo?</h3></div>
+    <p class="card-lead">En la Etapa 1 calculábamos límites con tablas y gráficos. Pero para muchas funciones hay un atajo. Veamos <span class="lim">lim</span><sub>x→3</sub> (5x + 1).</p>
+
+    <div class="poe-states" id="states-sub">
+      <div class="pstate on" data-s="predict"><span class="pn">1</span>Predecí</div><span class="parrow">→</span>
+      <div class="pstate" data-s="observe"><span class="pn">2</span>Observá</div><span class="parrow">→</span>
+      <div class="pstate" data-s="explain"><span class="pn">3</span>Explicá</div>
+    </div>
+
+    <div class="poe-predict">
+      <div class="predict-group">
+        <div class="pq">¿Cuánto da <span class="lim">lim</span><sub>x→3</sub> (5x + 1)?</div>
+        <div class="popts">
+          <button class="popt" onclick="poeSel('16',this)"><span class="pdot"></span>16</button>
+          <button class="popt" onclick="poeSel('15',this)"><span class="pdot"></span>15</button>
+          <button class="popt" onclick="poeSel('noexiste',this)"><span class="pdot"></span>No existe</button>
+          <button class="popt" onclick="poeSel('cercano',this)"><span class="pdot"></span>Un valor cercano a 16, pero no 16</button>
+        </div>
+      </div>
+      <div class="predict-actions">
+        <button class="btn btn-go dim" id="lock-sub" onclick="poeLock()">Ver qué pasa →</button>
+        <div class="lockmsg" id="lockmsg-sub">Elegí una opción para continuar.</div>
+      </div>
+    </div>
+
+    <div class="poe-observe locked" id="obs-sub">
+      <div class="lock-ov"><div class="lock-ic">🔒</div><div class="lock-tx">Primero hacé tu predicción</div><div class="lock-sub">El gráfico y la tabla se desbloquean al confirmar.</div></div>
+      <div class="observe-inner">
+        <div class="obs-grid">
+          <div class="canvas-wrap"><canvas id="cv-sub" width="540" height="400"></canvas></div>
+          <div><div class="ltable" id="tbl-sub"></div>
+            <p style="font-size:13px;color:var(--g600);margin-top:10px">La recta 5x+1 no tiene huecos ni saltos: por ambos lados las imágenes se acercan a 16, y además f(3) = 16. Acá límite y valor coinciden.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="poe-explain" id="exp-sub">
+      <div class="explain-head"><div class="eh-ic">💡</div><h4>Lo que muestra el experimento</h4></div>
+      <div class="explain-body" id="expbody-sub"></div>
+      <div class="explain-next"><button class="btn btn-next" data-go="sec-props">Ver las propiedades que lo justifican →</button></div>
+    </div>
+  </section>
+
+  <!-- PROPIEDADES (3 bloques) -->
+  <section class="card" id="sec-props">
+    <div class="card-title"><div class="cti ic-props">🧱</div><h3>Las propiedades, en 3 bloques</h3></div>
+    <p class="card-lead">No hace falta memorizar doce reglas sueltas. Se ordenan en tres ideas. Tocá cada bloque para abrirlo.</p>
+
+    <div class="blocks" id="blocks">
+      <div class="block" id="block-a">
+        <div class="block-head" onclick="toggleBlock('a')">
+          <div class="block-badge bb-a">A</div>
+          <div class="block-title"><div class="bt-name">Los ladrillos</div><div class="bt-sub">Los dos límites básicos con los que se arma todo</div></div>
+          <div class="block-chev">▼</div>
+        </div>
+        <div class="block-body">
+          <div class="prop-row"><div class="prop-eq"><span class="lim">lim</span><sub>x→a</sub> k = k</div><div class="prop-ex"><span class="lim">lim</span><sub>x→2</sub> 8 = 8</div></div>
+          <div class="prop-row"><div class="prop-eq"><span class="lim">lim</span><sub>x→a</sub> x = a</div><div class="prop-ex"><span class="lim">lim</span><sub>x→3</sub> x = 3</div></div>
+          <p style="font-size:13.5px;color:var(--g600);margin:10px 0 0">El límite de una <strong>constante</strong> es ella misma; el límite de <strong>x</strong> es el punto al que tiende. Todo lo demás se construye combinando estos dos.</p>
+        </div>
+      </div>
+
+      <div class="block" id="block-b">
+        <div class="block-head" onclick="toggleBlock('b')">
+          <div class="block-badge bb-b">B</div>
+          <div class="block-title"><div class="bt-name">El límite se reparte entre las operaciones</div><div class="bt-sub">Suma, resta, producto, cociente y múltiplos</div></div>
+          <div class="block-chev">▼</div>
+        </div>
+        <div class="block-body">
+          <div class="prop-row"><div class="prop-eq"><span class="lim">lim</span> (f ± g) = <span class="lim">lim</span> f ± <span class="lim">lim</span> g</div><div class="prop-ex">suma / resta</div></div>
+          <div class="prop-row"><div class="prop-eq"><span class="lim">lim</span> (f · g) = <span class="lim">lim</span> f · <span class="lim">lim</span> g</div><div class="prop-ex">producto</div></div>
+          <div class="prop-row"><div class="prop-eq"><span class="lim">lim</span> (f / g) = <span class="lim">lim</span> f / <span class="lim">lim</span> g</div><div class="prop-ex">cociente, si <span class="lim">lim</span> g ≠ 0</div></div>
+          <div class="prop-row"><div class="prop-eq"><span class="lim">lim</span> k·f = k · <span class="lim">lim</span> f</div><div class="prop-ex"><span class="lim">lim</span><sub>x→3</sub> 5x = 15</div></div>
+          <p style="font-size:13.5px;color:var(--g600);margin:10px 0 0">La idea única: <strong>el límite "entra"</strong> en sumas, restas, productos y cocientes. Por eso <span class="lim">lim</span>(mx + b) = ma + b — es solo combinar los ladrillos. <em>La única condición fina:</em> en el cociente, el límite del denominador no puede ser 0.</p>
+        </div>
+      </div>
+
+      <div class="block" id="block-c">
+        <div class="block-head" onclick="toggleBlock('c')">
+          <div class="block-badge bb-c">C</div>
+          <div class="block-title"><div class="bt-name">Potencias, raíces y logaritmo</div><div class="bt-sub">El límite también entra en estas operaciones</div></div>
+          <div class="block-chev">▼</div>
+        </div>
+        <div class="block-body">
+          <div class="prop-row"><div class="prop-eq"><span class="lim">lim</span> f<sup>n</sup> = (<span class="lim">lim</span> f)<sup>n</sup></div><div class="prop-ex">potencia</div></div>
+          <div class="prop-row"><div class="prop-eq"><span class="lim">lim</span> <sup>n</sup>√f = <sup>n</sup>√(<span class="lim">lim</span> f)</div><div class="prop-ex">raíz</div></div>
+          <div class="prop-row"><div class="prop-eq"><span class="lim">lim</span> f<sup>g</sup> = (<span class="lim">lim</span> f)<sup>(<span class="lim">lim</span> g)</sup></div><div class="prop-ex">potencia-función</div></div>
+          <div class="prop-row"><div class="prop-eq"><span class="lim">lim</span> ln f = ln(<span class="lim">lim</span> f)</div><div class="prop-ex">logaritmo, si <span class="lim">lim</span> f &gt; 0</div></div>
+          <p style="font-size:13.5px;color:var(--g600);margin:10px 0 0">Mismo espíritu del bloque B: el límite "atraviesa" potencias, raíces y logaritmo. Podés calcular el límite del interior y después aplicar la operación.</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:20px;font-size:14.5px;color:var(--g700)"><strong>Ejemplo trabajado — descomponer con propiedades.</strong> Calculemos <span class="lim">lim</span><sub>x→2</sub> (x³ + √(18x)) usando los bloques, paso a paso:</p>
+    <div class="lsteps" id="dec-steps"></div>
+  </section>
+
+  <!-- UNICIDAD -->
+  <section class="card" id="sec-uniq">
+    <div class="card-title"><div class="cti ic-uniq">☝️</div><h3>El límite, si existe, es único</h3></div>
+    <p class="card-lead">Una propiedad corta pero fundamental, y que ya usaste sin nombrarla.</p>
+    <div class="uniq-box">
+      Si <span class="lim">lim</span><sub>x→a</sub> f(x) = L₁ &nbsp;<strong>y</strong>&nbsp; <span class="lim">lim</span><sub>x→a</sub> f(x) = L₂, entonces <strong>L₁ = L₂</strong>. Una función no puede tender a dos valores distintos al mismo tiempo.
+      <p style="margin:10px 0 0">¿Te suena? Es exactamente lo que viste con el <strong>salto</strong> en la Etapa 1: si por izquierda tiende a 3 y por derecha a 5, esos dos valores distintos <strong>contradicen la unicidad</strong> — por eso el límite no existe. La unicidad es la regla que está por detrás de "los laterales deben coincidir".</p>
+    </div>
+  </section>
+
+  <!-- INFINITÉSIMOS -->
+  <section class="card" id="sec-inf">
+    <div class="card-title"><div class="cti ic-inf">🔬</div><h3>Infinitésimos</h3></div>
+    <p class="card-lead">Un nombre técnico para una idea simple — y la pieza que prepara la próxima etapa.</p>
+    <div class="bigidea" style="margin-top:0;margin-bottom:18px"><strong>Definición.</strong> Una función f es un <strong>infinitésimo en x₀</strong> si <span class="lim">lim</span><sub>x→x₀</sub> f(x) = 0. Es decir: una función que <em>tiende a 0</em> en ese punto. (Ojo: es una <strong>función</strong> que se acerca a 0, no un "número muy chiquito".)</p>
+
+    <div class="poe-states" id="states-inf">
+      <div class="pstate on" data-s="predict"><span class="pn">1</span>Predecí</div><span class="parrow">→</span>
+      <div class="pstate" data-s="observe"><span class="pn">2</span>Observá</div><span class="parrow">→</span>
+      <div class="pstate" data-s="explain"><span class="pn">3</span>Explicá</div>
+    </div>
+
+    <div class="poe-predict">
+      <div class="predict-group">
+        <div class="pq">¿Es f(x) = x² − 9 un infinitésimo en x = 3?</div>
+        <div class="popts">
+          <button class="popt" onclick="poeSelI('si',this)"><span class="pdot"></span>Sí: su límite en x = 3 es 0</button>
+          <button class="popt" onclick="poeSelI('no',this)"><span class="pdot"></span>No: x² − 9 nunca es un número chiquito</button>
+        </div>
+      </div>
+      <div class="predict-actions">
+        <button class="btn btn-go dim" id="lock-inf" onclick="poeLockI()">Ver qué pasa →</button>
+        <div class="lockmsg" id="lockmsg-inf">Elegí una opción para continuar.</div>
+      </div>
+    </div>
+
+    <div class="poe-observe locked" id="obs-inf">
+      <div class="lock-ov"><div class="lock-ic">🔒</div><div class="lock-tx">Primero hacé tu predicción</div><div class="lock-sub">El gráfico se desbloquea al confirmar.</div></div>
+      <div class="observe-inner">
+        <div class="obs-grid">
+          <div class="canvas-wrap"><canvas id="cv-inf" width="540" height="400"></canvas></div>
+          <div><p style="font-size:13.5px;color:var(--g700)">La parábola x² − 9 <strong>cruza el cero</strong> en x = 3 (y también en x = −3). Su límite ahí es 0, así que es un infinitésimo en esos puntos — aunque en otros valores de x esté lejísimos de 0.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="poe-explain" id="exp-inf">
+      <div class="explain-head"><div class="eh-ic">💡</div><h4>Lo que muestra el experimento</h4></div>
+      <div class="explain-body" id="expbody-inf"></div>
+      <div style="margin-top:16px">
+        <p style="font-size:14px;color:var(--g700);font-weight:600;margin-bottom:8px">Probá vos: tocá cada caso y mirá si es infinitésimo ahí.</p>
+        <div class="tester" id="inf-tester">
+          <button class="tchip" onclick="testInf('a',this)">x² − 9 &nbsp;en&nbsp; x = 3</button>
+          <button class="tchip" onclick="testInf('b',this)">x² − 9 &nbsp;en&nbsp; x = 0</button>
+          <button class="tchip" onclick="testInf('c',this)">sen x &nbsp;en&nbsp; x = 0</button>
+          <button class="tchip" onclick="testInf('d',this)">x − 2 &nbsp;en&nbsp; x = 2</button>
+        </div>
+        <div class="tester-out" id="tester-out">
+          <div class="canvas-wrap" style="max-width:420px"><canvas id="cv-test" width="420" height="280"></canvas></div>
+          <div class="verdict" id="test-verdict"></div>
+          <p id="test-why" style="font-size:13.5px;color:var(--g600);margin-top:8px"></p>
+        </div>
+        <div class="bigidea"><strong>El puente con la próxima etapa.</strong> Cuando dividís <em>un infinitésimo sobre otro infinitésimo</em> (los dos tienden a 0), obtenés la forma <strong>0/0</strong> — lo que el apunte llama "cociente de infinitésimos". Por eso 0/0 es indeterminado y necesita técnicas especiales: es justo el tema de la Etapa 3.</p>
+      </div>
+      <div class="explain-next"><button class="btn btn-next" data-go="sec-quiz">Ir a la práctica →</button></div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="card" id="sec-quiz">
+    <div class="card-title"><div class="cti ic-quiz">✏️</div><h3>Verificá tu comprensión</h3></div>
+    <p class="card-lead">Si te equivocás, la devolución te dice por qué.</p>
+    <div id="quiz-mount"></div>
+    <div class="quiz-done" id="quiz-done"></div>
+  </section>
+
+  <!-- SÍNTESIS -->
+  <section class="card" id="sec-sint">
+    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Síntesis: ¿qué cambió en tu cabeza?</h3></div>
+    <p class="card-lead">Ponerlo en palabras lo fija mejor que solo leerlo.</p>
+    <div class="sint-q">Con tus palabras: ¿por qué para una función "buena" (como un polinomio) alcanza con <strong>reemplazar</strong> para calcular el límite?</div>
+    <textarea class="sint-ta" id="sint1" placeholder="Porque las propiedades garantizan que…"></textarea>
+    <div class="sint-q">¿Qué es un <strong>infinitésimo</strong>, y por qué dividir dos infinitésimos da una indeterminación?</div>
+    <textarea class="sint-ta" id="sint2" placeholder="Un infinitésimo es… Al dividir dos, queda…"></textarea>
+    <div style="margin-top:14px"><button class="btn btn-next" onclick="saveSint()">Guardar mi reflexión ✓</button></div>
+    <div class="sint-done" id="sint-done"><span>🎉</span><div><strong>¡Etapa 2 completa!</strong> Ya tenés las propiedades como herramienta y sabés calcular por sustitución directa. Y entendés que cuando reemplazar da 0/0 (cociente de infinitésimos) hace falta otra cosa — exactamente lo que vas a aprender en la Etapa 3.</div></div>
+  </section>
+
+</div></div>
+
+<script>
+/* ===================== MOTOR DE GRAFICACIÓN ===================== */
+class GraphPlotter{
+  constructor(id,o={}){
+    this.canvas=document.getElementById(id);this.ctx=this.canvas.getContext('2d');
+    this.xMin=o.xMin??-6;this.xMax=o.xMax??6;this.yMin=o.yMin??-8;this.yMax=o.yMax??8;
+    this.pL=46;this.pR=18;this.pT=18;this.pB=34;
+  }
+  get W(){return this.canvas.width-this.pL-this.pR}
+  get H(){return this.canvas.height-this.pT-this.pB}
+  cx(x){return this.pL+(x-this.xMin)/(this.xMax-this.xMin)*this.W}
+  cy(y){return this.pT+(this.yMax-y)/(this.yMax-this.yMin)*this.H}
+  clear(){const c=this.ctx;c.fillStyle='#f8fbff';c.fillRect(0,0,this.canvas.width,this.canvas.height)}
+  drawGrid(){const c=this.ctx;c.strokeStyle='#e2eaf5';c.lineWidth=.75;c.setLineDash([]);
+    for(let x=Math.ceil(this.xMin);x<=Math.floor(this.xMax);x++){if(x===0)continue;c.beginPath();c.moveTo(this.cx(x),this.pT);c.lineTo(this.cx(x),this.pT+this.H);c.stroke();}
+    for(let y=Math.ceil(this.yMin);y<=Math.floor(this.yMax);y++){if(y===0)continue;c.beginPath();c.moveTo(this.pL,this.cy(y));c.lineTo(this.pL+this.W,this.cy(y));c.stroke();}}
+  drawAxes(){const c=this.ctx,y0=this.cy(0),x0=this.cx(0);
+    const inY=y0>=this.pT&&y0<=this.pT+this.H,inX=x0>=this.pL&&x0<=this.pL+this.W;
+    const ay0=inY?y0:this.pT+this.H,ax0=inX?x0:this.pL;
+    c.strokeStyle='#334155';c.lineWidth=1.5;c.fillStyle='#334155';c.setLineDash([]);
+    if(inY){c.beginPath();c.moveTo(this.pL,y0);c.lineTo(this.pL+this.W-6,y0);c.stroke();
+      c.beginPath();c.moveTo(this.pL+this.W,y0);c.lineTo(this.pL+this.W-10,y0-4);c.lineTo(this.pL+this.W-10,y0+4);c.closePath();c.fill();
+      c.fillStyle='#475569';c.font='12px Outfit,sans-serif';c.textAlign='center';c.fillText('x',this.pL+this.W+7,y0+4);}
+    if(inX){c.strokeStyle='#334155';c.fillStyle='#334155';
+      c.beginPath();c.moveTo(x0,this.pT+this.H);c.lineTo(x0,this.pT+6);c.stroke();
+      c.beginPath();c.moveTo(x0,this.pT);c.lineTo(x0-4,this.pT+10);c.lineTo(x0+4,this.pT+10);c.closePath();c.fill();
+      c.fillStyle='#475569';c.font='12px Outfit,sans-serif';c.fillText('y',x0,this.pT-6);}
+    c.fillStyle='#64748b';c.font='10.5px Outfit,sans-serif';
+    for(let x=Math.ceil(this.xMin);x<=Math.floor(this.xMax);x++){if(x===0)continue;const px=this.cx(x);
+      c.strokeStyle='#475569';c.lineWidth=1;c.beginPath();c.moveTo(px,ay0-3);c.lineTo(px,ay0+3);c.stroke();
+      if(inY&&Math.abs(px-this.pL)>5&&Math.abs(px-(this.pL+this.W))>10){c.textAlign='center';c.fillText(x,px,ay0+14);}}
+    for(let y=Math.ceil(this.yMin);y<=Math.floor(this.yMax);y++){if(y===0)continue;const py=this.cy(y);
+      c.strokeStyle='#475569';c.lineWidth=1;c.beginPath();c.moveTo(ax0-3,py);c.lineTo(ax0+3,py);c.stroke();
+      if(inX){c.textAlign='right';c.fillText(y,ax0-6,py+3);}}
+    if(inX&&inY){c.textAlign='right';c.fillStyle='#64748b';c.fillText('0',x0-4,y0+12);}}
+  hLine(val,label,color){const c=this.ctx;c.save();c.strokeStyle=color||'#cbd5e1';c.lineWidth=1.25;c.setLineDash([5,5]);
+    const y=this.cy(val);if(y>=this.pT&&y<=this.pT+this.H){c.beginPath();c.moveTo(this.pL,y);c.lineTo(this.pL+this.W,y);c.stroke();
+      c.setLineDash([]);c.fillStyle=color||'#64748b';c.font='italic 11px Outfit,sans-serif';c.textAlign='left';c.fillText(label,this.pL+5,y-4);}c.restore();c.setLineDash([]);}
+  vGuide(val,color){const c=this.ctx;c.save();c.strokeStyle=color||'#cbd5e1';c.lineWidth=1.1;c.setLineDash([4,4]);
+    const x=this.cx(val);c.beginPath();c.moveTo(x,this.pT);c.lineTo(x,this.pT+this.H);c.stroke();c.restore();c.setLineDash([]);}
+  plot(fn,color='#1d6fcc',lw=2.6){const c=this.ctx;c.strokeStyle=color;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';c.setLineDash([]);
+    const steps=800,dx=(this.xMax-this.xMin)/steps;let started=false,prevY=null;c.beginPath();
+    for(let i=0;i<=steps;i++){const x=this.xMin+i*dx;let y;
+      try{y=fn(x)}catch(e){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      if(!isFinite(y)||isNaN(y)){c.stroke();c.beginPath();started=false;prevY=null;continue}
+      if(prevY!==null&&Math.abs(y-prevY)>(this.yMax-this.yMin)*.75){c.stroke();c.beginPath();started=false}
+      const X=this.cx(x),Y=this.cy(y);if(!started){c.moveTo(X,Y);started=true}else c.lineTo(X,Y);prevY=y;}
+    c.stroke();}
+  point(x,y,filled=true,color='#ef4444',r=6){const c=this.ctx,px=this.cx(x),py=this.cy(y);
+    c.beginPath();c.arc(px,py,r,0,Math.PI*2);
+    if(filled){c.fillStyle=color;c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();}
+    else{c.fillStyle='#f8fbff';c.fill();c.strokeStyle=color;c.lineWidth=2.6;c.stroke();}}
+}
+function fmt(n){if(!isFinite(n))return n>0?'+∞':'−∞';let s=n.toFixed(4);s=s.replace(/\.?0+$/,'');s=s.replace('.',',');s=s.replace('-','−');return s;}
+
+const DONE={diag:false,sub:false,props:false,uniq:true,inf:false,quiz:false,sint:false};
+const PRED={};
+
+/* ===================== DIAGNÓSTICO ===================== */
+function selectDiag(btn){
+  document.querySelectorAll('#diag-opts .popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');document.getElementById('diag-note').classList.add('show');
+  DONE.diag=true;updateRuta();
+}
+
+/* ===================== POE SUSTITUCIÓN ===================== */
+function setStates(id,state){
+  document.querySelectorAll('#states-'+id+' .pstate').forEach(el=>{
+    el.classList.remove('on','cleared');const s=el.dataset.s,order=['predict','observe','explain'];
+    if(order.indexOf(s)<order.indexOf(state))el.classList.add('cleared');else if(s===state)el.classList.add('on');
+  });
+}
+function poeSel(v,btn){
+  btn.closest('.popts').querySelectorAll('.popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');PRED.sub=v;
+  document.getElementById('lock-sub').classList.remove('dim');
+  document.getElementById('lockmsg-sub').classList.remove('show');
+}
+let GS;
+function drawSub(){
+  GS=GS||new GraphPlotter('cv-sub',{xMin:-1,xMax:5,yMin:-2,yMax:20});
+  GS.clear();GS.drawGrid();GS.drawAxes();GS.hLine(16,'y = 16');GS.vGuide(3);
+  GS.plot(x=>5*x+1,'#1d6fcc',2.6);
+  GS.point(3,16,true,'#0ea5e9',6);
+}
+function buildSubTable(){
+  const L=[2.9,2.99],R=[3.1,3.01],f=x=>5*x+1;
+  const row=x=>`<div class="trow"><span class="tx">${fmt(x)}</span><span class="tarrow">→</span><span class="tfx">${fmt(f(x))}</span></div>`;
+  document.getElementById('tbl-sub').innerHTML=
+    `<div class="tcol"><div class="tcol-head left">x → 3⁻</div>${L.map(row).join('')}<div class="tcol-foot left">→ <b>16</b></div></div>
+     <div class="tcol"><div class="tcol-head right">x → 3⁺</div>${R.map(row).join('')}<div class="tcol-foot right">→ <b>16</b></div></div>`;
+}
+function poeLock(){
+  if(!PRED.sub){document.getElementById('lockmsg-sub').classList.add('show');return;}
+  document.getElementById('obs-sub').classList.remove('locked');
+  setStates('sub','observe');drawSub();buildSubTable();
+  document.querySelectorAll('#poe-sub .poe-predict .popt').forEach(b=>b.style.pointerEvents='none');
+  document.getElementById('lock-sub').classList.add('dim');
+  setTimeout(explainSub,900);
+}
+function explainSub(){
+  const exp=document.getElementById('exp-sub');if(exp.classList.contains('show'))return;
+  const p=PRED.sub;let h='';
+  if(p==='16'){h+=`<p>Correcto: da <strong>16</strong>. Como 5x+1 es una recta sin huecos ni saltos, el límite coincide con el valor: f(3) = 5·3+1 = 16.</p>`;}
+  else if(p==='15'){h+=`<p>Cuidado con el +1: 5·3 = 15, y después sumás 1 → <strong>16</strong>. La recta no tiene huecos, así que el límite es f(3) = 16.</p>`;}
+  else if(p==='noexiste'){h+=`<p>Sí existe: mirá la tabla, por ambos lados se acerca a <strong>16</strong>. Para funciones sin huecos ni saltos el límite siempre existe y coincide con el valor.</p>`;}
+  else{h+=`<p>Es exactamente 16, no "casi". La recta pasa por (3, 16) sin huecos: el límite es el valor exacto, <strong>16</strong>.</p>`;}
+  h+=`<div class="bigidea"><strong>El atajo (y su justificación).</strong> Para funciones "buenas" —polinomios, raíces, exponenciales, logaritmos en su dominio— el límite se calcula <strong>reemplazando</strong>. Lo que <em>autoriza</em> ese atajo son las propiedades del límite que vas a ver ahora. <em>Pero cuidado:</em> el atajo falla cuando al reemplazar te queda 0/0 o ∞/∞ — ahí hay que hacer otra cosa (Etapas 3 y 4).</p></div>`;
+  document.getElementById('expbody-sub').innerHTML=h;
+  exp.classList.add('show');setStates('sub','explain');DONE.sub=true;updateRuta();
+}
+
+/* ===================== BLOQUES DE PROPIEDADES ===================== */
+function toggleBlock(k){
+  const el=document.getElementById('block-'+k);
+  el.classList.toggle('open');
+  if(document.querySelectorAll('.block.open').length>0){DONE.props=true;updateRuta();}
+}
+
+/* descomposición paso a paso */
+const DEC=[
+  {label:'Separar suma',math:'lim(x³ + √(18x)) = lim x³ + lim √(18x)',why:'Bloque B: el límite se reparte en la suma.'},
+  {label:'Potencia y raíz',math:'= (lim x)³ + √(lim 18x)',why:'Bloque C: el límite entra en la potencia y en la raíz.'},
+  {label:'Aplicar ladrillos',math:'= (2)³ + √(18·2)',why:'Bloque A: lim x = 2. Y lim 18x = 18·2 = 36 (constante por x).'},
+  {label:'Calcular',math:'= 8 + √36 = 8 + 6',why:'Ya no hay límites pendientes: solo aritmética.'},
+  {label:'Resultado',math:'lim = 14',why:'El límite quedó descompuesto en piezas simples y resueltas con los tres bloques.'}
+];
+function renderDec(){
+  const m=document.getElementById('dec-steps');
+  m.innerHTML=DEC.map((s,i)=>`<div class="lstep" id="dec-${i}"><div class="lstep-label">${s.label}</div><div class="lstep-body"><div class="lstep-math">${s.math}</div><div class="lstep-why">${s.why}</div>${i<DEC.length-1?`<button class="btn lstep-next" onclick="decAdvance()">Siguiente paso ▾</button>`:''}</div></div>`).join('');
+  document.getElementById('dec-0').classList.add('show');
+}
+let DECidx=0;
+function decAdvance(){DECidx++;const el=document.getElementById('dec-'+DECidx);if(el)el.classList.add('show');if(DECidx>=DEC.length-1){DONE.props=true;updateRuta();}}
+
+/* ===================== INFINITÉSIMOS ===================== */
+function poeSelI(v,btn){
+  btn.closest('.popts').querySelectorAll('.popt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');PRED.inf=v;
+  document.getElementById('lock-inf').classList.remove('dim');
+  document.getElementById('lockmsg-inf').classList.remove('show');
+}
+let GINF;
+function drawInf(){
+  GINF=GINF||new GraphPlotter('cv-inf',{xMin:-5,xMax:5,yMin:-11,yMax:8});
+  GINF.clear();GINF.drawGrid();GINF.drawAxes();
+  GINF.plot(x=>x*x-9,'#1d6fcc',2.6);
+  GINF.point(3,0,true,'#059669',6);GINF.point(-3,0,true,'#059669',6);
+}
+function poeLockI(){
+  if(!PRED.inf){document.getElementById('lockmsg-inf').classList.add('show');return;}
+  document.getElementById('obs-inf').classList.remove('locked');
+  setStates('inf','observe');drawInf();
+  document.querySelectorAll('#sec-inf .poe-predict .popt').forEach(b=>b.style.pointerEvents='none');
+  document.getElementById('lock-inf').classList.add('dim');
+  setTimeout(explainInf,900);
+}
+function explainInf(){
+  const exp=document.getElementById('exp-inf');if(exp.classList.contains('show'))return;
+  let h='';
+  if(PRED.inf==='si'){h+=`<p>Correcto. <span class="lim">lim</span><sub>x→3</sub> (x²−9) = 9 − 9 = <strong>0</strong>, así que x²−9 es un infinitésimo en x = 3 (y también en x = −3).</p>`;}
+  else{h+=`<p>El nombre engaña: un infinitésimo no es "un número chiquito". Es una <strong>función que tiende a 0</strong> en un punto. Y x²−9 sí lo hace en x = 3: <span class="lim">lim</span><sub>x→3</sub>(x²−9) = 0.</p>`;}
+  h+=`<div class="bigidea"><strong>Clave conceptual:</strong> "infinitésimo" depende del <strong>punto</strong>. La misma función x²−9 es infinitésimo en x = 3 y en x = −3 (donde vale 0), pero <em>no</em> en x = 0 (donde vale −9). Ser infinitésimo es una propiedad <em>local</em>, no de la función entera.</p></div>`;
+  document.getElementById('expbody-inf').innerHTML=h;
+  exp.classList.add('show');setStates('inf','explain');DONE.inf=true;updateRuta();
+}
+const TESTS={
+  a:{fn:x=>x*x-9,win:{xMin:-5,xMax:5,yMin:-11,yMax:8},pt:3,val:0,yes:true,label:'x² − 9 en x = 3',why:'lim = 3²−9 = 0. Tiende a 0 ⇒ es infinitésimo acá.'},
+  b:{fn:x=>x*x-9,win:{xMin:-5,xMax:5,yMin:-11,yMax:8},pt:0,val:-9,yes:false,label:'x² − 9 en x = 0',why:'lim = 0²−9 = −9 ≠ 0. No tiende a 0 ⇒ no es infinitésimo en x = 0.'},
+  c:{fn:x=>Math.sin(x),win:{xMin:-6,xMax:6,yMin:-2,yMax:2},pt:0,val:0,yes:true,label:'sen x en x = 0',why:'lim = sen 0 = 0. Tiende a 0 ⇒ es infinitésimo en x = 0.'},
+  d:{fn:x=>x-2,win:{xMin:-2,xMax:6,yMin:-4,yMax:4},pt:2,val:0,yes:true,label:'x − 2 en x = 2',why:'lim = 2−2 = 0. Tiende a 0 ⇒ es infinitésimo en x = 2.'}
+};
+let GT;
+function testInf(k,btn){
+  document.querySelectorAll('#inf-tester .tchip').forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');
+  const t=TESTS[k];
+  document.getElementById('tester-out').classList.add('show');
+  GT=new GraphPlotter('cv-test',t.win);
+  GT.clear();GT.drawGrid();GT.drawAxes();GT.vGuide(t.pt);GT.plot(t.fn,'#1d6fcc',2.4);
+  GT.point(t.pt,t.val,true,t.yes?'#059669':'#dc2626',6);
+  const v=document.getElementById('test-verdict');
+  v.className='verdict '+(t.yes?'yes':'no');
+  v.innerHTML=(t.yes?'✅ Es infinitésimo':'❌ No es infinitésimo')+' &nbsp;·&nbsp; lim = '+fmt(t.val);
+  document.getElementById('test-why').textContent=t.why;
+}
+
+/* ===================== QUIZ ===================== */
+const QUIZ=[
+ {q:'<span class="lim">lim</span><sub>x→2</sub> (x³ + √(18x)) = ?',
+  opts:[
+   {t:'14',ok:true,fb:'Correcto: por propiedades, (2)³ + √(18·2) = 8 + √36 = 8 + 6 = 14.'},
+   {t:'No existe',ok:false,fb:'Sí existe: es un polinomio más una raíz, ambos "buenos" en x = 2. Reemplazando: 8 + 6 = 14.'},
+   {t:'10',ok:false,fb:'Revisá la raíz: √(18·2) = √36 = 6, no 2. Total: 8 + 6 = 14.'},
+   {t:'2',ok:false,fb:'Ese es solo lim x. Falta elevar al cubo y sumar la raíz: 8 + 6 = 14.'}
+  ]},
+ {q:'¿Qué es un infinitésimo en un punto x₀?',
+  opts:[
+   {t:'Un número muy pequeño, casi cero.',ok:false,fb:'No es un número: es una FUNCIÓN. Y no "es" pequeña: tiende a 0 cuando x → x₀.'},
+   {t:'Una función cuyo límite en x₀ es 0.',ok:true,fb:'Exacto: f es infinitésimo en x₀ si lim_{x→x₀} f(x) = 0.'},
+   {t:'Una función que vale 0 en x₀.',ok:false,fb:'Casi, pero no: lo que importa es que TIENDA a 0 (el límite), no cuánto valga f(x₀) exactamente. Puede incluso no estar definida ahí.'},
+   {t:'El número 0.',ok:false,fb:'El 0 es un número; un infinitésimo es una función que se acerca a 0 en un punto.'}
+  ]},
+ {q:'Al calcular <span class="lim">lim</span><sub>x→1</sub> (x²−1)/(x−1) reemplazás x = 1. ¿Qué pasa?',
+  opts:[
+   {t:'Da 0/0 directamente, así que el límite es 0.',ok:false,fb:'0/0 no vale 0: es una indeterminación (cociente de infinitésimos). El atajo de reemplazar NO sirve acá.'},
+   {t:'Da 0/0: el atajo no sirve, hay que reescribir (próxima etapa).',ok:true,fb:'Correcto. Numerador y denominador son infinitésimos en x = 1: su cociente es 0/0, indeterminado. Se trabaja en la Etapa 3.'},
+   {t:'Da 16, como en el ejemplo de la recta.',ok:false,fb:'No: acá numerador y denominador se anulan en x = 1. Queda 0/0, no un número directo.'},
+   {t:'El límite no existe porque hay un cociente.',ok:false,fb:'Que haya cociente no impide el límite. Da 0/0 (indeterminado), pero reescribiendo se resuelve: el límite existe.'}
+  ]}
+];
+const quizState=QUIZ.map(()=>({answered:false}));
+function renderQuiz(){
+  const m=document.getElementById('quiz-mount'),L=['A','B','C','D'];let h='';
+  QUIZ.forEach((it,qi)=>{
+    h+=`<div class="qitem"><div class="qhead">Pregunta ${qi+1} de ${QUIZ.length}</div><div class="qtext">${it.q}</div><div class="qopts">`;
+    it.opts.forEach((o,oi)=>{h+=`<button class="qopt" id="q-${qi}-${oi}" onclick="answerQuiz(${qi},${oi})"><span class="ql">${L[oi]}</span>${o.t}</button>`;});
+    h+=`</div><div class="qfb" id="qfb-${qi}"><span class="qfb-ic"></span><span class="qfb-tx"></span></div></div>`;
+  });
+  m.innerHTML=h;
+}
+function answerQuiz(qi,oi){
+  if(quizState[qi].answered)return;quizState[qi].answered=true;
+  const it=QUIZ[qi],chosen=it.opts[oi];
+  it.opts.forEach((o,i)=>{const b=document.getElementById('q-'+qi+'-'+i);b.classList.add('locked');if(o.ok)b.classList.add('correct');else if(i===oi)b.classList.add('wrong');});
+  const fb=document.getElementById('qfb-'+qi);fb.className='qfb show '+(chosen.ok?'ok':'bad');
+  fb.querySelector('.qfb-ic').textContent=chosen.ok?'✅':'❌';fb.querySelector('.qfb-tx').textContent=chosen.fb;
+  if(quizState.every(q=>q.answered)){
+    const n=QUIZ.reduce((a,it,i)=>a+(document.getElementById('qfb-'+i).classList.contains('ok')?1:0),0);
+    const d=document.getElementById('quiz-done');
+    d.innerHTML=`Respondiste correctamente <b>${n}</b> de ${QUIZ.length}. ${n===QUIZ.length?'Tenés la idea clara 💪':'Repasá la devolución en rojo.'}`;
+    d.classList.add('show');DONE.quiz=true;updateRuta();
+  }
+}
+
+/* ===================== SÍNTESIS ===================== */
+function saveSint(){document.getElementById('sint-done').classList.add('show');DONE.sint=true;updateRuta();}
+
+/* ===================== RUTA ===================== */
+function updateRuta(){
+  const map=['diag','sub','props','uniq','inf','quiz','sint'];
+  document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('done',DONE[map[i]]));
+}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-go]');if(el){const t=document.getElementById(el.dataset.go);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}});
+
+/* ===================== INIT ===================== */
+document.addEventListener('DOMContentLoaded',()=>{
+  drawSub();drawInf();
+  renderDec();
+  renderQuiz();
+  const secs=[['sec-diag',0],['poe-sub',1],['sec-props',2],['sec-uniq',3],['sec-inf',4],['sec-quiz',5],['sec-sint',6]];
+  const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const idx=secs.find(s=>s[0]===e.target.id);if(!idx)return;document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('active',i===idx[1]));}});},{rootMargin:'-40% 0px -55% 0px'});
+  secs.forEach(s=>{const el=document.getElementById(s[0]);if(el)obs.observe(el);});
+});
+window.addEventListener('resize',()=>{if(GS&&!document.getElementById('obs-sub').classList.contains('locked'))drawSub();if(GINF&&!document.getElementById('obs-inf').classList.contains('locked'))drawInf();});
+</script>
+</body>
+</html>
