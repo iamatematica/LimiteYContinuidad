@@ -15,7 +15,7 @@ archivo `README.md`). Vas a necesitar a mano las 8 direcciones, del tipo:
 
 ```
 https://iamatematica.github.io/LimiteYContinuidad/index.html                          (campus)
-https://iamatematica.github.io/LimiteYContinuidad/etapa1-nocion-de-limite.html
+https://iamatematica.github.io/LimiteYContinuidad/etapa1-limite-y-limites-laterales.html
 https://iamatematica.github.io/LimiteYContinuidad/etapa2-algebra-e-infinitesimos.html
 https://iamatematica.github.io/LimiteYContinuidad/etapa3-indeterminaciones.html
 https://iamatematica.github.io/LimiteYContinuidad/etapa4-infinitos-y-asintotas.html
@@ -55,7 +55,7 @@ Vas a hacer esto una vez por etapa. Empecemos por la 1; las otras son idénticas
    clic en **"Añadir una actividad o recurso"**.
 2. En el listado, elegí **"URL"**.
 3. Completá:
-   - **Nombre:** `Etapa 1 — Noción de límite`
+   - **Nombre:** `Etapa 1 — Límite y límites laterales`
    - **URL externa:** pegá la dirección de la etapa 1.
 4. *(Opcional, recomendado)* En **"Apariencia"**, en "Mostrar", elegí **"En ventana
    emergente"** o **"Abrir"** — así la etapa se abre cómoda, ocupando la pantalla.

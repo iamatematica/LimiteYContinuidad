@@ -13,7 +13,7 @@ La unidad son **8 archivos** que deben vivir **todos en la misma carpeta**:
 
 ```
 index.html                            ← página de inicio (el "campus")
-etapa1-nocion-de-limite.html
+etapa1-limite-y-limites-laterales.html
 etapa2-algebra-e-infinitesimos.html
 etapa3-indeterminaciones.html
 etapa4-infinitos-y-asintotas.html
