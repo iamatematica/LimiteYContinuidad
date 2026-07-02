@@ -178,6 +178,13 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 .sint-ta{width:100%;min-height:72px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);resize:vertical;background:var(--g50)}
 .sint-ta:focus{outline:none;border-color:var(--warn);background:var(--white)}
 .sint-fill{display:inline-block;min-width:120px;border-bottom:2px dashed var(--g300);color:var(--warn);font-weight:700}
+.sint-item{margin:16px 0;padding-bottom:16px;border-bottom:1px solid var(--g100)}
+.sint-item:last-of-type{border-bottom:none}
+.btn-reveal{background:var(--warn-bg);color:#92400e;border:1px solid #fcd34d;padding:8px 18px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-reveal:hover{background:#fde68a}
+.btn-reveal.used{opacity:.5;pointer-events:none}
+.sint-ans{display:none;margin-top:10px;background:var(--g50);border:1px solid var(--g200);border-left:3px solid var(--ok);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;font-size:14px;color:var(--g700);animation:rise .3s ease both}
+.sint-ans.show{display:block}
 .sint-done{display:none;margin-top:14px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#065f46}
 .sint-done.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
 @media(max-width:520px){
@@ -364,14 +371,22 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 
   <!-- SÍNTESIS -->
   <section class="card" id="sec-sint">
-    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Síntesis: ¿qué cambió en tu cabeza?</h3></div>
-    <p class="card-lead">Ponerlo en palabras lo fija mejor que solo leerlo.</p>
-    <div class="sint-q">Completá: <span class="sint-fill">antes pensaba</span> que 0/0 significaba… <span class="sint-fill">ahora entiendo</span> que es…</div>
-    <textarea class="sint-ta" id="sint1" placeholder="Antes pensaba que 0/0 significaba ___ . Ahora entiendo que es ___ ."></textarea>
-    <div class="sint-q">Ya tenés tres herramientas para salvar 0/0. ¿Cómo decidís cuál usar? (pista: ¿qué tiene la expresión — polinomios, raíces o funciones trigonométricas?)</div>
-    <textarea class="sint-ta" id="sint2" placeholder="Si veo polinomios… Si veo una raíz… Si veo seno o tangente…"></textarea>
-    <div style="margin-top:14px"><button class="btn btn-next" onclick="saveSint()">Guardar mi reflexión ✓</button></div>
-    <div class="sint-done" id="sint-done"><span>🎉</span><div><strong>¡Etapa 3 completa!</strong> Ya sabés reconocer un 0/0 y tenés las tres herramientas para salvarlo: factorizar, conjugado y el límite trigonométrico. Fijate que cada 0/0 que salvaste por factorización o conjugado dejó un <strong>hueco</strong>: eso es una discontinuidad evitable, justo el puente con la etapa de continuidad.</div></div>
+    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Para fijar las ideas</h3></div>
+    <p class="card-lead">Pensá tu respuesta primero y después comparala con la nuestra. Es la mejor forma de consolidar lo que viste.</p>
+
+    <div class="sint-item">
+      <div class="sint-q">¿Qué significa realmente que al reemplazar te dé <strong>0/0</strong>? ¿Es lo mismo que decir "el límite no existe"?</div>
+      <button class="btn btn-reveal" onclick="revealSint(1)">Ver respuesta</button>
+      <div class="sint-ans" id="sint-ans-1">0/0 es una <strong>indeterminación</strong>, no un resultado. <strong>No</strong> significa que el límite no exista: significa que la forma actual de la expresión no alcanza para decidir, y hay que <strong>reescribirla</strong> (factorizar, conjugado, etc.). De hecho, en todos los casos que viste el límite <em>sí existía</em> — solo había un hueco en ese punto. 0/0 es una señal de "trabajá más", no de "no hay respuesta".</div>
+    </div>
+
+    <div class="sint-item">
+      <div class="sint-q">Ya tenés tres herramientas para salvar 0/0. ¿Cómo decidís cuál usar? (pista: ¿qué tiene la expresión — polinomios, raíces o funciones trigonométricas?)</div>
+      <button class="btn btn-reveal" onclick="revealSint(2)">Ver respuesta</button>
+      <div class="sint-ans" id="sint-ans-2">Mirás <strong>qué forma</strong> tiene la expresión. Si son <strong>polinomios</strong> → factorizás y cancelás el factor común. Si hay una <strong>raíz</strong> → multiplicás por el conjugado para racionalizar. Si aparece <strong>seno, coseno o tangente</strong> → reescribís hasta que aparezca el patrón del límite trigonométrico fundamental (sen(u)/u → 1). La clave es reconocer el tipo de expresión antes de elegir la técnica.</div>
+    </div>
+
+    <div class="sint-done show" style="margin-top:18px"><span>🎉</span><div><strong>¡Etapa 3 completa!</strong> Ya sabés reconocer un 0/0 y tenés las tres herramientas para salvarlo: factorizar, conjugado y el límite trigonométrico. Fijate que cada 0/0 que salvaste por factorización o conjugado dejó un <strong>hueco</strong>: eso es una discontinuidad evitable, justo el puente con la etapa de continuidad.</div></div>
   </section>
 
 </div></div>
@@ -497,7 +512,7 @@ const RUNGS=[
      {label:'Factorizar',math:'x²−1 = (x−1)(x+1)',why:'Diferencia de cuadrados: a²−b² = (a−b)(a+b). El denominador ya es (x−1).'},
      {label:'Simplificar',math:'(x−1)(x+1) / (x−1) = x+1',why:'Cancelamos el (x−1) común. Es válido porque al tomar el límite x se acerca a 1 pero x ≠ 1.'},
      {label:'Evaluar',math:'En x = 1: (1) + 1 = 2',why:'La expresión simplificada x+1 ya no se indetermina: ahora sí podemos reemplazar.'},
-     {label:'Resultado',math:'lim = 2',why:'La función original tiene un HUECO en (1; 2): no está definida ahí, pero el límite vale 2.'}
+     {label:'Resultado',math:'lim_{x→1} = 2',why:'La función original tiene un HUECO en (1; 2): no está definida ahí, pero el límite vale 2.'}
    ]},
   {id:'r2',kind:'fill',scaffold:'Completás el último paso',num:'x²−9',den:'x−3',aLabel:'3',
    graph:{win:{xMin:-1,xMax:5,yMin:-1,yMax:8},fn:x=>x+3,hole:[3,6]},
@@ -512,7 +527,7 @@ const RUNGS=[
          {t:'No existe',ok:false,fb:'El límite sí existe. Tras simplificar, x+3 está perfectamente definida en x = 3. El 0/0 inicial era solo una señal para reescribir.'},
          {t:'9',ok:false,fb:'Revisá: x+3 en x = 3 es 3 + 3 = 6, no 9.'}
        ]}},
-     {label:'Resultado',math:'lim = 6  —  hueco en (3; 6)'}
+     {label:'Resultado',math:'lim_{x→3} = 6  —  hueco en (3; 6)'}
    ]},
   {id:'r3',kind:'fill',scaffold:'Completás casi todo',num:'x²−4',den:'x+2',aLabel:'−2',
    graph:{win:{xMin:-5,xMax:2,yMin:-6,yMax:2},fn:x=>x-2,hole:[-2,-4]},
@@ -539,7 +554,7 @@ const RUNGS=[
          {t:'4',ok:false,fb:'Cuidado con el signo: −2 − 2 = −4.'},
          {t:'No existe',ok:false,fb:'El límite existe: x−2 está definida en −2. Vale −4.'}
        ]}},
-     {label:'Resultado',math:'lim = −4  —  hueco en (−2; −4)'}
+     {label:'Resultado',math:'lim_{x→−2} = −4  —  hueco en (−2; −4)'}
    ]},
   {id:'r4',kind:'fill',scaffold:'Lo resolvés solo',num:'x²+x−6',den:'x−2',aLabel:'2',
    graph:{win:{xMin:-2,xMax:4,yMin:-2,yMax:7},fn:x=>x+3,hole:[2,5]},
@@ -551,7 +566,7 @@ const RUNGS=[
          {t:'0',ok:false,fb:'No: tras simplificar queda x+3, que en 2 da 5.'},
          {t:'1',ok:false,fb:'Revisá la factorización: (x−2)(x+3)/(x−2) = x+3; en 2 → 5.'}
        ]}},
-     {label:'Solución',math:'x²+x−6 = (x−2)(x+3) → se cancela (x−2) → x+3 → en x = 2: 5.  ⇒ lim = 5 — hueco en (2; 5)'}
+     {label:'Solución',math:'x²+x−6 = (x−2)(x+3) → se cancela (x−2) → x+3 → en x = 2: 5.  ⇒ lim_{x→2} = 5 — hueco en (2; 5)'}
    ]}
 ];
 /* ===== ESCALERA 2: CONJUGADO ===== */
@@ -564,7 +579,7 @@ const CONJ_RUNGS=[
      {label:'Dif. de cuadrados',math:'(√x − 2)(√x + 2) = x − 4',why:'(a−b)(a+b) = a²−b². La raíz desaparece del numerador: queda x − 4.'},
      {label:'Simplificar',math:'(x − 4) / [(x − 4)(√x + 2)] = 1/(√x + 2)',why:'Se cancela el (x − 4) común. Válido porque x → 4 pero x ≠ 4.'},
      {label:'Evaluar',math:'1/(√4 + 2) = 1/4',why:'Ya no hay indeterminación: reemplazamos en la expresión simplificada.'},
-     {label:'Resultado',math:'lim = 1/4 = 0,25 — hueco en (4; 0,25)',why:'La función tiene un hueco en (4; 0,25): el límite existe aunque ahí no esté definida.'}
+     {label:'Resultado',math:'lim_{x→4} = 1/4 = 0,25 — hueco en (4; 0,25)',why:'La función tiene un hueco en (4; 0,25): el límite existe aunque ahí no esté definida.'}
    ]},
   {id:'c2',kind:'fill',scaffold:'Completás pasos',num:'√(x+1) − 1',den:'x',aLabel:'0',
    graph:{win:{xMin:-1,xMax:5,yMin:0,yMax:1},fn:x=>1/(Math.sqrt(x+1)+1),hole:[0,0.5]},
@@ -591,7 +606,7 @@ const CONJ_RUNGS=[
          {t:'1',ok:false,fb:'Revisá el denominador: √1 + 1 = 2, así que 1/2.'},
          {t:'2',ok:false,fb:'2 es el denominador; el límite es 1/2.'}
        ]}},
-     {label:'Resultado',math:'lim = 1/2 = 0,5 — hueco en (0; 0,5)'}
+     {label:'Resultado',math:'lim_{x→0} = 1/2 = 0,5 — hueco en (0; 0,5)'}
    ]},
   {id:'c3',kind:'fill',scaffold:'Lo resolvés solo',num:'x − 9',den:'√x − 3',aLabel:'9',
    graph:{win:{xMin:0,xMax:14,yMin:0,yMax:8},fn:x=>Math.sqrt(x)+3,hole:[9,6]},
@@ -603,7 +618,7 @@ const CONJ_RUNGS=[
          {t:'0',ok:false,fb:'No: tras simplificar queda √x+3, que en 9 da 6.'},
          {t:'3',ok:false,fb:'Casi: √9 = 3, pero falta sumar 3 → 6.'}
        ]}},
-     {label:'Solución',math:'(x−9)/(√x−3) × (√x+3)/(√x+3) = (x−9)(√x+3)/(x−9) = √x+3 → en x=9: 6.  ⇒ lim = 6 — hueco en (9; 6)'}
+     {label:'Solución',math:'(x−9)/(√x−3) × (√x+3)/(√x+3) = (x−9)(√x+3)/(x−9) = √x+3 → en x=9: 6.  ⇒ lim_{x→9} = 6 — hueco en (9; 6)'}
    ]}
 ];
 const RUNG_BY_ID={};RUNGS.concat(CONJ_RUNGS).forEach(r=>RUNG_BY_ID[r.id]=r);
@@ -708,9 +723,9 @@ function buildTrigTable(){
 }
 const TRIG_STEPS=[
   {label:'Reescribir',math:'sen(3x)/(7x) = [sen(3x)/(3x)] · (3x)/(7x)',why:'Multiplicamos y dividimos por 3x para "fabricar" el patrón sen(u)/u con u = 3x.'},
-  {label:'Ladrillo',math:'lim sen(3x)/(3x) = 1',why:'Es el límite fundamental: sen(u)/u → 1 cuando u → 0. Acá u = 3x → 0.'},
+  {label:'Ladrillo',math:'lim_{x→0} sen(3x)/(3x) = 1',why:'Es el límite fundamental: sen(u)/u → 1 cuando u → 0. Acá u = 3x → 0.'},
   {label:'Simplificar',math:'(3x)/(7x) = 3/7',why:'Se cancela la x: queda la constante 3/7.'},
-  {label:'Resultado',math:'lim = 1 · 3/7 = 3/7',why:'El ladrillo aporta 1 y queda el cociente de coeficientes 3/7.'}
+  {label:'Resultado',math:'lim_{x→0} = 1 · 3/7 = 3/7',why:'El ladrillo aporta 1 y queda el cociente de coeficientes 3/7.'}
 ];
 function renderTrigSteps(){
   const m=document.getElementById('trig-steps');
@@ -795,7 +810,12 @@ function answerQuiz(qi,oi){
 }
 
 /* ===================== SÍNTESIS ===================== */
-function saveSint(){document.getElementById('sint-done').classList.add('show');DONE.sint=true;updateRuta();}
+function revealSint(n){
+  const ans=document.getElementById('sint-ans-'+n);
+  if(ans)ans.classList.add('show');
+  if(event&&event.target)event.target.classList.add('used');
+  DONE.sint=true;updateRuta();
+}
 
 /* ===================== RUTA ===================== */
 function updateRuta(){

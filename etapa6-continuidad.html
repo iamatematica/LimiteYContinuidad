@@ -204,6 +204,13 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 
 .sint-q{font-weight:600;color:var(--navy);font-size:14.5px;margin:14px 0 8px;padding-left:12px;border-left:3px solid var(--warn)}
 .sint-ta{width:100%;min-height:72px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);resize:vertical;background:var(--g50)}
+.sint-item{margin:16px 0;padding-bottom:16px;border-bottom:1px solid var(--g100)}
+.sint-item:last-of-type{border-bottom:none}
+.btn-reveal{background:var(--warn-bg);color:#92400e;border:1px solid #fcd34d;padding:8px 18px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-reveal:hover{background:#fde68a}
+.btn-reveal.used{opacity:.5;pointer-events:none}
+.sint-ans{display:none;margin-top:10px;background:var(--g50);border:1px solid var(--g200);border-left:3px solid var(--ok);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;font-size:14px;color:var(--g700);animation:rise .3s ease both}
+.sint-ans.show{display:block}
 .sint-ta:focus{outline:none;border-color:var(--warn);background:var(--white)}
 .sint-done{display:none;margin-top:14px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#065f46}
 .sint-done.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
@@ -406,14 +413,22 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 
   <!-- SÍNTESIS -->
   <section class="card" id="sec-sint">
-    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Síntesis: ¿qué cambió en tu cabeza?</h3></div>
-    <p class="card-lead">Ponerlo en palabras lo fija mejor que solo leerlo.</p>
-    <div class="sint-q">Con tus palabras: ¿cuál es la diferencia entre que una función <strong>tenga valor</strong> en un punto y que <strong>tenga límite</strong> en ese punto?</div>
-    <textarea class="sint-ta" id="sint1" placeholder="Tener valor significa… Tener límite significa… Para ser continua hace falta…"></textarea>
-    <div class="sint-q">¿Por qué una discontinuidad <strong>evitable</strong> se puede arreglar y una <strong>esencial</strong> no? Conectalo con lo que viste de la 0/0 (Etapa 3) y las asíntotas (Etapas 4 y 5).</div>
-    <textarea class="sint-ta" id="sint2" placeholder="La evitable se arregla porque… La de salto/infinita no, porque… El hueco de la 0/0 es…"></textarea>
-    <div style="margin-top:14px"><button class="btn btn-next" onclick="saveSint()">Guardar mi reflexión ✓</button></div>
-    <div class="sint-done" id="sint-done"><span>🎉</span><div><strong>¡Etapa 6 completa!</strong> Ya tenés las tres condiciones y sabés clasificar discontinuidades. Mirá todo lo que se reunió acá: el <strong>salto</strong> de la Etapa 1 era una discontinuidad esencial de salto; el <strong>hueco</strong> de la 0/0 (Etapas 3 y 5), una evitable; la <strong>asíntota</strong> (Etapas 4 y 5), una esencial infinita. Solo queda el cierre integrador.</div></div>
+    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Para fijar las ideas</h3></div>
+    <p class="card-lead">Pensá tu respuesta primero y después comparala con la nuestra. Es la mejor forma de consolidar lo que viste.</p>
+
+    <div class="sint-item">
+      <div class="sint-q">Con tus palabras: ¿cuál es la diferencia entre que una función <strong>tenga valor</strong> en un punto y que <strong>tenga límite</strong> en ese punto?</div>
+      <button class="btn btn-reveal" onclick="revealSint(1)">Ver respuesta</button>
+      <div class="sint-ans" id="sint-ans-1"><strong>Tener valor</strong> en a significa que f(a) existe: el punto a pertenece al dominio y la función le asigna una altura. <strong>Tener límite</strong> en a significa que las imágenes <em>alrededor</em> de a se acercan a un número (y los dos laterales coinciden), sin importar qué pase justo en a. Son independientes: puede haber valor sin límite (salto), límite sin valor (hueco), o ambos sin coincidir. Para que la función sea <strong>continua</strong> en a hacen falta las tres cosas: que f(a) exista, que el límite exista, y que sean <strong>iguales</strong>.</div>
+    </div>
+
+    <div class="sint-item">
+      <div class="sint-q">¿Por qué una discontinuidad <strong>evitable</strong> se puede arreglar y una <strong>esencial</strong> no? Conectalo con lo que viste de la 0/0 (Etapa 3) y las asíntotas (Etapas 4 y 5).</div>
+      <button class="btn btn-reveal" onclick="revealSint(2)">Ver respuesta</button>
+      <div class="sint-ans" id="sint-ans-2">En una <strong>evitable</strong> (el hueco) el límite <em>sí existe</em> y es finito: solo falla que f(a) no está definida o no coincide. Como el límite existe, basta con <strong>redefinir</strong> ese único punto con el valor del límite y la función queda continua. Es el caso de la 0/0 de la Etapa 3, donde el límite existía y solo había un hueco. En una <strong>esencial</strong> no se puede: en el <strong>salto</strong> los laterales difieren (no hay un único valor para asignar), y en la <strong>asíntota</strong> el límite es infinito (no hay ningún número finito que poner). El problema no es un punto suelto, sino el comportamiento mismo de la función.</div>
+    </div>
+
+    <div class="sint-done show" style="margin-top:18px"><span>🎉</span><div><strong>¡Etapa 6 completa!</strong> Ya tenés las tres condiciones y sabés clasificar discontinuidades. Mirá todo lo que se reunió acá: el <strong>salto</strong> de la Etapa 1 era una discontinuidad esencial de salto; el <strong>hueco</strong> de la 0/0 (Etapas 3 y 5), una evitable; la <strong>asíntota</strong> (Etapas 4 y 5), una esencial infinita. Solo queda el cierre integrador.</div></div>
   </section>
 
 </div></div>
@@ -523,9 +538,9 @@ function explainOpen(){
 const COND={
   1:{ok:'si',vOk:'✅ Correcto. f(2) = 2² − 6·2 + 5 = 4 − 12 + 5 = −3. La función está definida en x = 2.',
         vBad:'Mirá: f(2) = 2² − 6·2 + 5 = −3. Sí está definida (es un polinomio, definido en todo ℝ).'},
-  2:{ok:'si',vOk:'✅ Correcto. Es un polinomio: el límite existe y se calcula por sustitución directa. lim = −3, finito.',
+  2:{ok:'si',vOk:'✅ Correcto. Es un polinomio: el límite existe y se calcula por sustitución directa. lim_{x→2} = −3, finito.',
         vBad:'En un polinomio el límite siempre existe y es finito (Etapa 2). Acá lim_{x→2}(x²−6x+5) = −3.'},
-  3:{ok:'si',vOk:'✅ Correcto. lim = −3 y f(2) = −3: coinciden. Se cumple la condición 3.',
+  3:{ok:'si',vOk:'✅ Correcto. lim_{x→2} = −3 y f(2) = −3: coinciden. Se cumple la condición 3.',
         vBad:'Los dos valores son −3 (el límite) y −3 (la función): coinciden. La condición 3 se cumple.'}
 };
 const condState={1:false,2:false,3:false};
@@ -728,7 +743,12 @@ function answerQuiz(qi,oi){
 }
 
 /* ===================== SÍNTESIS ===================== */
-function saveSint(){document.getElementById('sint-done').classList.add('show');DONE.sint=true;updateRuta();}
+function revealSint(n){
+  const ans=document.getElementById('sint-ans-'+n);
+  if(ans)ans.classList.add('show');
+  if(event&&event.target)event.target.classList.add('used');
+  DONE.sint=true;updateRuta();
+}
 
 /* ===================== RUTA ===================== */
 function updateRuta(){

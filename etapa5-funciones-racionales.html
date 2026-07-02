@@ -164,6 +164,13 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 .sint-ta{width:100%;min-height:72px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);resize:vertical;background:var(--g50)}
 .sint-ta:focus{outline:none;border-color:var(--warn);background:var(--white)}
 .sint-fill{display:inline-block;min-width:120px;border-bottom:2px dashed var(--g300);color:var(--warn);font-weight:700}
+.sint-item{margin:16px 0;padding-bottom:16px;border-bottom:1px solid var(--g100)}
+.sint-item:last-of-type{border-bottom:none}
+.btn-reveal{background:var(--warn-bg);color:#92400e;border:1px solid #fcd34d;padding:8px 18px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-reveal:hover{background:#fde68a}
+.btn-reveal.used{opacity:.5;pointer-events:none}
+.sint-ans{display:none;margin-top:10px;background:var(--g50);border:1px solid var(--g200);border-left:3px solid var(--ok);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;font-size:14px;color:var(--g700);animation:rise .3s ease both}
+.sint-ans.show{display:block}
 .sint-done{display:none;margin-top:14px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#065f46}
 .sint-done.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
 @media(max-width:520px){
@@ -260,14 +267,22 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 
   <!-- SÍNTESIS -->
   <section class="card" id="sec-sint">
-    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Síntesis: ¿qué cambió en tu cabeza?</h3></div>
-    <p class="card-lead">Ponerlo en palabras lo fija mejor que solo leerlo.</p>
-    <div class="sint-q">Mirando solo la <strong>factorización</strong>, ¿cómo sabés si un valor prohibido del dominio va a ser un <strong>hueco</strong> o una <strong>asíntota vertical</strong>?</div>
-    <textarea class="sint-ta" id="sint1" placeholder="Si el factor del denominador también está en el numerador (se cancela)… Si no se cancela…"></textarea>
-    <div class="sint-q">¿Cuál es el primer paso que hacés siempre al analizar una racional, y por qué es tan importante?</div>
-    <textarea class="sint-ta" id="sint2" placeholder="Lo primero es… porque…"></textarea>
-    <div style="margin-top:14px"><button class="btn btn-next" onclick="saveSint()">Guardar mi reflexión ✓</button></div>
-    <div class="sint-done" id="sint-done"><span>🎉</span><div><strong>¡Etapa 5 completa!</strong> Ya sabés analizar una racional de punta a punta y, sobre todo, distinguir hueco de asíntota. Ese hueco que aparece al cancelar un factor es una <strong>discontinuidad evitable</strong> — el concepto central de la próxima y última etapa: continuidad.</div></div>
+    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Para fijar las ideas</h3></div>
+    <p class="card-lead">Pensá tu respuesta primero y después comparala con la nuestra. Es la mejor forma de consolidar lo que viste.</p>
+
+    <div class="sint-item">
+      <div class="sint-q">Mirando solo la <strong>factorización</strong>, ¿cómo sabés si un valor prohibido del dominio va a ser un <strong>hueco</strong> o una <strong>asíntota vertical</strong>?</div>
+      <button class="btn btn-reveal" onclick="revealSint(1)">Ver respuesta</button>
+      <div class="sint-ans" id="sint-ans-1">Mirás si el factor que se anula en el denominador <strong>también está en el numerador</strong>. Si <strong>se cancela</strong> (aparece arriba y abajo) → es un <strong>hueco</strong> (discontinuidad evitable): la función "casi" está definida ahí, solo le falta ese punto. Si <strong>no se cancela</strong> (queda solo en el denominador) → es una <strong>asíntota vertical</strong>: la función se dispara a ±∞. La factorización es la que revela cuál de los dos es.</div>
+    </div>
+
+    <div class="sint-item">
+      <div class="sint-q">¿Cuál es el primer paso que hacés siempre al analizar una racional, y por qué es tan importante?</div>
+      <button class="btn btn-reveal" onclick="revealSint(2)">Ver respuesta</button>
+      <div class="sint-ans" id="sint-ans-2"><strong>Factorizar</strong> numerador y denominador (y, cuando se pueda, simplificar). Es el primer paso porque la forma factorizada es la que te muestra <em>todo</em>: los ceros (numerador), los valores prohibidos del dominio (denominador), cuáles son huecos y cuáles asíntotas (según se cancelen o no). Sin factorizar, estás analizando a ciegas; con la expresión factorizada, cada característica salta a la vista.</div>
+    </div>
+
+    <div class="sint-done show" style="margin-top:18px"><span>🎉</span><div><strong>¡Etapa 5 completa!</strong> Ya sabés analizar una racional de punta a punta y, sobre todo, distinguir hueco de asíntota. Ese hueco que aparece al cancelar un factor es una <strong>discontinuidad evitable</strong> — el concepto central de la próxima y última etapa: continuidad.</div></div>
   </section>
 
 </div></div>
@@ -560,7 +575,12 @@ function answerQuiz(qi,oi){
 }
 
 /* ===================== SÍNTESIS ===================== */
-function saveSint(){document.getElementById('sint-done').classList.add('show');DONE.sint=true;updateRuta();}
+function revealSint(n){
+  const ans=document.getElementById('sint-ans-'+n);
+  if(ans)ans.classList.add('show');
+  if(event&&event.target)event.target.classList.add('used');
+  DONE.sint=true;updateRuta();
+}
 
 /* ===================== RUTA ===================== */
 function updateRuta(){

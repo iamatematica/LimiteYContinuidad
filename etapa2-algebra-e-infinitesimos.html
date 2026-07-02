@@ -190,6 +190,13 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 .sint-ta{width:100%;min-height:72px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:'Outfit',sans-serif;font-size:14px;color:var(--g700);resize:vertical;background:var(--g50)}
 .sint-ta:focus{outline:none;border-color:var(--warn);background:var(--white)}
 .sint-fill{display:inline-block;min-width:120px;border-bottom:2px dashed var(--g300);color:var(--warn);font-weight:700}
+.sint-item{margin:16px 0;padding-bottom:16px;border-bottom:1px solid var(--g100)}
+.sint-item:last-of-type{border-bottom:none}
+.btn-reveal{background:var(--warn-bg);color:#92400e;border:1px solid #fcd34d;padding:8px 18px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-reveal:hover{background:#fde68a}
+.btn-reveal.used{opacity:.5;pointer-events:none}
+.sint-ans{display:none;margin-top:10px;background:var(--g50);border:1px solid var(--g200);border-left:3px solid var(--ok);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;font-size:14px;color:var(--g700);animation:rise .3s ease both}
+.sint-ans.show{display:block}
 .sint-done{display:none;margin-top:14px;background:var(--ok-bg);border:1px solid #6ee7b7;border-radius:var(--r);padding:14px 16px;font-size:14px;color:#065f46}
 .sint-done.show{display:flex;gap:10px;align-items:flex-start;animation:rise .4s ease both}
 @media(max-width:520px){
@@ -432,14 +439,22 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 
   <!-- SÍNTESIS -->
   <section class="card" id="sec-sint">
-    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Síntesis: ¿qué cambió en tu cabeza?</h3></div>
-    <p class="card-lead">Ponerlo en palabras lo fija mejor que solo leerlo.</p>
-    <div class="sint-q">Con tus palabras: ¿por qué para una función "buena" (como un polinomio) alcanza con <strong>reemplazar</strong> para calcular el límite?</div>
-    <textarea class="sint-ta" id="sint1" placeholder="Porque las propiedades garantizan que…"></textarea>
-    <div class="sint-q">¿Qué es un <strong>infinitésimo</strong>, y por qué dividir dos infinitésimos da una indeterminación?</div>
-    <textarea class="sint-ta" id="sint2" placeholder="Un infinitésimo es… Al dividir dos, queda…"></textarea>
-    <div style="margin-top:14px"><button class="btn btn-next" onclick="saveSint()">Guardar mi reflexión ✓</button></div>
-    <div class="sint-done" id="sint-done"><span>🎉</span><div><strong>¡Etapa 2 completa!</strong> Ya tenés las propiedades como herramienta y sabés calcular por sustitución directa. Y entendés que cuando reemplazar da 0/0 (cociente de infinitésimos) hace falta otra cosa — exactamente lo que vas a aprender en la Etapa 3.</div></div>
+    <div class="card-title"><div class="cti ic-sint">🪞</div><h3>Para fijar las ideas</h3></div>
+    <p class="card-lead">Pensá tu respuesta primero y después comparala con la nuestra. Es la mejor forma de consolidar lo que viste.</p>
+
+    <div class="sint-item">
+      <div class="sint-q">Con tus palabras: ¿por qué para una función "buena" (como un polinomio) alcanza con <strong>reemplazar</strong> para calcular el límite?</div>
+      <button class="btn btn-reveal" onclick="revealSint(1)">Ver respuesta</button>
+      <div class="sint-ans" id="sint-ans-1">Porque las <strong>propiedades del límite</strong> (suma, producto, potencia) permiten "meter" el límite dentro de cada operación, y en cada pieza básica el límite de x cuando x → a es simplemente a. Al recomponer, el resultado coincide con evaluar la función en a. Esto vale para polinomios y, en general, para funciones <strong>continuas</strong>: en ellas el límite y el valor coinciden, así que reemplazar funciona.</div>
+    </div>
+
+    <div class="sint-item">
+      <div class="sint-q">¿Qué es un <strong>infinitésimo</strong>, y por qué dividir dos infinitésimos da una indeterminación?</div>
+      <button class="btn btn-reveal" onclick="revealSint(2)">Ver respuesta</button>
+      <div class="sint-ans" id="sint-ans-2">Un <strong>infinitésimo</strong> es una función cuyo límite es <strong>0</strong> en el punto considerado (tiende a cero). Al dividir dos infinitésimos queda 0/0, que es una <strong>indeterminación</strong>: el resultado no está predeterminado porque depende de <em>qué tan rápido</em> cada uno tiende a 0. Pueden dar cualquier valor finito, ∞, o no existir. Por eso 0/0 no es "cero" ni "uno": avisa que hay que reescribir la expresión para decidir.</div>
+    </div>
+
+    <div class="sint-done show" style="margin-top:18px"><span>🎉</span><div><strong>¡Etapa 2 completa!</strong> Ya tenés las propiedades como herramienta y sabés calcular por sustitución directa. Y entendés que cuando reemplazar da 0/0 (cociente de infinitésimos) hace falta otra cosa — exactamente lo que vas a aprender en la Etapa 3.</div></div>
   </section>
 
 </div></div>
@@ -565,11 +580,11 @@ function toggleBlock(k){
 
 /* descomposición paso a paso */
 const DEC=[
-  {label:'Separar suma',math:'lim(x³ + √(18x)) = lim x³ + lim √(18x)',why:'Bloque B: el límite se reparte en la suma.'},
-  {label:'Potencia y raíz',math:'= (lim x)³ + √(lim 18x)',why:'Bloque C: el límite entra en la potencia y en la raíz.'},
-  {label:'Aplicar ladrillos',math:'= (2)³ + √(18·2)',why:'Bloque A: lim x = 2. Y lim 18x = 18·2 = 36 (constante por x).'},
+  {label:'Separar suma',math:'lim_{x→2}(x³ + √(18x)) = lim_{x→2} x³ + lim_{x→2} √(18x)',why:'Bloque B: el límite se reparte en la suma.'},
+  {label:'Potencia y raíz',math:'= (lim_{x→2} x)³ + √(lim_{x→2} 18x)',why:'Bloque C: el límite entra en la potencia y en la raíz.'},
+  {label:'Aplicar ladrillos',math:'= (2)³ + √(18·2)',why:'Bloque A: lim_{x→2} x = 2. Y lim_{x→2} 18x = 18·2 = 36 (constante por x).'},
   {label:'Calcular',math:'= 8 + √36 = 8 + 6',why:'Ya no hay límites pendientes: solo aritmética.'},
-  {label:'Resultado',math:'lim = 14',why:'El límite quedó descompuesto en piezas simples y resueltas con los tres bloques.'}
+  {label:'Resultado',math:'lim_{x→2} = 14',why:'El límite quedó descompuesto en piezas simples y resueltas con los tres bloques.'}
 ];
 function renderDec(){
   const m=document.getElementById('dec-steps');
@@ -611,10 +626,10 @@ function explainInf(){
   exp.classList.add('show');setStates('inf','explain');DONE.inf=true;updateRuta();
 }
 const TESTS={
-  a:{fn:x=>x*x-9,win:{xMin:-5,xMax:5,yMin:-11,yMax:8},pt:3,val:0,yes:true,label:'x² − 9 en x = 3',why:'lim = 3²−9 = 0. Tiende a 0 ⇒ es infinitésimo acá.'},
-  b:{fn:x=>x*x-9,win:{xMin:-5,xMax:5,yMin:-11,yMax:8},pt:0,val:-9,yes:false,label:'x² − 9 en x = 0',why:'lim = 0²−9 = −9 ≠ 0. No tiende a 0 ⇒ no es infinitésimo en x = 0.'},
-  c:{fn:x=>Math.sin(x),win:{xMin:-6,xMax:6,yMin:-2,yMax:2},pt:0,val:0,yes:true,label:'sen x en x = 0',why:'lim = sen 0 = 0. Tiende a 0 ⇒ es infinitésimo en x = 0.'},
-  d:{fn:x=>x-2,win:{xMin:-2,xMax:6,yMin:-4,yMax:4},pt:2,val:0,yes:true,label:'x − 2 en x = 2',why:'lim = 2−2 = 0. Tiende a 0 ⇒ es infinitésimo en x = 2.'}
+  a:{fn:x=>x*x-9,win:{xMin:-5,xMax:5,yMin:-11,yMax:8},pt:3,val:0,yes:true,label:'x² − 9 en x = 3',why:'lim_{x→3} = 3²−9 = 0. Tiende a 0 ⇒ es infinitésimo acá.'},
+  b:{fn:x=>x*x-9,win:{xMin:-5,xMax:5,yMin:-11,yMax:8},pt:0,val:-9,yes:false,label:'x² − 9 en x = 0',why:'lim_{x→0} = 0²−9 = −9 ≠ 0. No tiende a 0 ⇒ no es infinitésimo en x = 0.'},
+  c:{fn:x=>Math.sin(x),win:{xMin:-6,xMax:6,yMin:-2,yMax:2},pt:0,val:0,yes:true,label:'sen x en x = 0',why:'lim_{x→0} = sen 0 = 0. Tiende a 0 ⇒ es infinitésimo en x = 0.'},
+  d:{fn:x=>x-2,win:{xMin:-2,xMax:6,yMin:-4,yMax:4},pt:2,val:0,yes:true,label:'x − 2 en x = 2',why:'lim_{x→2} = 2−2 = 0. Tiende a 0 ⇒ es infinitésimo en x = 2.'}
 };
 let GT;
 function testInf(k,btn){
@@ -627,7 +642,7 @@ function testInf(k,btn){
   GT.point(t.pt,t.val,true,t.yes?'#059669':'#dc2626',6);
   const v=document.getElementById('test-verdict');
   v.className='verdict '+(t.yes?'yes':'no');
-  v.innerHTML=(t.yes?'✅ Es infinitésimo':'❌ No es infinitésimo')+' &nbsp;·&nbsp; lim = '+fmt(t.val);
+  v.innerHTML=(t.yes?'✅ Es infinitésimo':'❌ No es infinitésimo')+' &nbsp;·&nbsp; lim_{x→'+fmt(t.pt)+'} = '+fmt(t.val);
   document.getElementById('test-why').textContent=t.why;
 }
 
@@ -638,7 +653,7 @@ const QUIZ=[
    {t:'14',ok:true,fb:'Correcto: por propiedades, (2)³ + √(18·2) = 8 + √36 = 8 + 6 = 14.'},
    {t:'No existe',ok:false,fb:'Sí existe: es un polinomio más una raíz, ambos "buenos" en x = 2. Reemplazando: 8 + 6 = 14.'},
    {t:'10',ok:false,fb:'Revisá la raíz: √(18·2) = √36 = 6, no 2. Total: 8 + 6 = 14.'},
-   {t:'2',ok:false,fb:'Ese es solo lim x. Falta elevar al cubo y sumar la raíz: 8 + 6 = 14.'}
+   {t:'2',ok:false,fb:'Ese es solo lim_{x→2} x. Falta elevar al cubo y sumar la raíz: 8 + 6 = 14.'}
   ]},
  {q:'¿Qué es un infinitésimo en un punto x₀?',
   opts:[
@@ -653,6 +668,20 @@ const QUIZ=[
    {t:'Da 0/0: el atajo no sirve, hay que reescribir (próxima etapa).',ok:true,fb:'Correcto. Numerador y denominador son infinitésimos en x = 1: su cociente es 0/0, indeterminado. Se trabaja en la Etapa 3.'},
    {t:'Da 16, como en el ejemplo de la recta.',ok:false,fb:'No: acá numerador y denominador se anulan en x = 1. Queda 0/0, no un número directo.'},
    {t:'El límite no existe porque hay un cociente.',ok:false,fb:'Que haya cociente no impide el límite. Da 0/0 (indeterminado), pero reescribiendo se resuelve: el límite existe.'}
+  ]},
+ {q:'¿Cuál de estas igualdades es una <strong>propiedad válida</strong> del límite (para funciones con límite finito)?',
+  opts:[
+   {t:'El límite de una suma es la suma de los límites.',ok:true,fb:'Correcto: lim(f + g) = lim f + lim g. Lo mismo vale para resta, producto y (con denominador ≠ 0) cociente. Por eso podemos separar.'},
+   {t:'El límite de una suma es el producto de los límites.',ok:false,fb:'No: la suma va con suma. El producto de los límites corresponde al límite de un PRODUCTO, no de una suma.'},
+   {t:'El límite del producto es la suma de los límites.',ok:false,fb:'Al revés de lo que parece: lim(f·g) = lim f · lim g (producto con producto). La suma corresponde a la suma.'},
+   {t:'El límite de una constante por f es esa constante al cuadrado por lim f.',ok:false,fb:'No: lim(k·f) = k · lim f. La constante sale multiplicando tal cual, no al cuadrado.'}
+  ]},
+ {q:'Sabiendo que sen(x) siempre está entre −1 y 1, ¿cuánto vale <span class="lim">lim</span><sub>x→∞</sub> sen(x)/x?',
+  opts:[
+   {t:'No existe, porque sen(x) oscila para siempre.',ok:false,fb:'Aunque sen(x) oscile, está ACOTADO entre −1 y 1, y se divide por x que crece sin límite. El cociente se aplasta hacia 0.'},
+   {t:'0: una función acotada dividida por algo que tiende a ∞ tiende a 0.',ok:true,fb:'Exacto. sen(x) nunca se escapa de [−1, 1], así que sen(x)/x queda atrapado entre −1/x y 1/x, y ambos tienden a 0. Acotada / ∞ → 0.'},
+   {t:'1, por el límite trigonométrico fundamental.',ok:false,fb:'Cuidado: sen(x)/x → 1 vale cuando x → 0, no cuando x → ∞. Acá x tiende a infinito: el resultado es 0.'},
+   {t:'Infinito, porque se divide por x.',ok:false,fb:'Al dividir por x GRANDE el resultado se hace chico, no grande. Y el numerador está acotado. El límite es 0.'}
   ]}
 ];
 const quizState=QUIZ.map(()=>({answered:false}));
@@ -680,7 +709,12 @@ function answerQuiz(qi,oi){
 }
 
 /* ===================== SÍNTESIS ===================== */
-function saveSint(){document.getElementById('sint-done').classList.add('show');DONE.sint=true;updateRuta();}
+function revealSint(n){
+  const ans=document.getElementById('sint-ans-'+n);
+  if(ans)ans.classList.add('show');
+  if(event&&event.target)event.target.classList.add('used');
+  DONE.sint=true;updateRuta();
+}
 
 /* ===================== RUTA ===================== */
 function updateRuta(){

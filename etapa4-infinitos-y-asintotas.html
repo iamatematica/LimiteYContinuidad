@@ -129,6 +129,22 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 .case-card{background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .2s;text-align:center}
 .case-card:hover{border-color:var(--blue);background:#f0f7ff}
 .case-card.on{border-color:var(--blue);background:#eff6ff;box-shadow:var(--sh)}
+.xcases{margin-top:18px}
+.xcases-head{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.xcases-sub{font-size:13px;color:var(--g600);margin-bottom:14px}
+.xcase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:820px){.xcase-grid{grid-template-columns:1fr}}
+.xcase{background:#fff;border:1.5px solid var(--g200);border-radius:var(--r);padding:12px;display:flex;flex-direction:column}
+.xcase-title{font-size:13.5px;font-weight:800;color:var(--navy);margin-bottom:2px}
+.xcase-fn{font-family:'Courier New',monospace;font-size:13px;color:var(--blue);font-weight:700;margin-bottom:8px}
+.xcase-cv{background:#f8fbff;border:1px solid var(--g200);border-radius:8px;overflow:hidden;margin-bottom:8px}
+.xcase-cv canvas{display:block;width:100%;height:auto}
+.xcase-desc{font-size:12.5px;color:var(--g600);line-height:1.5;margin-top:auto}
+.xcase-desc strong{color:var(--navy)}
+.xcase-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:50px;margin-bottom:8px}
+.xb-inf{background:#fef3c7;color:#b45309}
+.xb-one{background:#dbeafe;color:#1d4ed8}
+.xb-far{background:#e9d5ff;color:#7c2d92}
 .case-deg{font-family:'Courier New',monospace;font-weight:700;color:var(--navy);font-size:15px;margin-bottom:6px}
 .case-name{font-size:12px;color:var(--g500);font-weight:600}
 .case-detail{display:none;margin-top:16px;background:var(--navy);border-radius:var(--r);padding:16px 18px;color:#e0f2fe;animation:rise .35s ease both}
@@ -389,7 +405,7 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
     <div class="def-grid">
       <div class="def-card def-v"><h4><span class="badge">V</span>Vertical</h4><div style="font-size:13px;color:var(--g600)">La recta x = a, si la función se dispara al infinito al acercarse a a.</div><div class="def-eq"><span class="lim">lim</span><sub>x→a</sub> f(x) = ∞ &nbsp;⇒&nbsp; x = a</div></div>
       <div class="def-card def-h"><h4><span class="badge">H</span>Horizontal</h4><div style="font-size:13px;color:var(--g600)">La recta y = L, si la función tiende a L cuando x se va al infinito.</div><div class="def-eq"><span class="lim">lim</span><sub>x→∞</sub> f(x) = L &nbsp;⇒&nbsp; y = L</div></div>
-      <div class="def-card def-o"><h4><span class="badge">O</span>Oblicua</h4><div style="font-size:13px;color:var(--g600)">La recta y = mx + b, cuando no hay horizontal pero la curva se "pega" a una recta inclinada.</div><div class="def-eq">m = <span class="lim">lim</span> f(x)/x &nbsp;·&nbsp; b = <span class="lim">lim</span> [f(x) − mx]</div></div>
+      <div class="def-card def-o"><h4><span class="badge">O</span>Oblicua</h4><div style="font-size:13px;color:var(--g600)">La recta y = mx + b, cuando no hay horizontal pero la curva se "pega" a una recta inclinada.</div><div class="def-eq">m = <span class="lim">lim</span><sub>x→∞</sub> f(x)/x &nbsp;·&nbsp; b = <span class="lim">lim</span><sub>x→∞</sub> [f(x) − mx]</div><div style="font-size:12px;color:var(--g500);margin-top:8px">con m finito y m ≠ 0</div></div>
     </div>
 
     <p style="margin-top:18px;font-size:14.5px;color:var(--g700)"><strong>Ejemplo trabajado — asíntota oblicua.</strong> Busquemos las asíntotas de <span class="frac"><span class="fnum">2x²</span><span class="fden">x + 3</span></span>. Avanzá paso a paso:</p>
@@ -545,7 +561,7 @@ const II_STEPS=[
   {label:'Dividir',math:'÷ x⁵ arriba y abajo (la mayor potencia)',why:'Dividimos cada término por x⁵, el grado más alto presente.'},
   {label:'Simplificar',math:'(2 + 5/x² − 6/x⁴ + 8/x⁵) / (4 − 2/x⁴ + 1/x⁵)',why:'Cada término con x en el denominador tiende a 0 cuando x → ∞ (recordá: k/x → 0).'},
   {label:'Evaluar',math:'(2 + 0 − 0 + 0) / (4 − 0 + 0) = 2/4',why:'Quedan solo los coeficientes principales: 2 y 4.'},
-  {label:'Resultado',math:'lim = 1/2',why:'Grados iguales ⇒ el límite es el cociente de los coeficientes principales.'}
+  {label:'Resultado',math:'lim_{x→∞} = 1/2',why:'Grados iguales ⇒ el límite es el cociente de los coeficientes principales.'}
 ];
 function revealIISteps(){
   const mount=document.getElementById('ii-steps');
@@ -562,9 +578,9 @@ function explainII(){
   exp.classList.add('show');setStates('ii','explain');DONE.ii=true;updateRuta();
 }
 const CASES={
-  mayor:{ex:'lim (2x⁵ + …) / (4x³ − …)',res:'= +∞',why:'El numerador tiene mayor grado: "gana" y el cociente se dispara. (Sería −∞ si los signos de los coeficientes principales fueran opuestos.)'},
-  igual:{ex:'lim (2x⁵ + …) / (4x⁵ − …)',res:'= 2/4 = 1/2',why:'Mismo grado arriba y abajo: el límite es el cociente de los coeficientes principales. Acá 2/4.'},
-  menor:{ex:'lim (4x³ − …) / (2x⁵ + …)',res:'= 0',why:'El denominador tiene mayor grado: "gana" y arrastra el cociente a 0.'}
+  mayor:{ex:'lim_{x→∞} (2x⁵ + …) / (4x³ − …)',res:'= +∞',why:'El numerador tiene mayor grado: "gana" y el cociente se dispara. (Sería −∞ si los signos de los coeficientes principales fueran opuestos.)'},
+  igual:{ex:'lim_{x→∞} (2x⁵ + …) / (4x⁵ − …)',res:'= 2/4 = 1/2',why:'Mismo grado arriba y abajo: el límite es el cociente de los coeficientes principales. Acá 2/4.'},
+  menor:{ex:'lim_{x→∞} (4x³ − …) / (2x⁵ + …)',res:'= 0',why:'El denominador tiene mayor grado: "gana" y arrastra el cociente a 0.'}
 };
 function showCase(k,el){
   document.querySelectorAll('#ii-cases .case-card').forEach(c=>c.classList.remove('on'));
@@ -589,8 +605,57 @@ function explainCross(){
   if(p==='si'){h+=`<p>Exacto. La curva cruza y = 2 en x = 2 (el punto rojo), y solo se <em>aproxima</em> a la recta cuando x → ±∞.</p>`;}
   else{h+=`<p>Es la respuesta intuitiva, pero falla. Mirá: la curva <strong>cruza</strong> y = 2 en x = 2 (punto rojo). Lo que vale para las verticales no vale para las horizontales.</p>`;}
   h+=`<div class="bigidea"><strong>La distinción clave.</strong> Una asíntota <strong>vertical</strong> no se cruza porque la función no está definida en ese punto. Pero una asíntota <strong>horizontal</strong> (u <strong>oblicua</strong>) describe solo el comportamiento <em>en el infinito</em>: para x finito la curva puede cruzarla cuantas veces quiera.</p></div>`;
+  h+=`<div class="xcases">
+    <div class="xcases-head">¿Cuándo ocurre esto? Tres casos típicos</div>
+    <div class="xcases-sub">No es un capricho raro: hay situaciones bien identificables donde la curva cruza su asíntota horizontal. Mirá los tres patrones más frecuentes.</div>
+    <div class="xcase-grid">
+      <div class="xcase">
+        <div class="xcase-badge xb-inf">cruza ∞ veces</div>
+        <div class="xcase-title">1. Oscilación amortiguada</div>
+        <div class="xcase-fn">f(x) = sen(x) / x</div>
+        <div class="xcase-cv"><canvas id="xcv1" width="300" height="220"></canvas></div>
+        <div class="xcase-desc">Tiende a <strong>y = 0</strong>, pero oscila: cada vez que sen(x) = 0 (en x = ±π, ±2π…) <strong>cruza</strong> la asíntota. La amplitud se achica, pero los cruces no terminan nunca.</div>
+      </div>
+      <div class="xcase">
+        <div class="xcase-badge xb-one">cruza 1 vez</div>
+        <div class="xcase-title">2. Racional con cero arriba</div>
+        <div class="xcase-fn">f(x) = x / (x² + 1)</div>
+        <div class="xcase-cv"><canvas id="xcv2" width="300" height="220"></canvas></div>
+        <div class="xcase-desc">Tiende a <strong>y = 0</strong>. Como el numerador se anula en x = 0, la curva <strong>cruza</strong> ahí: sube a un máximo, baja, y se aproxima a 0 desde el otro lado.</div>
+      </div>
+      <div class="xcase">
+        <div class="xcase-badge xb-far">cruza 1 vez</div>
+        <div class="xcase-title">3. Cruce lejos del origen</div>
+        <div class="xcase-fn">f(x) = (x²−2x+3)/(x²+1)</div>
+        <div class="xcase-cv"><canvas id="xcv3" width="300" height="220"></canvas></div>
+        <div class="xcase-desc">Tiende a <strong>y = 1</strong>. Viene desde arriba, <strong>cruza</strong> la asíntota en x = 1, y después se acerca a 1 desde abajo. El cruce no tiene por qué estar en el origen.</div>
+      </div>
+    </div>
+  </div>`;
   document.getElementById('expbody-cross').innerHTML=h;
   exp.classList.add('show');setStates('cross','explain');DONE.cross=true;updateRuta();
+  drawXCases();
+}
+
+function drawXCases(){
+  // Caso 1: sen(x)/x — AH y=0, cruza infinitas veces
+  const g1=new GraphPlotter('xcv1',{xMin:-12,xMax:12,yMin:-0.4,yMax:1.15});
+  g1.clear();g1.drawGrid();g1.drawAxes();
+  g1.hLine(0,'y = 0','#0ea5e9');
+  g1.plot(x=>Math.abs(x)<1e-6?1:Math.sin(x)/x,'#1d6fcc',2.4);
+  [Math.PI,2*Math.PI,3*Math.PI,-Math.PI,-2*Math.PI,-3*Math.PI].forEach(xc=>g1.point(xc,0,true,'#dc2626',4));
+  // Caso 2: x/(x²+1) — AH y=0, cruza en x=0
+  const g2=new GraphPlotter('xcv2',{xMin:-8,xMax:8,yMin:-0.65,yMax:0.65});
+  g2.clear();g2.drawGrid();g2.drawAxes();
+  g2.hLine(0,'y = 0','#0ea5e9');
+  g2.plot(x=>x/(x*x+1),'#1d6fcc',2.4);
+  g2.point(0,0,true,'#dc2626',5);
+  // Caso 3: (x²−2x+3)/(x²+1) — AH y=1, cruza en x=1
+  const g3=new GraphPlotter('xcv3',{xMin:-6,xMax:10,yMin:-0.3,yMax:3.3});
+  g3.clear();g3.drawGrid();g3.drawAxes();
+  g3.hLine(1,'y = 1','#0ea5e9');
+  g3.plot(x=>(x*x-2*x+3)/(x*x+1),'#1d6fcc',2.4);
+  g3.point(1,1,true,'#dc2626',5);
 }
 
 /* ===================== ASÍNTOTA OBLICUA (worked) ===================== */
@@ -598,8 +663,8 @@ const OB_STEPS=[
   {label:'Dominio',math:'x + 3 ≠ 0  ⇒  x ≠ −3',why:'El denominador se anula en −3: ahí no está definida.'},
   {label:'Vertical',math:'lim_{x→−3} 2x²/(x+3) = ∞  ⇒  x = −3',why:'Al acercarse a −3 el denominador → 0 y la función se dispara: asíntota vertical x = −3.'},
   {label:'Horizontal',math:'lim_{x→∞} 2x²/(x+3) = ∞  ⇒  no hay AH',why:'El numerador tiene mayor grado: el límite es ∞, así que no hay asíntota horizontal. Buscamos oblicua.'},
-  {label:'Pendiente m',math:'m = lim 2x²/[x(x+3)] = lim 2x²/(x²+3x) = 2',why:'m = lim f(x)/x. Grados iguales ⇒ cociente de coeficientes principales = 2.'},
-  {label:'Ordenada b',math:'b = lim [2x²/(x+3) − 2x] = lim (−6x)/(x+3) = −6',why:'b = lim [f(x) − mx]. Operando queda −6.'},
+  {label:'Pendiente m',math:'m = lim_{x→∞} 2x²/[x(x+3)] = lim_{x→∞} 2x²/(x²+3x) = 2',why:'m = lim_{x→∞} f(x)/x. Grados iguales ⇒ cociente de coeficientes principales = 2.'},
+  {label:'Ordenada b',math:'b = lim_{x→∞} [2x²/(x+3) − 2x] = lim_{x→∞} (−6x)/(x+3) = −6',why:'b = lim_{x→∞} [f(x) − mx]. Operando queda −6.'},
   {label:'Resultado',math:'Oblicua: y = 2x − 6   ·   Vertical: x = −3',why:'La curva se "pega" a la recta y = 2x − 6 en el infinito, y se dispara en x = −3.'}
 ];
 function renderOb(){
@@ -643,6 +708,20 @@ const QUIZ=[
    {t:'3/5.',ok:true,fb:'Correcto: grados iguales ⇒ cociente de coeficientes principales, 3/5.'},
    {t:'∞.',ok:false,fb:'El numerador no domina: los grados son iguales (2 y 2). El límite es finito, 3/5.'},
    {t:'0.',ok:false,fb:'0 sería si el denominador tuviera mayor grado. Acá los grados empatan: da 3/5.'}
+  ]},
+ {q:'¿Dónde tiene una <strong>asíntota vertical</strong> la función f(x) = (x + 1)/(x − 3)?',
+  opts:[
+   {t:'En x = 3, donde se anula el denominador (y no el numerador).',ok:true,fb:'Correcto. El denominador x − 3 se anula en x = 3, pero el numerador ahí vale 4 ≠ 0: la función se dispara a ±∞. Asíntota vertical en x = 3.'},
+   {t:'En x = −1, donde se anula el numerador.',ok:false,fb:'En x = −1 se anula el NUMERADOR: eso da un cero de la función (corta el eje x), no una asíntota vertical. La asíntota está donde se anula el denominador.'},
+   {t:'En y = 1, porque es el cociente de coeficientes.',ok:false,fb:'Eso sería la asíntota HORIZONTAL (y = 1). La pregunta es por la vertical, que está en x = 3.'},
+   {t:'No tiene asíntota vertical.',ok:false,fb:'Sí tiene: el denominador se anula en x = 3 sin cancelarse con el numerador. Ahí hay una asíntota vertical.'}
+  ]},
+ {q:'Si al analizar una racional el grado del numerador es <strong>exactamente uno más</strong> que el del denominador, ¿qué tipo de asíntota buscás?',
+  opts:[
+   {t:'Oblicua (y = mx + b): la curva se pega a una recta inclinada.',ok:true,fb:'Correcto. Numerador con grado uno más que el denominador ⇒ no hay horizontal, sino una asíntota OBLICUA. Se halla con m = lim f(x)/x y b = lim [f(x) − mx].'},
+   {t:'Horizontal en y = 0.',ok:false,fb:'La horizontal en y = 0 aparece cuando el numerador tiene MENOR grado. Con grado uno más, la asíntota es oblicua.'},
+   {t:'Horizontal en el cociente de coeficientes.',ok:false,fb:'Eso es cuando los grados son IGUALES. Si el numerador supera por uno al denominador, la asíntota es oblicua, no horizontal.'},
+   {t:'Ninguna: el límite es siempre infinito y no hay asíntota.',ok:false,fb:'Aunque el límite en ±∞ sea infinito, la curva sí se aproxima a una recta inclinada: esa es la asíntota oblicua.'}
   ]}
 ];
 const quizState=QUIZ.map(()=>({answered:false}));
