@@ -88,6 +88,48 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 .btn{padding:11px 24px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:8px}
 .btn-go{background:var(--hint);color:#fff}.btn-go:hover{background:#6d28d9;transform:translateY(-1px)}
 .btn-go.dim{opacity:.45;pointer-events:none}
+/* ===== Teoría racionales (nuevo) ===== */
+.ic-teoria{background:#dbeafe;color:var(--blue)}
+.ic-explora{background:#fef3c7;color:var(--warn)}
+.def-card{background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:15px 18px;margin:14px 0}
+.def-card h4{margin:0 0 6px;color:var(--navy);font-size:15px;display:flex;align-items:center;gap:8px}
+.def-card .badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:var(--blue);color:#fff;font-size:13px;font-weight:800;flex-shrink:0}
+.def-card p{margin:6px 0;color:var(--g700);font-size:14px;line-height:1.6}
+.def-eq{background:var(--white);border:1px solid var(--g200);border-radius:8px;padding:12px 16px;margin:10px 0;font-family:'Courier New',monospace;font-size:15px;color:var(--navy);text-align:center}
+.def-note{font-size:12.5px;color:var(--g500);margin-top:8px}
+.bigidea{background:linear-gradient(90deg,#eff6ff,var(--white));border:1px solid #bfdbfe;border-left:4px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:14px 18px;margin:14px 0;font-size:14px;color:var(--g700);line-height:1.65}
+.bigidea strong{color:var(--navy)}
+/* Tabla de asíntotas horizontales */
+.ah-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+.ah-table th{background:var(--navy);color:#dbeafe;padding:10px 12px;text-align:left;font-weight:600;font-size:12.5px}
+.ah-table td{padding:10px 12px;border-bottom:1px solid var(--g200);vertical-align:top}
+.ah-table tr:last-child td{border-bottom:none}
+.ah-table tr:nth-child(even) td{background:var(--g50)}
+.ah-table .cs{font-family:'Courier New',monospace;color:var(--navy);font-weight:700}
+.ah-ej{background:#eff6ff;border-radius:6px;padding:2px 7px;font-family:'Courier New',monospace;font-size:12px;color:var(--blue);display:inline-block;margin-top:3px}
+/* Exploradores */
+.explora-grid{display:grid;grid-template-columns:minmax(0,560px) 260px;gap:22px;align-items:start;justify-content:center;margin-top:14px}
+@media(max-width:820px){.explora-grid{grid-template-columns:1fr}}
+.explora-cv{background:#f8fbff;border:1px solid var(--g200);border-radius:var(--r);overflow:hidden;max-width:560px;margin:0 auto;width:100%}
+.explora-cv canvas{display:block;width:100%;height:auto}
+.explora-panel{display:flex;flex-direction:column;gap:14px}
+.ctrl{background:var(--g50);border:1px solid var(--g200);border-radius:var(--r);padding:13px 15px}
+.ctrl-title{font-size:11.5px;font-weight:800;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.slider-row{margin-bottom:11px}
+.slider-row:last-child{margin-bottom:0}
+.slider-lab{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:13px;color:var(--g700)}
+.slider-lab b{color:var(--navy)}
+.slider-val{background:var(--blue);color:#fff;padding:2px 10px;border-radius:50px;font-size:12px;font-weight:700;min-width:34px;text-align:center;font-family:'Courier New',monospace}
+.explora-panel input[type=range]{width:100%;accent-color:var(--blue);height:4px;cursor:pointer}
+.explora-fn{background:var(--navy);color:#dbeafe;border-radius:var(--r);padding:11px 14px;font-family:'Courier New',monospace;font-size:13px;text-align:center;word-break:break-word}
+.explora-read{background:var(--white);border:1px solid var(--g200);border-radius:var(--r);padding:11px 14px;font-size:12.5px}
+.exr{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--g100)}
+.exr:last-child{border-bottom:none}
+.exr .k{color:var(--g600)}
+.exr .v{font-family:'Courier New',monospace;font-weight:700;color:var(--navy);font-size:12px}
+.exr .v.av{color:var(--warn)}
+.exr .v.ah{color:var(--teal)}
+.exr .v.hole{color:var(--hint)}
 .btn-ghost{background:var(--g100);color:var(--g700);border:1px solid var(--g200)}.btn-ghost:hover{background:var(--g200)}
 .btn-next{background:var(--navy);color:#bfdbfe}.btn-next:hover{background:var(--blue);color:#fff;transform:translateY(-1px)}
 .lockmsg{font-size:13px;color:var(--hint);margin-top:8px;font-weight:600;display:none}
@@ -207,12 +249,15 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
 <nav class="ruta">
   <div class="container ruta-inner" id="ruta">
     <div class="rstep active" data-go="sec-diag"><span class="rnum">0</span>Idea previa</div>
-    <div class="rstep" data-go="sec-map"><span class="rnum">1</span>El protocolo</div>
-    <div class="rstep" data-go="rung-m1"><span class="rnum">2</span>Resuelto</div>
-    <div class="rstep" data-go="rung-e1"><span class="rnum">3</span>Guiado</div>
-    <div class="rstep" data-go="rung-e2"><span class="rnum">4</span>Solo</div>
-    <div class="rstep" data-go="sec-quiz"><span class="rnum">5</span>Práctica</div>
-    <div class="rstep" data-go="sec-sint"><span class="rnum">6</span>Síntesis</div>
+    <div class="rstep" data-go="sec-teoria"><span class="rnum">1</span>Teoría</div>
+    <div class="rstep" data-go="sec-explora1"><span class="rnum">2</span>Explorar</div>
+    <div class="rstep" data-go="sec-map"><span class="rnum">3</span>El protocolo</div>
+    <div class="rstep" data-go="rung-m1"><span class="rnum">4</span>Resuelto</div>
+    <div class="rstep" data-go="rung-m2"><span class="rnum">5</span>Homográfica</div>
+    <div class="rstep" data-go="rung-e1"><span class="rnum">6</span>Guiado</div>
+    <div class="rstep" data-go="rung-e2"><span class="rnum">7</span>Solo</div>
+    <div class="rstep" data-go="sec-quiz"><span class="rnum">8</span>Práctica</div>
+    <div class="rstep" data-go="sec-sint"><span class="rnum">9</span>Síntesis</div>
   </div>
 </nav>
 
@@ -233,6 +278,128 @@ sup{font-size:.7em;vertical-align:super}sub{font-size:.7em;vertical-align:sub}
       </div>
     </div>
     <div class="diag-note" id="diag-note"><span>📌</span><div>Anotada tu idea. La vas a poder confirmar vos mismo en el primer ejemplo: la clave está en <strong>factorizar y ver qué se cancela</strong>.</div></div>
+  </section>
+
+  <!-- ===================== TEORÍA ===================== -->
+  <section class="card" id="sec-teoria">
+    <div class="card-title"><div class="cti ic-teoria">📖</div><h3>¿Qué es una función racional?</h3></div>
+    <p class="card-lead">Antes de analizar, definamos con precisión el objeto con el que vamos a trabajar y las herramientas que ya venís usando desde las etapas anteriores.</p>
+
+    <div class="def-card">
+      <h4><span class="badge">A</span>Definición</h4>
+      <p>Una <strong>función racional</strong> es un cociente de dos polinomios:</p>
+      <div class="def-eq">f(x) = P(x) / Q(x)&nbsp;&nbsp;&nbsp;con Q(x) ≠ 0</div>
+      <p>donde P(x) (numerador) y Q(x) (denominador) son polinomios. Es la generalización natural de una fracción: en lugar de números, arriba y abajo hay polinomios.</p>
+      <div class="def-note">Ejemplos: <span class="mono">f(x) = (x−1)/(x+2)</span>, <span class="mono">f(x) = x²/(x²−9)</span>, <span class="mono">f(x) = 1/x</span>. Todo polinomio es también racional (con denominador 1).</div>
+    </div>
+
+    <div class="def-card">
+      <h4><span class="badge">B</span>Dominio</h4>
+      <p>Como no se puede dividir por cero, el dominio de una racional es <strong>todos los reales excepto los ceros del denominador</strong>:</p>
+      <div class="def-eq">Dom f = ℝ − { x : Q(x) = 0 }</div>
+      <p>Para hallarlo, resolvés la ecuación Q(x) = 0 y excluís esas raíces. Esos son los <strong>valores prohibidos</strong>, y en cada uno va a pasar algo especial (un hueco o una asíntota vertical, como verás en el punto D).</p>
+    </div>
+
+    <div class="def-card">
+      <h4><span class="badge">C</span>Ceros de la función</h4>
+      <p>Los <strong>ceros</strong> (donde f(x) = 0, es decir donde la curva corta el eje x) son los valores que <strong>anulan el numerador sin anular el denominador</strong>:</p>
+      <div class="def-eq">f(x) = 0&nbsp;&nbsp;⟺&nbsp;&nbsp;P(x) = 0&nbsp;&nbsp;y&nbsp;&nbsp;Q(x) ≠ 0</div>
+      <p>La aclaración importa: si un valor anula numerador y denominador a la vez, no es un cero — ahí hay un hueco (lo vemos ya).</p>
+    </div>
+
+    <div class="def-card" style="border-left:4px solid var(--hint);background:#faf5ff">
+      <h4><span class="badge" style="background:var(--hint)">D</span>El corazón: hueco vs. asíntota vertical</h4>
+      <p>Los valores prohibidos del dominio (ceros del denominador) se dividen en <strong>dos tipos</strong>, y la <strong>factorización</strong> es la que revela cuál es cuál:</p>
+      <div class="bigidea" style="background:linear-gradient(90deg,#f5f3ff,var(--white));border-left-color:var(--hint)">
+        <strong>Si el factor se cancela</strong> (aparece en numerador y denominador) → <strong>HUECO</strong> (discontinuidad evitable). La función "casi" está definida ahí: le falta un solo punto. Es exactamente la <strong>indeterminación 0/0 de la Etapa 3</strong>, donde el límite existía pero había un agujero.<br><br>
+        <strong>Si el factor NO se cancela</strong> (queda solo en el denominador) → <strong>ASÍNTOTA VERTICAL</strong>. La función se dispara a ±∞ al acercarse: los límites laterales (x→a⁺ y x→a⁻) dan +∞ o −∞.
+      </div>
+      <p class="def-note">Por eso el primer paso siempre es <strong>factorizar y simplificar</strong>: sin eso, no podés distinguir un hueco de una asíntota.</p>
+    </div>
+
+    <div class="def-card">
+      <h4><span class="badge">E</span>Asíntota horizontal: las tres formas clásicas</h4>
+      <p>La asíntota horizontal describe hacia dónde tiende la función cuando <span class="mono">x → ∞</span>. Para una racional, depende de <strong>comparar el grado del numerador con el del denominador</strong> (lo que viste en la Etapa 4):</p>
+      <table class="ah-table">
+        <thead><tr><th>Comparación de grados</th><th>Asíntota horizontal</th><th>Ejemplo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>grado(P) &lt; grado(Q)<br><span class="def-note">numerador menor</span></td>
+            <td class="cs">y = 0</td>
+            <td><span class="ah-ej">1/(x+2) → y=0</span></td>
+          </tr>
+          <tr>
+            <td>grado(P) = grado(Q)<br><span class="def-note">grados iguales</span></td>
+            <td class="cs">y = coc. de coef. principales</td>
+            <td><span class="ah-ej">(3x²+1)/(5x²) → y=3/5</span></td>
+          </tr>
+          <tr>
+            <td>grado(P) &gt; grado(Q)<br><span class="def-note">numerador mayor</span></td>
+            <td class="cs">no hay AH</td>
+            <td><span class="ah-ej">si supera por 1 → oblicua</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="def-note">Regla de bolsillo: si abajo "gana" el grado, la función se aplasta hacia y=0; si empatan, se estabiliza en el cociente de coeficientes; si arriba "gana", no hay horizontal (y si es por un solo grado, aparece una oblicua y = mx + b).</p>
+    </div>
+
+    <div class="def-card">
+      <h4><span class="badge">F</span>Caso particular: la función homográfica</h4>
+      <p>Un caso muy frecuente es la <strong>homográfica</strong>, cociente de dos polinomios de grado 1:</p>
+      <div class="def-eq">f(x) = (ax + b) / (cx + d)&nbsp;&nbsp;&nbsp;(c ≠ 0)</div>
+      <p>Como los grados son <strong>iguales</strong> (1 y 1), cae en el caso del medio de la tabla: la asíntota horizontal es el cociente de los coeficientes principales. Y la vertical está donde se anula el denominador:</p>
+      <div class="def-eq">AH: y = a/c&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;AV: x = −d/c</div>
+      <p class="def-note">Ojo: <strong>y = a/c no es una fórmula mágica aparte</strong> — es el mismo "cociente de coeficientes principales" del caso grados iguales. Y <strong>x = −d/c</strong> es simplemente resolver cx + d = 0. Son el método general aplicado a este caso.</p>
+    </div>
+  </section>
+
+  <!-- ===================== EXPLORADOR 1: HOMOGRÁFICA ===================== -->
+  <section class="card" id="sec-explora1">
+    <div class="card-title"><div class="cti ic-explora">🔬</div><h3>Explorador 1 — La homográfica en vivo</h3></div>
+    <p class="card-lead">Moví los coeficientes a, b, c, d y observá cómo se mueven la asíntota horizontal (y = a/c) y la vertical (x = −d/c). Fijate que la curva nunca las toca.</p>
+    <div class="explora-grid">
+      <div class="explora-cv"><canvas id="cv-homo" width="560" height="430"></canvas></div>
+      <div class="explora-panel">
+        <div class="ctrl">
+          <div class="ctrl-title">Coeficientes</div>
+          <div class="slider-row"><div class="slider-lab"><b>a</b><span class="slider-val" id="ho-va">2</span></div><input type="range" id="ho-a" min="-4" max="4" step="1" value="2" oninput="drawHomo()"></div>
+          <div class="slider-row"><div class="slider-lab"><b>b</b><span class="slider-val" id="ho-vb">3</span></div><input type="range" id="ho-b" min="-6" max="6" step="1" value="3" oninput="drawHomo()"></div>
+          <div class="slider-row"><div class="slider-lab"><b>c</b><span class="slider-val" id="ho-vc">1</span></div><input type="range" id="ho-c" min="-4" max="4" step="1" value="1" oninput="drawHomo()"></div>
+          <div class="slider-row"><div class="slider-lab"><b>d</b><span class="slider-val" id="ho-vd">-1</span></div><input type="range" id="ho-d" min="-6" max="6" step="1" value="-1" oninput="drawHomo()"></div>
+        </div>
+        <div class="explora-fn" id="ho-fn">f(x) = (2x + 3)/(x − 1)</div>
+        <div class="explora-read">
+          <div class="exr"><span class="k">Asíntota horizontal</span><span class="v ah" id="ho-ah">y = 2</span></div>
+          <div class="exr"><span class="k">Asíntota vertical</span><span class="v av" id="ho-av">x = 1</span></div>
+          <div class="exr"><span class="k">Dominio</span><span class="v" id="ho-dom">ℝ − {1}</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EXPLORADOR 2: HUECO vs ASÍNTOTA ===================== -->
+  <section class="card" id="sec-explora2">
+    <div class="card-title"><div class="cti ic-explora">🔬</div><h3>Explorador 2 — ¿Hueco o asíntota?</h3></div>
+    <p class="card-lead">Esta función es f(x) = (x − a)(x − b) / [(x − c)(x − b)]. El factor (x − b) está arriba y abajo: se cancela. Moví los sliders y descubrí que en x = b aparece un <strong>hueco</strong> (se canceló), y en x = c una <strong>asíntota vertical</strong> (no se cancela).</p>
+    <div class="def-note" style="background:var(--grisclaro,#f4f6f8);border:1px solid var(--g200);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:var(--g600)">📎 <strong>Es un caso particular:</strong> este ejemplo es una <strong>cuadrática sobre una cuadrática</strong> (grado 2 arriba y abajo), armada a propósito con un factor común para mostrar el fenómeno de la forma más limpia. No representa a <em>todas</em> las racionales — es el caso más chico donde conviven un hueco y una asíntota. El mecanismo (factor que se cancela → hueco; factor que no → asíntota) vale en general, sin importar el grado.</div>
+    <div class="explora-grid">
+      <div class="explora-cv"><canvas id="cv-hole" width="560" height="430"></canvas></div>
+      <div class="explora-panel">
+        <div class="ctrl">
+          <div class="ctrl-title">Raíces</div>
+          <div class="slider-row"><div class="slider-lab"><b>a</b> <span style="font-size:11px;color:var(--g500)">(cero real)</span><span class="slider-val" id="hl-va">-2</span></div><input type="range" id="hl-a" min="-4" max="4" step="1" value="-2" oninput="drawHole()"></div>
+          <div class="slider-row"><div class="slider-lab"><b>b</b> <span style="font-size:11px;color:var(--hint)">(hueco)</span><span class="slider-val" id="hl-vb">2</span></div><input type="range" id="hl-b" min="-4" max="4" step="1" value="2" oninput="drawHole()"></div>
+          <div class="slider-row"><div class="slider-lab"><b>c</b> <span style="font-size:11px;color:var(--warn)">(asíntota)</span><span class="slider-val" id="hl-vc">-1</span></div><input type="range" id="hl-c" min="-4" max="4" step="1" value="-1" oninput="drawHole()"></div>
+        </div>
+        <div class="explora-fn" id="hl-fn">f(x) = (x+2)(x−2)/[(x+1)(x−2)]</div>
+        <div class="explora-read">
+          <div class="exr"><span class="k">Se simplifica a</span><span class="v" id="hl-simp">(x+2)/(x+1)</span></div>
+          <div class="exr"><span class="k">Hueco en</span><span class="v hole" id="hl-hole">x = 2</span></div>
+          <div class="exr"><span class="k">Asíntota vertical</span><span class="v av" id="hl-av">x = −1</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="bigidea" style="margin-top:16px">💡 <strong>Probá esto:</strong> hacé que <b>b</b> y <b>c</b> tengan el mismo valor. Cuando coinciden, el factor que daba asíntota se cancela con otro… y la función cambia por completo. Esa es la sensibilidad de las racionales a su factorización.</div>
   </section>
 
   <!-- PROTOCOLO -->
@@ -348,7 +515,78 @@ class GraphPlotter{
 }
 function fmt(n){if(!isFinite(n))return n>0?'+∞':'−∞';let s=(+n).toFixed(4);s=s.replace(/\.?0+$/,'');s=s.replace('.',',');s=s.replace('-','−');return s;}
 
-const DONE={diag:false,map:true,ladder:false,quiz:false,sint:false};
+/* ===================== EXPLORADOR 1: HOMOGRÁFICA ===================== */
+let Ghomo;
+function drawHomo(){
+  const a=+document.getElementById('ho-a').value, b=+document.getElementById('ho-b').value,
+        c=+document.getElementById('ho-c').value, d=+document.getElementById('ho-d').value;
+  document.getElementById('ho-va').textContent=a;
+  document.getElementById('ho-vb').textContent=b;
+  document.getElementById('ho-vc').textContent=c;
+  document.getElementById('ho-vd').textContent=d;
+  // Fórmula legible
+  const sg=(v,first)=>{const s=v<0?'−':(first?'':'+');const av=Math.abs(v);return (first?s:` ${s} `)+av;};
+  const num=`${a===1?'':a===-1?'−':fmt(a)}x${b!==0?sg(b):''}`;
+  const den=`${c===1?'':c===-1?'−':fmt(c)}x${d!==0?sg(d):''}`;
+  document.getElementById('ho-fn').textContent=`f(x) = (${num})/(${den})`;
+  // Lecturas
+  const ahEl=document.getElementById('ho-ah'), avEl=document.getElementById('ho-av'), domEl=document.getElementById('ho-dom');
+  Ghomo.clear();Ghomo.drawGrid();Ghomo.drawAxes();
+  if(c===0){
+    // No es homográfica: denominador constante → es una recta (o constante)
+    ahEl.textContent='(no aplica)'; avEl.textContent='no hay (c=0)'; domEl.textContent='ℝ';
+    if(d!==0){ Ghomo.plot(x=>(a*x+b)/d,'#1d6fcc',2.6); }
+    const cx=Ghomo.ctx; cx.fillStyle='#b45309'; cx.font='italic 12px Outfit,sans-serif'; cx.textAlign='center';
+    cx.fillText('Con c = 0 no es homográfica (denominador constante)', Ghomo.cx((Ghomo.xMin+Ghomo.xMax)/2), Ghomo.pT+Ghomo.H/2);
+    return;
+  }
+  const ah=a/c, av=-d/c;
+  ahEl.textContent=`y = ${fmt(ah)}`;
+  avEl.textContent=`x = ${fmt(av)}`;
+  domEl.textContent=`ℝ − {${fmt(av)}}`;
+  Ghomo.hLine(ah, `y = ${fmt(ah)}`);
+  Ghomo.vLine(av, `x = ${fmt(av)}`);
+  Ghomo.plot(x=>(a*x+b)/(c*x+d), '#1d6fcc', 2.6, [av]);
+}
+
+/* ===================== EXPLORADOR 2: HUECO vs ASÍNTOTA ===================== */
+let Ghole;
+function drawHole(){
+  const a=+document.getElementById('hl-a').value, b=+document.getElementById('hl-b').value, c=+document.getElementById('hl-c').value;
+  document.getElementById('hl-va').textContent=a;
+  document.getElementById('hl-vb').textContent=b;
+  document.getElementById('hl-vc').textContent=c;
+  const sg=v=>v<0?`+${-v}`:`−${v}`; // (x − raíz): si raíz=−2 → (x+2)
+  const fac=r=>`(x${r===0?'':sg(r)})`;
+  document.getElementById('hl-fn').textContent=`f(x) = ${fac(a)}${fac(b)}/[${fac(c)}${fac(b)}]`;
+  const simpEl=document.getElementById('hl-simp'), holeEl=document.getElementById('hl-hole'), avEl=document.getElementById('hl-av');
+  Ghole.clear();Ghole.drawGrid();Ghole.drawAxes();
+  // f(x) = (x-a)(x-b) / [(x-c)(x-b)]. El (x-b) se cancela SALVO que b===c (entonces (x-b) queda solo abajo → asíntota)
+  const fn=x=>((x-a)*(x-b))/(((x-c)*(x-b)));
+  if(b===c){
+    // El factor (x-b) del numerador se cancela con UNO de los (x-b) abajo... pero hay (x-c)=(x-b) repetido abajo
+    // f = (x-a)(x-b)/[(x-b)(x-b)] = (x-a)/(x-b): ahora x=b es ASÍNTOTA, no hueco
+    simpEl.textContent=`(x${a===0?'':sg(a)})/(x${sg(b)})`;
+    holeEl.textContent='ya no hay';
+    avEl.textContent=`x = ${b}`;
+    Ghole.vLine(b, `x = ${b}`);
+    Ghole.plot(x=>(x-a)/(x-b), '#1d6fcc', 2.6, [b]);
+    const cx=Ghole.ctx; cx.fillStyle='#6d28d9'; cx.font='italic 11.5px Outfit,sans-serif'; cx.textAlign='center';
+    cx.fillText('¡El hueco se volvió asíntota! (b = c)', Ghole.cx((Ghole.xMin+Ghole.xMax)/2), Ghole.pT+14);
+    return;
+  }
+  // Caso normal: hueco en x=b, asíntota en x=c
+  simpEl.textContent=`(x${a===0?'':sg(a)})/(x${sg(c)})`;
+  holeEl.textContent=`x = ${b}`;
+  avEl.textContent=`x = ${c}`;
+  Ghole.vLine(c, `x = ${c}`);
+  Ghole.plot(fn, '#1d6fcc', 2.6, [b,c]);
+  // Dibujar el hueco: altura = simplificada (x-a)/(x-c) en x=b
+  const holeY=(b-a)/(b-c);
+  if(isFinite(holeY)) Ghole.point(b, holeY, false, '#7c3aed', 6);
+}
+
+const DONE={diag:false,teoria:true,explora:true,map:true,ladder:false,quiz:false,sint:false};
 
 /* ===================== DIAGNÓSTICO ===================== */
 function selectDiag(btn){
@@ -362,8 +600,11 @@ const RUNGS=[
  {id:'m1',kind:'worked',scaffold:'Te muestro los 7 pasos',fnHTML:'<span class="frac"><span class="fnum">x³ − 6x² + 11x − 6</span><span class="fden">x² − 2x − 3</span></span>',
   graph:{win:{xMin:-8,xMax:9,yMin:-12,yMax:14},fn:x=>(x*x-3*x+2)/(x+1),va:[-1],ha:null,obl:[1,-4],hole:[3,0.5],xints:[[1,0],[2,0]],yint:[0,2]},
   steps:[
-    {label:'1·Dominio',math:'x² − 2x − 3 = (x+1)(x−3) ≠ 0  ⇒  Dom = ℝ − {−1, 3}',why:'Excluimos los valores que anulan el denominador.'},
-    {label:'2·Factorizar',math:'Numerador: x³−6x²+11x−6 = (x−1)(x−2)(x−3)',why:'Factorizamos arriba y abajo para ver qué factores comparten.'},
+    {label:'1·Dominio',math:'Denominador x² − 2x − 3 = 0.  Sus raíces son x = −1 y x = 3 (lo factorizamos en el paso 2d)  ⇒  Dom = ℝ − {−1, 3}',why:'Excluimos los valores que anulan el denominador. Para hallarlos resolvemos x²−2x−3 = 0.'},
+    {label:'2a·Factorizar: buscar raíz',math:'Numerador x³−6x²+11x−6. Por Gauss, candidatos: ±1, ±2, ±3, ±6 (divisores de −6). Probamos: P(1) = 1−6+11−6 = 0 ✓',why:'Para factorizar un polinomio de grado 3 primero buscamos una raíz entre los divisores del término independiente (Teorema de Gauss). x=1 anula el polinomio: es raíz.'},
+    {label:'2b·Factorizar: dividir',math:'Dividimos x³−6x²+11x−6 ÷ (x−1) = x²−5x+6.  Entonces: x³−6x²+11x−6 = (x−1)(x²−5x+6)',why:'Como x=1 es raíz, (x−1) es factor. Dividiendo (Ruffini o división de polinomios) obtenemos el cociente cuadrático, sin resto.'},
+    {label:'2c·Factorizar: el cuadrático',math:'x²−5x+6 = (x−2)(x−3).  Numerador completo: (x−1)(x−2)(x−3)',why:'El cociente cuadrático se factoriza buscando dos números que multiplicados den 6 y sumados den 5: son 2 y 3.'},
+    {label:'2d·Factorizar denominador',math:'Denominador x²−2x−3 = (x+1)(x−3)',why:'Dos números que multiplicados den −3 y sumados den −2: son −3 y +1.'},
     {label:'3·Simplificar',math:'(x−1)(x−2)(x−3) / [(x+1)(x−3)] = (x−1)(x−2)/(x+1)',why:'Se cancela el factor (x−3), común a numerador y denominador.'},
     {label:'3·Hueco o AV',math:'(x−3) se cancela → HUECO en x=3.  (x+1) NO se cancela → AV en x=−1',why:'★ El paso clave: el factor que se cancela deja un hueco; el que queda en el denominador es asíntota vertical.'},
     {label:'Valor del hueco',math:'En x=3 la simplificada vale (3−1)(3−2)/(3+1) = 1/2  ⇒  hueco (3; 1/2)',why:'El hueco está a la altura que da la función simplificada.'},
@@ -372,6 +613,21 @@ const RUNGS=[
     {label:'6·7·Cierre',math:'Con AV x=−1, oblicua y=x−4, hueco (3;1/2) e intersecciones, armamos el gráfico.',why:'Todo junto da la forma de la curva. Mirá el gráfico y el resumen.'}
   ],
   summary:[['Dominio','ℝ − {−1, 3}'],['Simplificada','(x−1)(x−2)/(x+1)'],['Asíntota vertical','x = −1','va'],['Asíntota horizontal','no tiene','none'],['Asíntota oblicua','y = x − 4'],['Hueco','(3; 1/2)','hole'],['Intersección x','(1;0) y (2;0)'],['Intersección y','(0; 2)']]
+ },
+ {id:'m2',kind:'worked',scaffold:'Otro resuelto: una homográfica',fnHTML:'<span class="frac"><span class="fnum">2x + 3</span><span class="fden">x − 1</span></span>',
+  graph:{win:{xMin:-8,xMax:9,yMin:-8,yMax:11},fn:x=>(2*x+3)/(x-1),va:[1],ha:2,obl:null,hole:null,xints:[[-1.5,0]],yint:[0,-3]},
+  steps:[
+    {label:'1·Dominio',math:'Denominador x − 1 = 0 → x = 1  ⇒  Dom = ℝ − {1}',why:'Se excluye el único valor que anula el denominador.'},
+    {label:'2·Factorizar',math:'2x+3 y x−1 no tienen factores comunes: no se simplifica.',why:'Numerador y denominador ya son de grado 1 y no comparten raíces. Al no cancelarse nada, no habrá hueco.'},
+    {label:'3·Hueco o AV',math:'No hay factor que se cancele. El (x−1) queda en el denominador → ASÍNTOTA VERTICAL en x=1. No hay hueco.',why:'★ Como ningún factor se cancela, el cero del denominador es asíntota, no hueco.'},
+    {label:'4·Asíntota horizontal',math:'Grados iguales (1 y 1) ⇒ AH = cociente de coeficientes principales = 2/1  ⇒  y = 2',why:'Es una homográfica (ax+b)/(cx+d): la AH es a/c = 2/1 = 2. Es el caso "grados iguales" de la tabla.'},
+    {label:'Comprobación (fórmula)',math:'Fórmula homográfica: AH y = a/c = 2/1 = 2  ·  AV x = −d/c = −(−1)/1 = 1 ✓',why:'Las fórmulas rápidas de la homográfica confirman lo que hallamos paso a paso.'},
+    {label:'5·Intersecciones',math:'Eje x (numerador=0): 2x+3=0 → x=−3/2 ⇒ (−3/2; 0).   Eje y: f(0)=3/(−1)=−3 ⇒ (0; −3)',why:'El cero está donde se anula el numerador; la intersección con y es f(0).'},
+    {label:'6·Imagen',math:'La curva nunca alcanza su asíntota horizontal ⇒ Im = ℝ − {2}',why:'Una homográfica toma todos los valores reales salvo el de su AH.'},
+    {label:'7·Signos',math:'Cero en x=−3/2 y AV en x=1.  C⁺: x<−3/2 ó x>1.  C⁻: −3/2<x<1',why:'Analizando el signo de la función en cada intervalo que definen el cero y la asíntota.'},
+    {label:'Cierre',math:'AV x=1, AH y=2, corta en (−3/2;0) y (0;−3). Dos ramas que no tocan las asíntotas.',why:'Todo junto arma la curva. Mirá el gráfico y el resumen.'}
+  ],
+  summary:[['Dominio','ℝ − {1}'],['Simplificada','(2x+3)/(x−1) — no simplifica'],['Asíntota vertical','x = 1','va'],['Asíntota horizontal','y = 2'],['Hueco','no tiene','none'],['Imagen','ℝ − {2}'],['Intersección x','(−3/2; 0)'],['Intersección y','(0; −3)'],['Positividad C⁺','x < −3/2 ó x > 1'],['Negatividad C⁻','−3/2 < x < 1']]
  },
  {id:'e1',kind:'guided',scaffold:'Completás las decisiones',fnHTML:'<span class="frac"><span class="fnum">x − 2</span><span class="fden">x² − 4</span></span>',
   graph:{win:{xMin:-7,xMax:6,yMin:-4,yMax:4},fn:x=>1/(x+2),va:[-2],ha:0,obl:null,hole:[2,0.25],xints:[],yint:[0,0.5]},
@@ -584,7 +840,7 @@ function revealSint(n){
 
 /* ===================== RUTA ===================== */
 function updateRuta(){
-  const map=['diag','map','ladder','ladder','ladder','quiz','sint'];
+  const map=['diag','teoria','explora','map','ladder','ladder','ladder','ladder','quiz','sint'];
   document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('done',DONE[map[i]]));
 }
 var navLock=false, navLockTimer=null;
@@ -599,7 +855,9 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-go]');if(
 document.addEventListener('DOMContentLoaded',()=>{
   renderLadder();
   renderQuiz();
-  const secs=[['sec-diag',0],['sec-map',1],['rung-m1',2],['rung-e1',3],['rung-e2',4],['sec-quiz',5],['sec-sint',6]];
+  Ghomo=new GraphPlotter('cv-homo',{xMin:-8,xMax:8,yMin:-8,yMax:8}); drawHomo();
+  Ghole=new GraphPlotter('cv-hole',{xMin:-7,xMax:7,yMin:-8,yMax:8}); drawHole();
+  const secs=[['sec-diag',0],['sec-teoria',1],['sec-explora1',2],['sec-explora2',2],['sec-map',3],['rung-m1',4],['rung-m2',5],['rung-e1',6],['rung-e2',7],['sec-quiz',8],['sec-sint',9]];
   const obs=new IntersectionObserver(es=>{if(navLock)return;es.forEach(e=>{if(e.isIntersecting){const idx=secs.find(s=>s[0]===e.target.id);if(!idx)return;document.querySelectorAll('#ruta .rstep').forEach((el,i)=>el.classList.toggle('active',i===idx[1]));}});},{rootMargin:'-40% 0px -55% 0px'});
   secs.forEach(s=>{const el=document.getElementById(s[0]);if(el)obs.observe(el);});
 });
